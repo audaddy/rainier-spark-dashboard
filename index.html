@@ -16,7 +16,6 @@
           ink:  { 950:'#050608', 900:'#0b0d11', 800:'#14171c', 700:'#1c2027', 600:'#2a2f38' },
           steel:{ 700:'#1a3057', 600:'#2c4a78', 500:'#3e6aa8', 400:'#6f96c8' },
           ice:  '#a8c4e6',
-          electric: '#1a8cff',
           gold: '#c9a449',
           amber:'#e8b94a',
           green:'#6fb47a',
@@ -285,6 +284,11 @@
 <div class="scanlines" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
+<!-- Classification banner -->
+<div class="bg-emerald-900/95 text-white text-center font-condensed font-bold text-[11px] tracking-[0.18em] uppercase py-1.5 border-b border-black/30">
+  UNCLASSIFIED // FOR OFFICIAL USE ONLY
+</div>
+
 <div x-data="dashboard()" x-cloak class="relative z-10">
 
   <!-- ════════════ TOPBAR ════════════ -->
@@ -372,35 +376,24 @@
 
   <!-- ════════════ CONNECT QUICK-LINKS ════════════ -->
   <div class="border-b border-white/10 bg-ink-950/70 backdrop-blur-sm">
-    <div class="max-w-[1480px] mx-auto px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-end gap-x-5 gap-y-2.5">
-      <span class="inline-flex items-center gap-2 font-condensed font-semibold text-[12px] sm:text-[13px] text-electric tracking-[0.16em] uppercase">
-        <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric shrink-0" fill="currentColor"><path d="M13 2 L4 14 H11 L9 22 L20 9 H13 Z"/></svg>
+    <div class="max-w-[1480px] mx-auto px-4 sm:px-8 py-2.5 flex flex-wrap items-center gap-x-5 gap-y-2.5">
+      <span class="inline-flex items-center gap-2 font-condensed font-semibold text-[12px] sm:text-[13px] text-slate-300 tracking-[0.16em] uppercase">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice shrink-0" fill="currentColor"><path d="M13 2 L4 14 H11 L9 22 L20 9 H13 Z"/></svg>
         Connect with Rainier Spark
       </span>
-      <div class="flex flex-wrap items-center gap-2">
-        <a href="#team" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19v-1a3 3 0 0 0-2.6-3"/></svg>
+      <div class="flex flex-wrap items-center gap-2 sm:ml-auto">
+        <a href="#team" class="inline-flex items-center gap-2 border border-white/15 hover:border-ice hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-slate-200 hover:text-white">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19v-1a3 3 0 0 0-2.6-3"/></svg>
           Team
         </a>
-        <a href="#visit" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        <a href="#visit" class="inline-flex items-center gap-2 border border-white/15 hover:border-ice hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-slate-200 hover:text-white">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
           Location / Hours
         </a>
-        <div class="relative" x-data="orgbox()">
-          <button type="button" @click="open = !open" class="inline-flex items-center gap-2 border border-electric/55 text-electric hover:bg-electric hover:text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase">
-            <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
-            Email Org Box
-          </button>
-          <div x-show="open" x-cloak x-transition.opacity @click.outside="open = false" @keydown.escape.window="open = false"
-            class="absolute right-0 top-full mt-2 z-50 w-[290px] bg-ink-900 border border-electric/40 rounded shadow-xl shadow-black/60 p-3 text-left normal-case">
-            <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-1.5">Rainier Spark · Org Box</div>
-            <div class="flex items-center gap-2">
-              <input type="text" readonly value="62AW.Rainier.Spark@us.af.mil" @focus="$event.target.select()" @click="$event.target.select()" class="flex-1 min-w-0 bg-ink-950 border border-white/10 rounded-sm px-2 py-1.5 font-mono text-[12px] text-electric select-all" />
-              <button type="button" @click="copy()" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-2.5 py-1.5 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors" x-text="copied ? 'Copied' : 'Copy'"></button>
-            </div>
-            <div class="mt-2 font-mono text-[9px] text-slate-500 leading-relaxed">Paste into your email client's To: field.</div>
-          </div>
-        </div>
+        <a href="/cdn-cgi/l/email-protection#6d5b5f2c3a433f0c040304081f433e1d0c1f062d181e430c0b43000401" class="inline-flex items-center gap-2 border border-ice/55 text-ice hover:bg-ice hover:text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+          Email Org Box
+        </a>
       </div>
     </div>
   </div>
@@ -962,7 +955,7 @@
     </div>
 
     <!-- Org box -->
-    <div x-data="orgbox()" class="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] items-center gap-x-5 gap-y-3 mb-12 border border-ice/25 rounded bg-gradient-to-r from-steel-700/35 to-ink-900/85 px-5 sm:px-6 py-4">
+    <div class="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] items-center gap-x-5 gap-y-3 mb-12 border border-ice/25 rounded bg-gradient-to-r from-steel-700/35 to-ink-900/85 px-5 sm:px-6 py-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-sm border border-ice/30 bg-steel-600/25 flex items-center justify-center shrink-0">
           <svg viewBox="0 0 24 24" class="w-5 h-5 text-ice" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
@@ -972,12 +965,11 @@
           <div class="font-condensed font-bold text-white text-base sm:text-lg uppercase tracking-wide leading-none mt-0.5">Reach the whole cell</div>
         </div>
       </div>
-      <button type="button" @click="copy()" :title="copied ? 'Copied!' : 'Click to copy'" class="font-mono text-sm sm:text-[15px] text-ice hover:text-white break-all justify-self-start sm:justify-self-center transition underline decoration-dotted decoration-ice/40 hover:decoration-ice underline-offset-4 cursor-pointer"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dee8ec9f89f08cbfb7b0b7bbacf08daebfacb59eabadf0bfb8f0b3b7b2">[email&#160;protected]</a></button>
-      <button type="button" @click="copy()" class="inline-flex items-center justify-center gap-2 bg-ice hover:bg-white text-ink-950 px-4 py-2 rounded-sm transition-colors font-condensed font-bold text-[12px] tracking-[0.14em] uppercase justify-self-start sm:justify-self-end">
-        <svg x-show="!copied" viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-        <svg x-show="copied" x-cloak viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
-        <span x-text="copied ? 'Copied!' : 'Copy Email'">Copy Email</span>
-      </button>
+      <a href="/cdn-cgi/l/email-protection#12242053453c40737b7c7b77603c41627360795267613c73743c7f7b7e" class="font-mono text-sm sm:text-[15px] text-ice hover:text-white break-all justify-self-start sm:justify-self-center transition underline decoration-dotted decoration-ice/40 hover:decoration-ice underline-offset-4"><span class="__cf_email__" data-cfemail="f4c2c6b5a3daa6959d9a9d9186daa78495869fb48187da9592da999d98">[email&#160;protected]</span></a>
+      <a href="/cdn-cgi/l/email-protection#0a3c384b5d24586b6364636f7824597a6b78614a7f79246b6c24676366" class="inline-flex items-center justify-center gap-2 bg-ice hover:bg-white text-ink-950 px-4 py-2 rounded-sm transition-colors font-condensed font-bold text-[12px] tracking-[0.14em] uppercase justify-self-start sm:justify-self-end">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+        Compose Email
+      </a>
     </div>
 
     <!-- Footer -->
@@ -1222,32 +1214,6 @@
   }, 3000);
 })();
 
-function orgbox() {
-  return {
-    open: false,
-    copied: false,
-    copy() {
-      const email = '62AW.Rainier.Spark@us.af.mil';
-      const done = () => { this.copied = true; setTimeout(() => { this.copied = false; }, 1800); };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(email).then(done).catch(() => this.fallbackCopy(email, done));
-      } else {
-        this.fallbackCopy(email, done);
-      }
-    },
-    fallbackCopy(text, done) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      try { document.execCommand('copy'); done(); } catch (e) {}
-      document.body.removeChild(ta);
-    },
-  };
-}
-
 function dashboard() {
   return {
     activeFilter: 'all',
@@ -1415,7 +1381,7 @@ function dashboard() {
           '<b>Real-time commander dashboard</b> aggregating unit metrics — IOC Nov 26.',
           'Data feeds <b>SafeGuard Wellness App</b> &amp; <b>Pulsar Fatigue Meter</b> for crew-rest decisions.',
         ],
-        lead: 'Maj Williston / Maj Bolling / Maj Jordan', tag: 'PHASE 1: PROCUREMENT',
+        lead: 'Maj Williston / Maj Bolling', tag: 'PHASE 1: PROCUREMENT',
         detail: {
           problem: 'No proactive risk-management tools for biothreat environments, no quantitative physiological status or illness detection, and no sensor data fusion across ground & air operations. Crew-rest decisions historically rely on self-report.',
           solution: 'Opt-in wearables program for aircrews & groundcrews. Fatigue meter + biosensors with presymptomatic detection. Real-time commander dashboard aggregating unit metrics. Drive AF-wide policy changes via operational data.',
