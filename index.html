@@ -1223,7 +1223,7 @@
         <div class="flex gap-2">
           <input type="text" x-model="$store.sparkle.playerName" placeholder="Initials or name" maxlength="20"
             class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
-          <button @click="$store.sparkle.submitScore()" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors">Submit</button>
+          <button @click="$store.sparkle.submitScore()" :disabled="$store.sparkle.submitting" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors disabled:opacity-50">Submit</button>
         </div>
       </div>
 
@@ -1243,7 +1243,7 @@
           </template>
         </div>
         <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.sparkle.leaderboard.length">No scores yet this week — be the first.</div>
-        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Board is stored on this device only.</div>
+        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
       </div>
     </div>
   </div>
@@ -1330,7 +1330,7 @@
         <div class="flex gap-2">
           <input type="text" x-model="$store.zip.playerName" placeholder="Initials or name" maxlength="20"
             class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
-          <button @click="$store.zip.submitScore()" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors">Submit</button>
+          <button @click="$store.zip.submitScore()" :disabled="$store.zip.submitting" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors disabled:opacity-50">Submit</button>
         </div>
       </div>
 
@@ -1350,7 +1350,7 @@
           </template>
         </div>
         <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.zip.leaderboard.length">No times yet today — be the first.</div>
-        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Board is stored on this device only.</div>
+        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
       </div>
     </div>
   </div>
@@ -1972,6 +1972,45 @@ function dashboard() {
   }
 }
 
+/* ── Leaderboard API (shared leaderboards for Sparkle + Zip) ── */
+const LB_API = 'https://rainier-spark-leaderboard.audaddy.workers.dev';
+
+async function fetchLeaderboard(game, period) {
+  try {
+    const res = await fetch(`${LB_API}/leaderboard?game=${game}&period=${encodeURIComponent(period)}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.leaderboard || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function postScore(game, period, name, score, clientId) {
+  try {
+    const res = await fetch(`${LB_API}/leaderboard`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game, period, name, score, clientId }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.leaderboard || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function getClientId(storageKey) {
+  let id;
+  try { id = localStorage.getItem(storageKey); } catch (e) {}
+  if (!id) {
+    id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    try { localStorage.setItem(storageKey, id); } catch (e) {}
+  }
+  return id;
+}
+
 /* ── SPARKLE: daily word game ── */
 document.addEventListener('alpine:init', () => {
   const WORD_BANK = [
@@ -2030,13 +2069,16 @@ document.addEventListener('alpine:init', () => {
     leaderboard: [],
     _lbKey: null,
     _stateKey: null,
+    _clientId: null,
+    submitting: false,
 
     init() {
       this.message = '';
       this._lbKey = 'sparkle-lb-' + isoWeekLabel();
       this._stateKey = 'sparkle-state-' + todayKey();
-      try { this.leaderboard = JSON.parse(localStorage.getItem(this._lbKey) || '[]'); } catch(e) { this.leaderboard = []; }
-      this.leaderboard.sort((a,b) => a.guesses - b.guesses || a.ms - b.ms);
+      this._clientId = getClientId(this._lbKey + '-cid');
+      this.leaderboard = [];
+      fetchLeaderboard('sparkle', isoWeekLabel()).then(lb => { this.leaderboard = lb; });
       // restore today's progress if it exists
       try {
         const saved = JSON.parse(localStorage.getItem(this._stateKey) || 'null');
@@ -2130,12 +2172,14 @@ document.addEventListener('alpine:init', () => {
       }
       this.persist();
     },
-    submitScore() {
+    async submitScore() {
+      if (this.submitting) return;
+      this.submitting = true;
       const name = (this.playerName || 'Anonymous').trim().slice(0,20) || 'Anonymous';
-      this.leaderboard.push({ name, guesses: this.won ? this.curRow+1 : 7, ms: Date.now() });
-      this.leaderboard.sort((a,b) => a.guesses - b.guesses || a.ms - b.ms);
-      this.leaderboard = this.leaderboard.slice(0, 25);
-      try { localStorage.setItem(this._lbKey, JSON.stringify(this.leaderboard)); } catch(e) {}
+      const score = { guesses: this.won ? this.curRow+1 : 7, ms: Date.now() };
+      const updated = await postScore('sparkle', isoWeekLabel(), name, score, this._clientId);
+      if (updated) this.leaderboard = updated;
+      this.submitting = false;
       this.submitted = true;
       this.persist();
     },
@@ -2301,7 +2345,8 @@ document.addEventListener('alpine:init', () => {
     startedAt: null, elapsedMs: 0, timeDisplay: '0:00',
     diffLabel: '', dayLabel: '',
     leaderboard: [],
-    _lbKey: null, _stateKey: null, _timer: null,
+    _lbKey: null, _stateKey: null, _timer: null, _clientId: null,
+    submitting: false,
 
     init() {
       const dk = todayKey();
@@ -2312,8 +2357,9 @@ document.addEventListener('alpine:init', () => {
       this.dayLabel = dk;
       this._lbKey = 'zip-lb-' + dk;
       this._stateKey = 'zip-state-' + dk;
-      try { this.leaderboard = JSON.parse(localStorage.getItem(this._lbKey) || '[]'); } catch(e) { this.leaderboard = []; }
-      this.leaderboard.sort((a,b) => a.timeMs - b.timeMs);
+      this._clientId = getClientId(this._lbKey + '-cid');
+      this.leaderboard = [];
+      fetchLeaderboard('zip', dk).then(lb => { this.leaderboard = lb; });
       try {
         const saved = JSON.parse(localStorage.getItem(this._stateKey) || 'null');
         if (saved && saved.rows === this.rows && saved.cols === this.cols) {
@@ -2448,12 +2494,14 @@ document.addEventListener('alpine:init', () => {
       this.stopTimer();
       this.persist();
     },
-    submitScore() {
+    async submitScore() {
+      if (this.submitting) return;
+      this.submitting = true;
       const name = (this.playerName || 'Anonymous').trim().slice(0,20) || 'Anonymous';
-      this.leaderboard.push({ name, timeMs: this.elapsedMs, timeLabel: this.fmtTime(this.elapsedMs) });
-      this.leaderboard.sort((a,b) => a.timeMs - b.timeMs);
-      this.leaderboard = this.leaderboard.slice(0, 25);
-      try { localStorage.setItem(this._lbKey, JSON.stringify(this.leaderboard)); } catch(e) {}
+      const score = { timeMs: this.elapsedMs, timeLabel: this.fmtTime(this.elapsedMs) };
+      const updated = await postScore('zip', this.dayLabel, name, score, this._clientId);
+      if (updated) this.leaderboard = updated;
+      this.submitting = false;
       this.submitted = true;
       this.persist();
     },
