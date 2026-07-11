@@ -40,6 +40,16 @@ function sortEntries(game, entries) {
   return entries.slice().sort((a, b) => a.timeMs - b.timeMs);
 }
 
+function validScore(game, score) {
+  if (game === 'sparkle') return Number.isFinite(score.guesses) && Number.isFinite(score.ms);
+  return Number.isFinite(score.timeMs);
+}
+
+function isBetter(game, a, b) {
+  if (game === 'sparkle') return a.guesses < b.guesses || (a.guesses === b.guesses && (a.ms || 0) < (b.ms || 0));
+  return a.timeMs < b.timeMs;
+}
+
 function redact(entries) {
   return entries.map(({ clientId, ...rest }) => rest);
 }
@@ -64,7 +74,7 @@ async function handlePost(request, env, origin) {
   }
 
   const { game, period, name, score, clientId } = body || {};
-  if (!GAMES.has(game) || !period || typeof score !== 'object' || score === null) {
+  if (!GAMES.has(game) || !period || typeof score !== 'object' || score === null || !validScore(game, score)) {
     return json({ error: 'invalid payload' }, 400, origin);
   }
 
@@ -72,12 +82,14 @@ async function handlePost(request, env, origin) {
   const raw = await env.LEADERBOARD_KV.get(key);
   const entries = raw ? JSON.parse(raw) : [];
 
-  if (clientId && entries.some((e) => e.clientId === clientId)) {
-    return json({ leaderboard: redact(sortEntries(game, entries).slice(0, MAX_ENTRIES)) }, 200, origin);
-  }
-
   const entry = { name: sanitizeName(name), clientId: clientId || null, ...score };
-  entries.push(entry);
+  // one row per player: resubmits from the same client keep their best score
+  const existing = clientId ? entries.findIndex((e) => e.clientId === clientId) : -1;
+  if (existing !== -1) {
+    if (isBetter(game, entry, entries[existing])) entries[existing] = entry;
+  } else {
+    entries.push(entry);
+  }
   const sorted = sortEntries(game, entries).slice(0, MAX_ENTRIES);
 
   await env.LEADERBOARD_KV.put(key, JSON.stringify(sorted));
