@@ -16,6 +16,7 @@
           ink:  { 950:'#050608', 900:'#0b0d11', 800:'#14171c', 700:'#1c2027', 600:'#2a2f38' },
           steel:{ 700:'#1a3057', 600:'#2c4a78', 500:'#3e6aa8', 400:'#6f96c8' },
           ice:  '#a8c4e6',
+          electric: '#1a8cff',
           gold: '#c9a449',
           amber:'#e8b94a',
           green:'#6fb47a',
@@ -284,11 +285,6 @@
 <div class="scanlines" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
-<!-- Classification banner -->
-<div class="bg-emerald-900/95 text-white text-center font-condensed font-bold text-[11px] tracking-[0.18em] uppercase py-1.5 border-b border-black/30">
-  UNCLASSIFIED // FOR OFFICIAL USE ONLY
-</div>
-
 <div x-data="dashboard()" x-cloak class="relative z-10">
 
   <!-- ════════════ TOPBAR ════════════ -->
@@ -376,24 +372,43 @@
 
   <!-- ════════════ CONNECT QUICK-LINKS ════════════ -->
   <div class="border-b border-white/10 bg-ink-950/70 backdrop-blur-sm">
-    <div class="max-w-[1480px] mx-auto px-4 sm:px-8 py-2.5 flex flex-wrap items-center gap-x-5 gap-y-2.5">
-      <span class="inline-flex items-center gap-2 font-condensed font-semibold text-[12px] sm:text-[13px] text-slate-300 tracking-[0.16em] uppercase">
-        <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice shrink-0" fill="currentColor"><path d="M13 2 L4 14 H11 L9 22 L20 9 H13 Z"/></svg>
+    <div class="max-w-[1480px] mx-auto px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-end gap-x-5 gap-y-2.5">
+      <button type="button" @click="$store.sparkle.openGame()" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Wordle
+      </button>
+      <button type="button" @click="$store.zip.openGame()" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white sm:mr-auto">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M5 5 L14 5 L14 12 L19 12 L19 19"/></svg>
+        Zip
+      </button>
+      <span class="inline-flex items-center gap-2 font-condensed font-semibold text-[12px] sm:text-[13px] text-electric tracking-[0.16em] uppercase">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric shrink-0" fill="currentColor"><path d="M13 2 L4 14 H11 L9 22 L20 9 H13 Z"/></svg>
         Connect with Rainier Spark
       </span>
-      <div class="flex flex-wrap items-center gap-2 sm:ml-auto">
-        <a href="#team" class="inline-flex items-center gap-2 border border-white/15 hover:border-ice hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-slate-200 hover:text-white">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19v-1a3 3 0 0 0-2.6-3"/></svg>
+      <div class="flex flex-wrap items-center gap-2">
+        <a href="#team" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19v-1a3 3 0 0 0-2.6-3"/></svg>
           Team
         </a>
-        <a href="#visit" class="inline-flex items-center gap-2 border border-white/15 hover:border-ice hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-slate-200 hover:text-white">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        <a href="#visit" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
           Location / Hours
         </a>
-        <a href="/cdn-cgi/l/email-protection#6d5b5f2c3a433f0c040304081f433e1d0c1f062d181e430c0b43000401" class="inline-flex items-center gap-2 border border-ice/55 text-ice hover:bg-ice hover:text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
-          Email Org Box
-        </a>
+        <div class="relative" x-data="orgbox()">
+          <button type="button" @click="open = !open" class="inline-flex items-center gap-2 border border-electric/55 text-electric hover:bg-electric hover:text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+            Email Org Box
+          </button>
+          <div x-show="open" x-cloak x-transition.opacity @click.outside="open = false" @keydown.escape.window="open = false"
+            class="absolute right-0 top-full mt-2 z-50 w-[290px] bg-ink-900 border border-electric/40 rounded shadow-xl shadow-black/60 p-3 text-left normal-case">
+            <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-1.5">Rainier Spark · Org Box</div>
+            <div class="flex items-center gap-2">
+              <input type="text" readonly value="62AW.Rainier.Spark@us.af.mil" @focus="$event.target.select()" @click="$event.target.select()" class="flex-1 min-w-0 bg-ink-950 border border-white/10 rounded-sm px-2 py-1.5 font-mono text-[12px] text-electric select-all" />
+              <button type="button" @click="copy()" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-2.5 py-1.5 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors" x-text="copied ? 'Copied' : 'Copy'"></button>
+            </div>
+            <div class="mt-2 font-mono text-[9px] text-slate-500 leading-relaxed">Paste into your email client's To: field.</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -955,7 +970,7 @@
     </div>
 
     <!-- Org box -->
-    <div class="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] items-center gap-x-5 gap-y-3 mb-12 border border-ice/25 rounded bg-gradient-to-r from-steel-700/35 to-ink-900/85 px-5 sm:px-6 py-4">
+    <div x-data="orgbox()" class="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] items-center gap-x-5 gap-y-3 mb-12 border border-ice/25 rounded bg-gradient-to-r from-steel-700/35 to-ink-900/85 px-5 sm:px-6 py-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-sm border border-ice/30 bg-steel-600/25 flex items-center justify-center shrink-0">
           <svg viewBox="0 0 24 24" class="w-5 h-5 text-ice" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
@@ -965,11 +980,12 @@
           <div class="font-condensed font-bold text-white text-base sm:text-lg uppercase tracking-wide leading-none mt-0.5">Reach the whole cell</div>
         </div>
       </div>
-      <a href="/cdn-cgi/l/email-protection#12242053453c40737b7c7b77603c41627360795267613c73743c7f7b7e" class="font-mono text-sm sm:text-[15px] text-ice hover:text-white break-all justify-self-start sm:justify-self-center transition underline decoration-dotted decoration-ice/40 hover:decoration-ice underline-offset-4"><span class="__cf_email__" data-cfemail="f4c2c6b5a3daa6959d9a9d9186daa78495869fb48187da9592da999d98">[email&#160;protected]</span></a>
-      <a href="/cdn-cgi/l/email-protection#0a3c384b5d24586b6364636f7824597a6b78614a7f79246b6c24676366" class="inline-flex items-center justify-center gap-2 bg-ice hover:bg-white text-ink-950 px-4 py-2 rounded-sm transition-colors font-condensed font-bold text-[12px] tracking-[0.14em] uppercase justify-self-start sm:justify-self-end">
-        <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
-        Compose Email
-      </a>
+      <button type="button" @click="copy()" :title="copied ? 'Copied!' : 'Click to copy'" class="font-mono text-sm sm:text-[15px] text-ice hover:text-white break-all justify-self-start sm:justify-self-center transition underline decoration-dotted decoration-ice/40 hover:decoration-ice underline-offset-4 cursor-pointer"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c1f7f38096ef93a0a8afa8a4b3ef92b1a0b3aa81b4b2efa0a7efaca8ad">[email&#160;protected]</a></button>
+      <button type="button" @click="copy()" class="inline-flex items-center justify-center gap-2 bg-ice hover:bg-white text-ink-950 px-4 py-2 rounded-sm transition-colors font-condensed font-bold text-[12px] tracking-[0.14em] uppercase justify-self-start sm:justify-self-end">
+        <svg x-show="!copied" viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        <svg x-show="copied" x-cloak viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
+        <span x-text="copied ? 'Copied!' : 'Copy Email'">Copy Email</span>
+      </button>
     </div>
 
     <!-- Footer -->
@@ -1116,6 +1132,230 @@
 
 </div>
 
+<!-- ════════════ WORD GAME (SPARKLE) ════════════ -->
+<div
+  x-data
+  x-show="$store.sparkle.gameOpen"
+  x-cloak
+  @keydown.escape.window="$store.sparkle.closeGame()"
+  class="fixed inset-0 z-[60] bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+  @click="$store.sparkle.closeGame()"
+  x-transition.opacity
+>
+  <div
+    @click.stop
+    class="bg-ink-800 border border-electric/30 rounded max-w-[480px] w-full max-h-[92vh] overflow-y-auto shadow-2xl"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 scale-95"
+    x-transition:enter-end="opacity-100 scale-100"
+  >
+    <!-- Head -->
+    <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-ink-950/60 sticky top-0 z-10">
+      <div>
+        <div class="font-mono text-[9px] text-electric tracking-[0.2em] uppercase">Rainier Spark · Daily Puzzle</div>
+        <div class="font-condensed font-extrabold text-white text-lg uppercase tracking-wide leading-none mt-0.5">SPARKLE</div>
+      </div>
+      <button @click="$store.sparkle.closeGame()" class="w-8 h-8 flex items-center justify-center rounded-sm border border-white/15 text-slate-400 hover:text-white hover:border-white/40 transition-colors">
+        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="p-5">
+      <!-- Grid -->
+      <div class="grid grid-rows-6 gap-1.5 mb-5 mx-auto" style="width: min(100%, 280px);">
+        <template x-for="(row, ri) in $store.sparkle.rows" :key="ri">
+          <div class="grid grid-cols-5 gap-1.5">
+            <template x-for="(cell, ci) in row" :key="ci">
+              <div
+                class="aspect-square rounded-sm border-2 flex items-center justify-center font-condensed font-extrabold text-xl uppercase transition-all duration-300"
+                :class="{
+                  'border-white/15 text-white': cell.state === 'empty',
+                  'border-white/40 text-white scale-105': cell.state === 'typing',
+                  'bg-green/90 border-green text-ink-950': cell.state === 'correct',
+                  'bg-amber/90 border-amber text-ink-950': cell.state === 'present',
+                  'bg-ink-700 border-ink-600 text-slate-400': cell.state === 'absent',
+                }"
+                x-text="cell.letter"
+              ></div>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <!-- Message -->
+      <div class="h-6 text-center font-condensed font-semibold text-sm tracking-wide uppercase mb-2" :class="$store.sparkle.msgType === 'error' ? 'text-priority' : 'text-ice'" x-text="$store.sparkle.message"></div>
+
+      <!-- Hint -->
+      <div class="flex justify-center mb-3" x-show="!$store.sparkle.gameOver">
+        <button @click="$store.sparkle.hint()" class="inline-flex items-center gap-2 border border-amber/45 hover:border-amber hover:bg-amber/15 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-amber">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .8 1.7v.5h5.6v-.5c0-.7.3-1.3.8-1.7A6 6 0 0 0 12 3Z"/></svg>
+          Hint <span x-show="$store.sparkle.hintsUsed" x-text="'(' + $store.sparkle.hintsUsed + ' used)'"></span>
+        </button>
+      </div>
+
+      <!-- On-screen keyboard -->
+      <div class="space-y-1.5 mb-2" x-show="!$store.sparkle.gameOver">
+        <template x-for="(krow, kri) in $store.sparkle.keyRows" :key="kri">
+          <div class="flex gap-1.5 justify-center">
+            <template x-for="k in krow" :key="k">
+              <button
+                @click="$store.sparkle.pressKey(k)"
+                class="h-11 rounded-sm font-condensed font-bold uppercase transition-colors flex items-center justify-center"
+                :class="[
+                  k === 'ENTER' || k === '⌫' ? 'px-2.5 text-[10px] flex-[1.6]' : 'flex-1 text-sm',
+                  {
+                    'bg-green/80 text-ink-950': $store.sparkle.keyState[k] === 'correct',
+                    'bg-amber/80 text-ink-950': $store.sparkle.keyState[k] === 'present',
+                    'bg-ink-700 text-slate-500': $store.sparkle.keyState[k] === 'absent',
+                    'bg-steel-700/50 text-white hover:bg-steel-600/60': !$store.sparkle.keyState[k],
+                  }
+                ]"
+                x-text="k"
+              ></button>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <!-- Post-game: name entry -->
+      <div x-show="$store.sparkle.gameOver && !$store.sparkle.submitted" class="border-t border-white/10 pt-4 mt-1">
+        <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to this week's board (optional)</div>
+        <div class="flex gap-2">
+          <input type="text" x-model="$store.sparkle.playerName" placeholder="Initials or name" maxlength="20"
+            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
+          <button @click="$store.sparkle.submitScore()" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors">Submit</button>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="border-t border-white/10 pt-4 mt-4">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="font-mono text-[9px] text-ice tracking-[0.18em] uppercase font-bold">This Week's Board</div>
+          <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase" x-text="$store.sparkle.weekLabel"></div>
+        </div>
+        <div class="space-y-1" x-show="$store.sparkle.leaderboard.length">
+          <template x-for="(e, i) in $store.sparkle.leaderboard.slice(0,8)" :key="i">
+            <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-sm bg-ink-950/50 border border-white/5">
+              <span class="font-mono text-[10px] text-slate-500 w-4 shrink-0" x-text="i+1"></span>
+              <span class="font-condensed font-semibold text-white text-sm flex-1 truncate" x-text="e.name"></span>
+              <span class="font-mono text-[10px] text-ice" x-text="e.guesses + '/6'"></span>
+            </div>
+          </template>
+        </div>
+        <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.sparkle.leaderboard.length">No scores yet this week — be the first.</div>
+        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Board is stored on this device only.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ ZIP GAME ════════════ -->
+<div
+  x-data
+  x-show="$store.zip.gameOpen"
+  x-cloak
+  @keydown.escape.window="$store.zip.closeGame()"
+  class="fixed inset-0 z-[60] bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+  @click="$store.zip.closeGame()"
+  x-transition.opacity
+>
+  <div
+    @click.stop
+    class="bg-ink-800 border border-electric/30 rounded max-w-[460px] w-full max-h-[92vh] overflow-y-auto shadow-2xl"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 scale-95"
+    x-transition:enter-end="opacity-100 scale-100"
+  >
+    <!-- Head -->
+    <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-ink-950/60 sticky top-0 z-10">
+      <div>
+        <div class="font-mono text-[9px] text-electric tracking-[0.2em] uppercase" x-text="$store.zip.diffLabel"></div>
+        <div class="font-condensed font-extrabold text-white text-lg uppercase tracking-wide leading-none mt-0.5">ZIP</div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="font-mono text-sm text-ice tabular-nums" x-text="$store.zip.timeDisplay"></div>
+        <button @click="$store.zip.closeGame()" class="w-8 h-8 flex items-center justify-center rounded-sm border border-white/15 text-slate-400 hover:text-white hover:border-white/40 transition-colors">
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="p-5">
+      <!-- Grid -->
+      <div class="mx-auto mb-4" :style="`position:relative; width:${$store.zip.gridPxWidth}px; height:${$store.zip.gridPxHeight}px; touch-action:none;`">
+        <div :style="`display:grid; grid-template-columns: repeat(${$store.zip.cols}, ${$store.zip.cellPx}px); gap:${$store.zip.gapPx}px;`">
+          <template x-for="(cell, i) in $store.zip.cells" :key="i">
+            <div
+              :data-zip-cell="i"
+              @mousedown.prevent="$store.zip.beginDrag(i)"
+              @mouseenter="$store.zip.dragOver(i)"
+              @touchstart.prevent="$store.zip.beginDrag(i)"
+              class="rounded-sm border flex items-center justify-center font-condensed font-bold text-sm uppercase cursor-pointer select-none transition-colors duration-150"
+              :style="`width:${$store.zip.cellPx}px; height:${$store.zip.cellPx}px;`"
+              :class="{
+                'bg-electric text-ink-950 border-electric shadow-[0_0_8px_rgba(26,140,255,0.5)]': $store.zip.pathSet.has(i) && $store.zip.pathArr[$store.zip.pathArr.length-1] === i,
+                'bg-steel-500/70 text-white border-steel-400': $store.zip.pathSet.has(i) && $store.zip.pathArr[$store.zip.pathArr.length-1] !== i,
+                'bg-ink-950/60 border-amber/50 text-amber': !$store.zip.pathSet.has(i) && cell.number !== null,
+                'bg-ink-950/40 border-white/10 text-slate-600': !$store.zip.pathSet.has(i) && cell.number === null,
+              }"
+              x-text="cell.number || ''"
+            ></div>
+          </template>
+        </div>
+        <!-- Maze walls overlay -->
+        <template x-for="(bar, wi) in $store.zip.wallBars" :key="wi">
+          <div class="absolute bg-ice rounded-sm pointer-events-none" :style="`left:${bar.left}px; top:${bar.top}px; width:${bar.width}px; height:${bar.height}px;`"></div>
+        </template>
+      </div>
+      <div class="text-center font-mono text-[9px] text-slate-500 tracking-[0.1em] uppercase mb-1">Drag across tiles, or click ahead to auto-fill</div>
+
+      <!-- Message -->
+      <div class="h-6 text-center font-condensed font-semibold text-sm tracking-wide uppercase mb-3" :class="$store.zip.msgType === 'error' ? 'text-priority' : 'text-ice'" x-text="$store.zip.message"></div>
+
+      <!-- Controls -->
+      <div class="flex gap-2 justify-center mb-2" x-show="!$store.zip.gameOver">
+        <button @click="$store.zip.undo()" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-slate-200 hover:text-white">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+          Undo
+        </button>
+        <button @click="$store.zip.reset()" class="inline-flex items-center gap-2 border border-priority/45 hover:border-priority px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-priority">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 3-6.7M3 3v5h5"/></svg>
+          Reset
+        </button>
+      </div>
+
+      <!-- Post-game: name entry -->
+      <div x-show="$store.zip.gameOver && !$store.zip.submitted" class="border-t border-white/10 pt-4 mt-1">
+        <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to today's board (optional)</div>
+        <div class="flex gap-2">
+          <input type="text" x-model="$store.zip.playerName" placeholder="Initials or name" maxlength="20"
+            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
+          <button @click="$store.zip.submitScore()" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors">Submit</button>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="border-t border-white/10 pt-4 mt-4">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="font-mono text-[9px] text-ice tracking-[0.18em] uppercase font-bold">Today's Board</div>
+          <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase" x-text="$store.zip.dayLabel"></div>
+        </div>
+        <div class="space-y-1" x-show="$store.zip.leaderboard.length">
+          <template x-for="(e, i) in $store.zip.leaderboard.slice(0,8)" :key="i">
+            <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-sm bg-ink-950/50 border border-white/5">
+              <span class="font-mono text-[10px] text-slate-500 w-4 shrink-0" x-text="i+1"></span>
+              <span class="font-condensed font-semibold text-white text-sm flex-1 truncate" x-text="e.name"></span>
+              <span class="font-mono text-[10px] text-ice" x-text="e.timeLabel"></span>
+            </div>
+          </template>
+        </div>
+        <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.zip.leaderboard.length">No times yet today — be the first.</div>
+        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Board is stored on this device only.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Bottom classification banner -->
 <div class="bg-emerald-900/95 text-white text-center font-condensed font-bold text-[11px] tracking-[0.18em] uppercase py-1.5 border-t border-black/30 relative z-10">
   UNCLASSIFIED // FOR OFFICIAL USE ONLY
@@ -1213,6 +1453,32 @@
     countPending.splice(0).forEach(countUpEl);
   }, 3000);
 })();
+
+function orgbox() {
+  return {
+    open: false,
+    copied: false,
+    copy() {
+      const email = '62AW.Rainier.Spark@us.af.mil';
+      const done = () => { this.copied = true; setTimeout(() => { this.copied = false; }, 1800); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(done).catch(() => this.fallbackCopy(email, done));
+      } else {
+        this.fallbackCopy(email, done);
+      }
+    },
+    fallbackCopy(text, done) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    },
+  };
+}
 
 function dashboard() {
   return {
@@ -1381,7 +1647,7 @@ function dashboard() {
           '<b>Real-time commander dashboard</b> aggregating unit metrics — IOC Nov 26.',
           'Data feeds <b>SafeGuard Wellness App</b> &amp; <b>Pulsar Fatigue Meter</b> for crew-rest decisions.',
         ],
-        lead: 'Maj Williston / Maj Bolling', tag: 'PHASE 1: PROCUREMENT',
+        lead: 'Maj Williston / Maj Bolling / Maj Jordan', tag: 'PHASE 1: PROCUREMENT',
         detail: {
           problem: 'No proactive risk-management tools for biothreat environments, no quantitative physiological status or illness detection, and no sensor data fusion across ground & air operations. Crew-rest decisions historically rely on self-report.',
           solution: 'Opt-in wearables program for aircrews & groundcrews. Fatigue meter + biosensors with presymptomatic detection. Real-time commander dashboard aggregating unit metrics. Drive AF-wide policy changes via operational data.',
@@ -1705,6 +1971,510 @@ function dashboard() {
     },
   }
 }
+
+/* ── SPARKLE: daily word game ── */
+document.addEventListener('alpine:init', () => {
+  const WORD_BANK = [
+    "BOARD","LINES","HUMAN","PILOT","MEDIC","TOKEN","FUNDS","PHASE","SCOPE",
+    "GROUP","ISSUE","BRIEF","TEAMS","LEVEL","YIELD","BATCH","TOTAL","FLAGS",
+    "EXIST","CYCLE","FLEET",
+    "REFIT","ROOMS","FLOOR","TABLE","GLASS","FIBER","PARTS","BUILD","STAND",
+    "DESKS","DRONE","TOOLS",
+    "COACH","WEEKS","ADAPT","READY","SLEEP","MODEL","LIGHT","LAMPS","TUBES",
+    "SPEED","COSTS","HOURS","SCALE","MATCH","TRACK","CHIEF","MAJOR",
+    "SPARK","RADIO","PRUSA","TRIPP"
+  ];
+  const KEY_ROWS = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['ENTER','Z','X','C','V','B','N','M','⌫'],
+  ];
+
+  function dayIndex() {
+    const epoch = new Date(Date.UTC(2026, 0, 1));
+    const now = new Date();
+    const utcNow = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.floor((utcNow - epoch.getTime()) / 86400000);
+  }
+  function todayKey() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function isoWeekLabel() {
+    const d = new Date();
+    const target = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = (target.getUTCDay() + 6) % 7;
+    target.setUTCDate(target.getUTCDate() - dayNum + 3);
+    const firstThursday = new Date(Date.UTC(target.getUTCFullYear(), 0, 4));
+    const week = 1 + Math.round(((target - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
+    return `${target.getUTCFullYear()}-W${String(week).padStart(2,'0')}`;
+  }
+
+  Alpine.store('sparkle', {
+    gameOpen: false,
+    answer: WORD_BANK[dayIndex() % WORD_BANK.length],
+    rows: Array.from({length:6}, () => Array.from({length:5}, () => ({letter:'', state:'empty'}))),
+    curRow: 0,
+    guessArr: ['','','','',''],
+    correctPos: [false,false,false,false,false],
+    gameOver: false,
+    won: false,
+    submitted: false,
+    playerName: '',
+    hintsUsed: 0,
+    message: '',
+    msgType: 'info',
+    keyState: {},
+    keyRows: KEY_ROWS,
+    weekLabel: isoWeekLabel(),
+    leaderboard: [],
+    _lbKey: null,
+    _stateKey: null,
+
+    init() {
+      this.message = '';
+      this._lbKey = 'sparkle-lb-' + isoWeekLabel();
+      this._stateKey = 'sparkle-state-' + todayKey();
+      try { this.leaderboard = JSON.parse(localStorage.getItem(this._lbKey) || '[]'); } catch(e) { this.leaderboard = []; }
+      this.leaderboard.sort((a,b) => a.guesses - b.guesses || a.ms - b.ms);
+      // restore today's progress if it exists
+      try {
+        const saved = JSON.parse(localStorage.getItem(this._stateKey) || 'null');
+        if (saved && saved.answer === this.answer) {
+          this.rows = saved.rows;
+          this.curRow = saved.curRow;
+          this.gameOver = saved.gameOver;
+          this.won = saved.won;
+          this.submitted = saved.submitted;
+          this.keyState = saved.keyState;
+          if (this.gameOver) this.message = this.won ? 'SOLVED · ' + this.curRow + '/6' : `ANSWER: ${this.answer}`;
+          this.hintsUsed = saved.hintsUsed || 0;
+          this.correctPos = saved.correctPos || [false,false,false,false,false];
+        }
+      } catch(e) {}
+    },
+    openGame() { this.gameOpen = true; document.body.classList.add('modal-open'); },
+    closeGame() { this.gameOpen = false; document.body.classList.remove('modal-open'); },
+
+    persist() {
+      try {
+        localStorage.setItem(this._stateKey, JSON.stringify({
+          answer: this.answer, rows: this.rows, curRow: this.curRow,
+          gameOver: this.gameOver, won: this.won, submitted: this.submitted, keyState: this.keyState,
+          hintsUsed: this.hintsUsed, correctPos: this.correctPos,
+        }));
+      } catch(e) {}
+    },
+    hint() {
+      if (this.gameOver) return;
+      const emptyIdx = [];
+      for (let i=0;i<5;i++) if (!this.guessArr[i]) emptyIdx.push(i);
+      const candidate = emptyIdx.find(i => !this.correctPos[i]);
+      if (candidate === undefined) {
+        this.flash(emptyIdx.length ? 'Nothing left to hint' : 'Row full — submit first');
+        return;
+      }
+      this.guessArr[candidate] = this.answer[candidate];
+      this.syncRow();
+      this.hintsUsed++;
+      this.persist();
+    },
+
+    pressKey(k) {
+      if (this.gameOver) return;
+      if (k === 'ENTER') { this.submitGuess(); return; }
+      if (k === '⌫') {
+        for (let i=4;i>=0;i--) { if (this.guessArr[i]) { this.guessArr[i] = ''; break; } }
+        this.syncRow();
+        return;
+      }
+      if (/^[A-Z]$/.test(k)) {
+        const idx = this.guessArr.findIndex(c => !c);
+        if (idx !== -1) { this.guessArr[idx] = k; this.syncRow(); }
+      }
+    },
+    syncRow() {
+      const row = this.rows[this.curRow];
+      for (let i=0;i<5;i++) row[i] = { letter: this.guessArr[i] || '', state: this.guessArr[i] ? 'typing' : 'empty' };
+    },
+    flash(msg) { this.message = msg; this.msgType = 'error'; setTimeout(() => { if (this.msgType==='error') this.message=''; }, 1400); },
+    submitGuess() {
+      if (this.guessArr.some(c => !c)) { this.flash('Not enough letters'); return; }
+      const guess = this.guessArr.join('');
+      const answerArr = this.answer.split('');
+      const result = Array(5).fill('absent');
+      const pool = {};
+      answerArr.forEach((ch,i) => { if (guess[i] === ch) { result[i] = 'correct'; } else { pool[ch] = (pool[ch]||0)+1; } });
+      for (let i=0;i<5;i++) {
+        if (result[i] === 'correct') continue;
+        const ch = guess[i];
+        if (pool[ch] > 0) { result[i] = 'present'; pool[ch]--; }
+      }
+      const row = this.rows[this.curRow];
+      for (let i=0;i<5;i++) row[i] = { letter: guess[i], state: result[i] };
+      for (let i=0;i<5;i++) if (result[i] === 'correct') this.correctPos[i] = true;
+      const order = { absent:0, present:1, correct:2 };
+      for (let i=0;i<5;i++) {
+        const ch = guess[i], st = result[i];
+        if (!this.keyState[ch] || order[st] > order[this.keyState[ch]]) this.keyState[ch] = st;
+      }
+      this.msgType = 'info';
+      if (guess === this.answer) {
+        this.won = true; this.gameOver = true;
+        this.message = 'SOLVED · ' + (this.curRow+1) + '/6';
+      } else if (this.curRow === 5) {
+        this.gameOver = true;
+        this.message = `ANSWER: ${this.answer}`;
+      } else {
+        this.curRow++; this.guessArr = ['','','','',''];
+      }
+      this.persist();
+    },
+    submitScore() {
+      const name = (this.playerName || 'Anonymous').trim().slice(0,20) || 'Anonymous';
+      this.leaderboard.push({ name, guesses: this.won ? this.curRow+1 : 7, ms: Date.now() });
+      this.leaderboard.sort((a,b) => a.guesses - b.guesses || a.ms - b.ms);
+      this.leaderboard = this.leaderboard.slice(0, 25);
+      try { localStorage.setItem(this._lbKey, JSON.stringify(this.leaderboard)); } catch(e) {}
+      this.submitted = true;
+      this.persist();
+    },
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const s = Alpine.store('sparkle');
+    if (!s || !s.gameOpen) return;
+    if (e.key === 'Enter') s.pressKey('ENTER');
+    else if (e.key === 'Backspace') s.pressKey('⌫');
+    else if (/^[a-zA-Z]$/.test(e.key)) s.pressKey(e.key.toUpperCase());
+  });
+
+  Alpine.store('sparkle').init();
+});
+
+/* ── ZIP: daily path puzzle ── */
+document.addEventListener('alpine:init', () => {
+  function mulberry32(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function hashStr(s) { let h = 0; for (let i=0;i<s.length;i++) h = (Math.imul(31,h) + s.charCodeAt(i)) | 0; return h; }
+  function todayKey() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  const WEEKDAY_NAMES = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  // Mon=0 .. Sun=6 difficulty ramp
+  const SIZES = [5,5,6,6,7,8,9];
+  const GAPS  = [3,3,4,5,6,8,10];
+  const WALL_PROBS = [0.03,0.05,0.08,0.11,0.15,0.20,0.26];
+
+  function boustrophedon(rows, cols) {
+    const path = [];
+    for (let r=0;r<rows;r++) {
+      if (r % 2 === 0) for (let c=0;c<cols;c++) path.push(r*cols+c);
+      else for (let c=cols-1;c>=0;c--) path.push(r*cols+c);
+    }
+    return path;
+  }
+
+  // "Backbite" algorithm — the standard technique for generating a well-mixed
+  // random Hamiltonian path on a lattice (used in self-avoiding-walk literature).
+  // Always yields a valid full-coverage path; repeated moves fold an endpoint
+  // onto a random lattice-adjacent point elsewhere in the chain, which reliably
+  // produces winding, cornery paths instead of boustrophedon sweeps.
+  function neighborsGrid(cell, rows, cols) {
+    const r = Math.floor(cell/cols), c = cell % cols;
+    const out = [];
+    if (r>0) out.push(cell-cols);
+    if (r<rows-1) out.push(cell+cols);
+    if (c>0) out.push(cell-1);
+    if (c<cols-1) out.push(cell+1);
+    return out;
+  }
+  function backbiteShuffle(initialPath, rows, cols, rng, iterations) {
+    let path = initialPath.slice();
+    const total = path.length;
+    const posOf = new Array(total);
+    path.forEach((cell,i) => posOf[cell] = i);
+    for (let iter=0; iter<iterations; iter++) {
+      const pickHead = rng() < 0.5;
+      if (pickHead) {
+        const endCell = path[0], adjCell = path[1];
+        const nbrs = neighborsGrid(endCell, rows, cols).filter(n => n !== adjCell);
+        if (!nbrs.length) continue;
+        const chosen = nbrs[Math.floor(rng()*nbrs.length)];
+        const j = posOf[chosen];
+        if (j < 1) continue;
+        path = path.slice(0,j).reverse().concat(path.slice(j));
+      } else {
+        const endCell = path[total-1], adjCell = path[total-2];
+        const nbrs = neighborsGrid(endCell, rows, cols).filter(n => n !== adjCell);
+        if (!nbrs.length) continue;
+        const chosen = nbrs[Math.floor(rng()*nbrs.length)];
+        const j = posOf[chosen];
+        if (j > total-2) continue;
+        path = path.slice(0,j+1).concat(path.slice(j+1).reverse());
+      }
+      path.forEach((cell,i) => posOf[cell] = i);
+    }
+    return path;
+  }
+  function generatePath(rows, cols, rng) {
+    const initial = boustrophedon(rows, cols);
+    const iterations = Math.max(300, rows*cols*14);
+    return backbiteShuffle(initial, rows, cols, rng, iterations);
+  }
+
+  function buildPuzzle(dayKey) {
+    const dayIdx = (new Date(dayKey + 'T00:00:00').getDay() + 6) % 7; // Mon=0..Sun=6
+    const rows = SIZES[dayIdx], cols = SIZES[dayIdx];
+    const gap = GAPS[dayIdx];
+    const rng = mulberry32(hashStr('zip-' + dayKey));
+    const path = generatePath(rows, cols, rng);
+    const total = rows*cols;
+    const numWaypoints = Math.max(4, Math.round(total/gap) + 1);
+    const positions = new Set([0, total-1]);
+    for (let k=1;k<numWaypoints-1;k++) positions.add(Math.round((k*(total-1))/(numWaypoints-1)));
+    const sorted = [...positions].sort((a,b)=>a-b);
+    const cellNumber = new Array(total).fill(null);
+    sorted.forEach((pos, k) => { cellNumber[path[pos]] = k+1; });
+    const cells = [];
+    for (let i=0;i<total;i++) cells.push({ row: Math.floor(i/cols), col: i%cols, number: cellNumber[i] });
+
+    // Maze walls: sprinkle blocked edges on grid-adjacent pairs NOT used by the
+    // solution path (so the path always remains solvable), density ramps with day.
+    const wallProb = WALL_PROBS[dayIdx];
+    const pathEdgeKeys = new Set();
+    for (let i=0;i<path.length-1;i++) { const a=path[i], b=path[i+1]; pathEdgeKeys.add(a<b ? a+'-'+b : b+'-'+a); }
+    const walls = [];
+    for (let r=0;r<rows;r++) {
+      for (let c=0;c<cols;c++) {
+        const a = r*cols+c;
+        if (c+1<cols) { const b=a+1; const key=a+'-'+b; if (!pathEdgeKeys.has(key) && rng()<wallProb) walls.push([a,b]); }
+        if (r+1<rows) { const b=a+cols; const key=a+'-'+b; if (!pathEdgeKeys.has(key) && rng()<wallProb) walls.push([a,b]); }
+      }
+    }
+
+    const cellPx = Math.floor(Math.min(48, 340/cols));
+    const gapPx = 3;
+    const wallSetArr = walls.map(([a,b]) => a+'-'+b);
+    const wallBars = walls.map(([a,b]) => {
+      const ra=Math.floor(a/cols), ca=a%cols, rb=Math.floor(b/cols), cb=b%cols;
+      const step = cellPx+gapPx;
+      if (ra === rb) {
+        const rightCol = Math.max(ca,cb);
+        return { left: rightCol*step - gapPx/2 - 1.5, top: ra*step, width: 3, height: cellPx };
+      } else {
+        const bottomRow = Math.max(ra,rb);
+        return { left: ca*step, top: bottomRow*step - gapPx/2 - 1.5, width: cellPx, height: 3 };
+      }
+    });
+    const gridPxWidth = cols*cellPx + (cols-1)*gapPx;
+    const gridPxHeight = rows*cellPx + (rows-1)*gapPx;
+
+    return {
+      rows, cols, total, maxNumber: sorted.length, cells,
+      weekday: WEEKDAY_NAMES[new Date(dayKey+'T00:00:00').getDay()],
+      wallSetArr, wallBars, cellPx, gapPx, gridPxWidth, gridPxHeight,
+    };
+  }
+
+  Alpine.store('zip', {
+    gameOpen: false,
+    rows: 5, cols: 5, total: 25, maxNumber: 1,
+    cells: [],
+    wallSet: new Set(),
+    wallBars: [],
+    cellPx: 48, gapPx: 3, gridPxWidth: 0, gridPxHeight: 0,
+    pathArr: [],
+    pathSet: new Set(),
+    nextNumber: 1,
+    dragging: false,
+    gameOver: false, won: false, submitted: false,
+    playerName: '',
+    message: '', msgType: 'info',
+    startedAt: null, elapsedMs: 0, timeDisplay: '0:00',
+    diffLabel: '', dayLabel: '',
+    leaderboard: [],
+    _lbKey: null, _stateKey: null, _timer: null,
+
+    init() {
+      const dk = todayKey();
+      const puzzle = buildPuzzle(dk);
+      Object.assign(this, puzzle);
+      this.wallSet = new Set(puzzle.wallSetArr);
+      this.diffLabel = `${puzzle.weekday} · ${puzzle.rows}×${puzzle.cols}`;
+      this.dayLabel = dk;
+      this._lbKey = 'zip-lb-' + dk;
+      this._stateKey = 'zip-state-' + dk;
+      try { this.leaderboard = JSON.parse(localStorage.getItem(this._lbKey) || '[]'); } catch(e) { this.leaderboard = []; }
+      this.leaderboard.sort((a,b) => a.timeMs - b.timeMs);
+      try {
+        const saved = JSON.parse(localStorage.getItem(this._stateKey) || 'null');
+        if (saved && saved.rows === this.rows && saved.cols === this.cols) {
+          this.pathArr = saved.pathArr || [];
+          this.pathSet = new Set(this.pathArr);
+          this.nextNumber = saved.nextNumber || 1;
+          this.gameOver = saved.gameOver || false;
+          this.won = saved.won || false;
+          this.submitted = saved.submitted || false;
+          this.elapsedMs = saved.elapsedMs || 0;
+          this.timeDisplay = this.fmtTime(this.elapsedMs);
+          if (this.gameOver) this.message = this.won ? 'SOLVED · ' + this.fmtTime(this.elapsedMs) : '';
+        }
+      } catch(e) {}
+    },
+    openGame() { this.gameOpen = true; document.body.classList.add('modal-open'); if (!this.gameOver && this.pathArr.length) this.startTimer(); },
+    closeGame() { this.gameOpen = false; document.body.classList.remove('modal-open'); this.stopTimer(); },
+
+    fmtTime(ms) { const s = Math.floor(ms/1000); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); },
+    startTimer() {
+      if (this._timer) return;
+      if (!this.startedAt) this.startedAt = Date.now() - this.elapsedMs;
+      this._timer = setInterval(() => {
+        this.elapsedMs = Date.now() - this.startedAt;
+        this.timeDisplay = this.fmtTime(this.elapsedMs);
+      }, 250);
+    },
+    stopTimer() { if (this._timer) { clearInterval(this._timer); this._timer = null; } },
+
+    isAdjacent(a, b) {
+      const ca = this.cells[a], cb = this.cells[b];
+      return Math.abs(ca.row-cb.row) + Math.abs(ca.col-cb.col) === 1;
+    },
+    hasWall(a, b) { const key = a<b ? a+'-'+b : b+'-'+a; return this.wallSet.has(key); },
+    isAdjacentFree(a, b) { return this.isAdjacent(a,b) && !this.hasWall(a,b); },
+    flash(msg) { this.message = msg; this.msgType = 'error'; setTimeout(() => { if (this.msgType==='error') this.message=''; }, 1300); },
+    persist() {
+      try {
+        localStorage.setItem(this._stateKey, JSON.stringify({
+          rows: this.rows, cols: this.cols, pathArr: this.pathArr, nextNumber: this.nextNumber,
+          gameOver: this.gameOver, won: this.won, submitted: this.submitted, elapsedMs: this.elapsedMs,
+        }));
+      } catch(e) {}
+    },
+
+    beginDrag(i) { this.dragging = true; this.interact(i); },
+    dragOver(i) { if (this.dragging) this.interact(i); },
+    endDrag() { this.dragging = false; },
+
+    interact(i) {
+      if (this.gameOver) return;
+      if (this.pathArr.length === 0) {
+        if (this.cells[i].number !== 1) { this.flash('Start on cell 1'); return; }
+        this.pathArr = [i]; this.pathSet = new Set([i]);
+        this.nextNumber = 2;
+        this.startTimer();
+        this.persist();
+        return;
+      }
+      const head = this.pathArr[this.pathArr.length-1];
+      if (i === head) return;
+      if (this.pathSet.has(i)) { this.truncateTo(i); return; }
+      if (this.isAdjacentFree(head, i)) { this.stepTo(i); return; }
+      this.jumpFill(head, i);
+    },
+    stepTo(i) {
+      const num = this.cells[i].number;
+      if (num !== null && num !== this.nextNumber) { this.flash(`Reach ${this.nextNumber} first`); return false; }
+      this.pathArr.push(i); this.pathSet.add(i);
+      if (num !== null) this.nextNumber = num+1;
+      if (this.pathArr.length === this.total) {
+        this.won = true; this.gameOver = true; this.stopTimer();
+        this.message = 'SOLVED · ' + this.fmtTime(this.elapsedMs);
+      }
+      this.persist();
+      return true;
+    },
+    jumpFill(head, target) {
+      const hc = this.cells[head], tc = this.cells[target];
+      const dr = Math.sign(tc.row-hc.row), dc = Math.sign(tc.col-hc.col);
+      if ((dr !== 0 && dc !== 0) || (dr === 0 && dc === 0)) { this.flash('Not in line'); return; }
+      const seq = [];
+      let cur = head;
+      while (cur !== target) {
+        const cc = this.cells[cur];
+        const nr = cc.row+dr, nc = cc.col+dc;
+        if (nr<0 || nr>=this.rows || nc<0 || nc>=this.cols) { this.flash('Blocked'); return; }
+        const nextIdx = nr*this.cols+nc;
+        if (this.pathSet.has(nextIdx)) { this.flash('Blocked'); return; }
+        if (!this.isAdjacentFree(cur, nextIdx)) { this.flash('Wall in the way'); return; }
+        seq.push(nextIdx);
+        cur = nextIdx;
+      }
+      let nn = this.nextNumber;
+      for (const idx of seq) {
+        const num = this.cells[idx].number;
+        if (num !== null) { if (num !== nn) { this.flash(`Reach ${nn} first`); return; } nn = num+1; }
+      }
+      seq.forEach(idx => {
+        this.pathArr.push(idx); this.pathSet.add(idx);
+        const num = this.cells[idx].number; if (num !== null) this.nextNumber = num+1;
+      });
+      if (this.pathArr.length === this.total) {
+        this.won = true; this.gameOver = true; this.stopTimer();
+        this.message = 'SOLVED · ' + this.fmtTime(this.elapsedMs);
+      }
+      this.persist();
+    },
+    truncateTo(i) {
+      const idx = this.pathArr.indexOf(i);
+      if (idx === -1) return;
+      this.pathArr = this.pathArr.slice(0, idx+1);
+      this.pathSet = new Set(this.pathArr);
+      this.nextNumber = this.maxNumberUpTo(this.pathArr);
+      this.persist();
+    },
+    maxNumberUpTo(arr) {
+      let max = 1;
+      arr.forEach(idx => { const n = this.cells[idx].number; if (n && n+1 > max) max = n+1; });
+      return max;
+    },
+    undo() {
+      if (this.gameOver || this.pathArr.length === 0) return;
+      this.pathArr.pop(); this.pathSet = new Set(this.pathArr);
+      this.nextNumber = this.pathArr.length ? this.maxNumberUpTo(this.pathArr) : 1;
+      this.persist();
+    },
+    reset() {
+      this.pathArr = []; this.pathSet = new Set();
+      this.nextNumber = 1; this.gameOver = false; this.won = false; this.submitted = false;
+      this.startedAt = null; this.elapsedMs = 0; this.timeDisplay = '0:00'; this.message = '';
+      this.stopTimer();
+      this.persist();
+    },
+    submitScore() {
+      const name = (this.playerName || 'Anonymous').trim().slice(0,20) || 'Anonymous';
+      this.leaderboard.push({ name, timeMs: this.elapsedMs, timeLabel: this.fmtTime(this.elapsedMs) });
+      this.leaderboard.sort((a,b) => a.timeMs - b.timeMs);
+      this.leaderboard = this.leaderboard.slice(0, 25);
+      try { localStorage.setItem(this._lbKey, JSON.stringify(this.leaderboard)); } catch(e) {}
+      this.submitted = true;
+      this.persist();
+    },
+  });
+
+  document.addEventListener('mouseup', () => { const z = Alpine.store('zip'); if (z) z.endDrag(); });
+  document.addEventListener('touchend', () => { const z = Alpine.store('zip'); if (z) z.endDrag(); });
+  document.addEventListener('touchcancel', () => { const z = Alpine.store('zip'); if (z) z.endDrag(); });
+  document.addEventListener('touchmove', (e) => {
+    const z = Alpine.store('zip');
+    if (!z || !z.dragging) return;
+    const t = e.touches[0];
+    if (!t) return;
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    if (el && el.dataset && el.dataset.zipCell !== undefined) {
+      z.dragOver(parseInt(el.dataset.zipCell, 10));
+    }
+  }, { passive: true });
+
+  Alpine.store('zip').init();
+});
 </script>
 
 </body>
