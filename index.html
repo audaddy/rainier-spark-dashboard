@@ -1189,7 +1189,7 @@
       <div class="flex justify-center mb-3" x-show="!$store.sparkle.gameOver">
         <button @click="$store.sparkle.hint()" class="inline-flex items-center gap-2 border border-amber/45 hover:border-amber hover:bg-amber/15 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-amber">
           <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .8 1.7v.5h5.6v-.5c0-.7.3-1.3.8-1.7A6 6 0 0 0 12 3Z"/></svg>
-          Hint <span x-show="$store.sparkle.hintsUsed" x-text="'(' + $store.sparkle.hintsUsed + ' used)'"></span>
+          Hint <span class="text-amber/60 normal-case tracking-normal">(+1 guess)</span> <span x-show="$store.sparkle.hintsUsed" x-text="'(' + $store.sparkle.hintsUsed + ' used)'"></span>
         </button>
       </div>
 
@@ -1219,30 +1219,39 @@
 
       <!-- Post-game: name entry -->
       <div x-show="$store.sparkle.gameOver && !$store.sparkle.submitted" class="border-t border-white/10 pt-4 mt-1">
-        <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to this week's board (optional)</div>
+        <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to today's board (optional)</div>
         <div class="flex gap-2">
           <input type="text" x-model="$store.sparkle.playerName" placeholder="Initials or name" maxlength="20"
+            @keydown.enter="$store.sparkle.submitScore()"
             class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
           <button @click="$store.sparkle.submitScore()" :disabled="$store.sparkle.submitting" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors disabled:opacity-50">Submit</button>
         </div>
       </div>
 
+      <!-- Post-game: play again -->
+      <div class="flex justify-center mt-3" x-show="$store.sparkle.gameOver">
+        <button @click="$store.sparkle.playAgain()" class="inline-flex items-center gap-2 border border-electric/50 hover:border-electric hover:bg-electric/15 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-electric">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 3-6.7M3 3v5h5"/></svg>
+          Play Again · New Word
+        </button>
+      </div>
+
       <!-- Leaderboard -->
       <div class="border-t border-white/10 pt-4 mt-4">
         <div class="flex items-center justify-between mb-2.5">
-          <div class="font-mono text-[9px] text-ice tracking-[0.18em] uppercase font-bold">This Week's Board</div>
-          <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase" x-text="$store.sparkle.weekLabel"></div>
+          <div class="font-mono text-[9px] text-ice tracking-[0.18em] uppercase font-bold">Today's Board</div>
+          <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase" x-text="$store.sparkle.dayLabel"></div>
         </div>
         <div class="space-y-1" x-show="$store.sparkle.leaderboard.length">
           <template x-for="(e, i) in $store.sparkle.leaderboard.slice(0,8)" :key="i">
             <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-sm bg-ink-950/50 border border-white/5">
               <span class="font-mono text-[10px] text-slate-500 w-4 shrink-0" x-text="i+1"></span>
               <span class="font-condensed font-semibold text-white text-sm flex-1 truncate" x-text="e.name"></span>
-              <span class="font-mono text-[10px] text-ice" x-text="e.guesses + '/6'"></span>
+              <span class="font-mono text-[10px] text-ice" x-text="e.guesses + '/6' + (e.ms ? ' · ' + $store.sparkle.fmtMs(e.ms) : '')"></span>
             </div>
           </template>
         </div>
-        <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.sparkle.leaderboard.length">No scores yet this week — be the first.</div>
+        <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.sparkle.leaderboard.length">No scores yet today — be the first.</div>
         <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
       </div>
     </div>
@@ -1329,9 +1338,18 @@
         <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to today's board (optional)</div>
         <div class="flex gap-2">
           <input type="text" x-model="$store.zip.playerName" placeholder="Initials or name" maxlength="20"
+            @keydown.enter="$store.zip.submitScore()"
             class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
           <button @click="$store.zip.submitScore()" :disabled="$store.zip.submitting" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors disabled:opacity-50">Submit</button>
         </div>
+      </div>
+
+      <!-- Post-game: play again -->
+      <div class="flex justify-center mt-3" x-show="$store.zip.gameOver">
+        <button @click="$store.zip.reset()" class="inline-flex items-center gap-2 border border-electric/50 hover:border-electric hover:bg-electric/15 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-electric">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 3-6.7M3 3v5h5"/></svg>
+          Play Again · Beat Your Time
+        </button>
       </div>
 
       <!-- Leaderboard -->
@@ -2039,16 +2057,6 @@ document.addEventListener('alpine:init', () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
-  function isoWeekLabel() {
-    const d = new Date();
-    const target = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    const dayNum = (target.getUTCDay() + 6) % 7;
-    target.setUTCDate(target.getUTCDate() - dayNum + 3);
-    const firstThursday = new Date(Date.UTC(target.getUTCFullYear(), 0, 4));
-    const week = 1 + Math.round(((target - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
-    return `${target.getUTCFullYear()}-W${String(week).padStart(2,'0')}`;
-  }
-
   Alpine.store('sparkle', {
     gameOpen: false,
     answer: WORD_BANK[dayIndex() % WORD_BANK.length],
@@ -2065,20 +2073,22 @@ document.addEventListener('alpine:init', () => {
     msgType: 'info',
     keyState: {},
     keyRows: KEY_ROWS,
-    weekLabel: isoWeekLabel(),
+    dayLabel: todayKey(),
     leaderboard: [],
     _lbKey: null,
     _stateKey: null,
     _clientId: null,
+    _startTs: null,
+    solveMs: 0,
     submitting: false,
 
     init() {
       this.message = '';
-      this._lbKey = 'sparkle-lb-' + isoWeekLabel();
+      this._lbKey = 'sparkle-lb-' + todayKey();
       this._stateKey = 'sparkle-state-' + todayKey();
       this._clientId = getClientId(this._lbKey + '-cid');
       this.leaderboard = [];
-      fetchLeaderboard('sparkle', isoWeekLabel()).then(lb => { this.leaderboard = lb; });
+      fetchLeaderboard('sparkle', todayKey()).then(lb => { this.leaderboard = lb; });
       // restore today's progress if it exists
       try {
         const saved = JSON.parse(localStorage.getItem(this._stateKey) || 'null');
@@ -2089,7 +2099,9 @@ document.addEventListener('alpine:init', () => {
           this.won = saved.won;
           this.submitted = saved.submitted;
           this.keyState = saved.keyState;
-          if (this.gameOver) this.message = this.won ? 'SOLVED · ' + this.curRow + '/6' : `ANSWER: ${this.answer}`;
+          this._startTs = saved.startTs || null;
+          this.solveMs = saved.solveMs || 0;
+          if (this.gameOver) this.message = this.won ? 'SOLVED · ' + (this.curRow+1) + '/6' + (this.solveMs ? ' · ' + this.fmtMs(this.solveMs) : '') : `ANSWER: ${this.answer}`;
           this.hintsUsed = saved.hintsUsed || 0;
           this.correctPos = saved.correctPos || [false,false,false,false,false];
         }
@@ -2104,6 +2116,7 @@ document.addEventListener('alpine:init', () => {
           answer: this.answer, rows: this.rows, curRow: this.curRow,
           gameOver: this.gameOver, won: this.won, submitted: this.submitted, keyState: this.keyState,
           hintsUsed: this.hintsUsed, correctPos: this.correctPos,
+          startTs: this._startTs, solveMs: this.solveMs,
         }));
       } catch(e) {}
     },
@@ -2132,9 +2145,13 @@ document.addEventListener('alpine:init', () => {
       }
       if (/^[A-Z]$/.test(k)) {
         const idx = this.guessArr.findIndex(c => !c);
-        if (idx !== -1) { this.guessArr[idx] = k; this.syncRow(); }
+        if (idx !== -1) {
+          if (!this._startTs) { this._startTs = Date.now(); this.persist(); }
+          this.guessArr[idx] = k; this.syncRow();
+        }
       }
     },
+    fmtMs(ms) { const s = Math.floor(ms/1000); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); },
     syncRow() {
       const row = this.rows[this.curRow];
       for (let i=0;i<5;i++) row[i] = { letter: this.guessArr[i] || '', state: this.guessArr[i] ? 'typing' : 'empty' };
@@ -2163,9 +2180,11 @@ document.addEventListener('alpine:init', () => {
       this.msgType = 'info';
       if (guess === this.answer) {
         this.won = true; this.gameOver = true;
-        this.message = 'SOLVED · ' + (this.curRow+1) + '/6';
+        this.solveMs = this._startTs ? Date.now() - this._startTs : 0;
+        this.message = 'SOLVED · ' + (this.curRow+1) + '/6' + (this.solveMs ? ' · ' + this.fmtMs(this.solveMs) : '');
       } else if (this.curRow === 5) {
         this.gameOver = true;
+        this.solveMs = this._startTs ? Date.now() - this._startTs : 0;
         this.message = `ANSWER: ${this.answer}`;
       } else {
         this.curRow++; this.guessArr = ['','','','',''];
@@ -2176,11 +2195,28 @@ document.addEventListener('alpine:init', () => {
       if (this.submitting) return;
       this.submitting = true;
       const name = (this.playerName || 'Anonymous').trim().slice(0,20) || 'Anonymous';
-      const score = { guesses: this.won ? this.curRow+1 : 7, ms: Date.now() };
-      const updated = await postScore('sparkle', isoWeekLabel(), name, score, this._clientId);
+      // hints cost +1 guess each so the board stays honest
+      const score = { guesses: (this.won ? this.curRow+1 : 7) + this.hintsUsed, ms: this.solveMs };
+      const updated = await postScore('sparkle', todayKey(), name, score, this._clientId);
       if (updated) this.leaderboard = updated;
       this.submitting = false;
       this.submitted = true;
+      this.persist();
+    },
+    playAgain() {
+      let w = this.answer;
+      while (w === this.answer) w = WORD_BANK[Math.floor(Math.random()*WORD_BANK.length)];
+      this.answer = w;
+      this.rows = Array.from({length:6}, () => Array.from({length:5}, () => ({letter:'', state:'empty'})));
+      this.curRow = 0;
+      this.guessArr = ['','','','',''];
+      this.correctPos = [false,false,false,false,false];
+      this.keyState = {};
+      this.gameOver = false; this.won = false; this.submitted = false;
+      this.hintsUsed = 0;
+      this._startTs = null; this.solveMs = 0;
+      this.message = 'NEW WORD — GO';
+      this.msgType = 'info';
       this.persist();
     },
   });
@@ -2387,7 +2423,11 @@ document.addEventListener('alpine:init', () => {
         this.timeDisplay = this.fmtTime(this.elapsedMs);
       }, 250);
     },
-    stopTimer() { if (this._timer) { clearInterval(this._timer); this._timer = null; } },
+    stopTimer() {
+      if (this._timer) { clearInterval(this._timer); this._timer = null; }
+      if (this.startedAt) { this.elapsedMs = Date.now() - this.startedAt; this.timeDisplay = this.fmtTime(this.elapsedMs); }
+      this.startedAt = null;
+    },
 
     isAdjacent(a, b) {
       const ca = this.cells[a], cb = this.cells[b];
