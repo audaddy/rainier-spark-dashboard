@@ -4,6 +4,15 @@
 <meta charset="utf-8" />
 <title>Rainier Spark · 62d AW Innovation Dashboard</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<!-- Installable app (Add to Home Screen / Install) -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#000000" />
+<link rel="icon" type="image/png" href="icon-192.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="apple-mobile-web-app-title" content="Rainier Spark" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -237,6 +246,11 @@
   .ticker:hover .ticker-track { animation-play-state: paused; }
   @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
+  /* Konami controller (mobile Snake unlock) */
+  .konami-btn { font-size: 13px; line-height: 1; transition: background-color .08s ease; user-select: none; -webkit-tap-highlight-color: transparent; cursor: pointer; }
+  .konami-shake { animation: konami-shake .32s ease; }
+  @keyframes konami-shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-7px); } 40%,80% { transform: translateX(7px); } }
+
   @media (prefers-reduced-motion: reduce) {
     .hud-grid { animation: none; }
     .ticker-track { animation: none; }
@@ -284,26 +298,6 @@
 
 <div class="scanlines" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
-
-<!-- Promotion toast -->
-<div
-  x-data
-  x-show="$store.progress.rankUpFlash"
-  x-cloak
-  x-transition:enter="transition ease-out duration-300"
-  x-transition:enter-start="opacity-0 -translate-y-3"
-  x-transition:enter-end="opacity-100 translate-y-0"
-  x-transition:leave="transition ease-in duration-300"
-  x-transition:leave-start="opacity-100 translate-y-0"
-  x-transition:leave-end="opacity-0 -translate-y-3"
-  class="fixed top-4 left-1/2 -translate-x-1/2 z-[80] bg-ink-800 border border-gold/60 rounded-sm px-5 py-3 shadow-2xl flex items-center gap-3"
->
-  <img class="w-9 h-9 shrink-0 bg-slate-200 rounded-full p-1" alt="" x-show="$store.progress.rankUpFlash" :src="$store.progress.rankUpFlash ? rankGlyph($store.progress.rankUpFlash.code) : ''">
-  <div>
-    <div class="font-mono text-[9px] text-gold tracking-[0.2em] uppercase">Promotion</div>
-    <div class="font-condensed font-bold text-white text-sm uppercase tracking-wide" x-text="$store.progress.rankUpFlash ? $store.progress.rankUpFlash.name : ''"></div>
-  </div>
-</div>
 
 <div x-data="dashboard()" x-cloak class="relative z-10">
 
@@ -372,17 +366,21 @@
       <div class="ticker overflow-hidden flex-1">
         <div class="ticker-track py-2">
           <template x-for="(item, i) in tickerItems" :key="'a'+i">
-            <span class="inline-flex items-center font-mono text-[11px] tracking-[0.08em]">
+            <span class="inline-flex items-center font-mono text-[11px] tracking-[0.08em]"
+              :class="item.m==='ARCADE' ? 'cursor-pointer' : ''"
+              @click="item.m==='ARCADE' && $store.konami.show()">
               <span class="text-ice/40 px-3">◈</span>
               <span class="text-slate-500" x-text="item.m"></span>
-              <span class="text-slate-200 ml-2" x-text="item.e"></span>
+              <span class="ml-2" :class="item.m==='ARCADE' ? 'text-electric underline decoration-dotted underline-offset-2' : 'text-slate-200'" x-text="item.e"></span>
             </span>
           </template>
           <template x-for="(item, i) in tickerItems" :key="'b'+i">
-            <span class="inline-flex items-center font-mono text-[11px] tracking-[0.08em]" aria-hidden="true">
+            <span class="inline-flex items-center font-mono text-[11px] tracking-[0.08em]" aria-hidden="true"
+              :class="item.m==='ARCADE' ? 'cursor-pointer' : ''"
+              @click="item.m==='ARCADE' && $store.konami.show()">
               <span class="text-ice/40 px-3">◈</span>
               <span class="text-slate-500" x-text="item.m"></span>
-              <span class="text-slate-200 ml-2" x-text="item.e"></span>
+              <span class="ml-2" :class="item.m==='ARCADE' ? 'text-electric underline decoration-dotted underline-offset-2' : 'text-slate-200'" x-text="item.e"></span>
             </span>
           </template>
         </div>
@@ -397,15 +395,10 @@
         <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Wordle
       </button>
-      <div class="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-sm border border-white/10 bg-ink-950/50"
-        :title="$store.progress.nextRank ? ($store.progress.nextRank.min - $store.progress.wins) + ' win(s) to ' + $store.progress.nextRank.name : 'Top rank reached'">
-        <img class="w-6 h-6 shrink-0 bg-slate-200 rounded-full p-0.5" alt="" :src="rankGlyph($store.progress.rank.code)">
-        <span class="font-mono text-[10px] text-ice tracking-[0.08em] uppercase" x-text="$store.progress.rank.abbr"></span>
-        <span class="w-px h-4 bg-white/15"></span>
-        <span class="inline-flex items-center gap-1 font-mono text-[10px] text-amber tracking-[0.06em]">
-          <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="currentColor"><path d="M12 2c1 3-1 4-1 6 0 1.3 1 2 2 2 1.5 0 2-1.3 2-2.3 2 2 3 4.6 3 7a6 6 0 0 1-12 0c0-4 2-6 3-8 .6-1.2.5-3-1-4.7 1.7.2 3.3 1 4 3z"/></svg>
-          <span x-text="$store.progress.streak"></span>
-        </span>
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-white/10 bg-ink-950/50"
+        x-show="$store.progress.streak > 0" x-cloak title="Daily win streak">
+        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-amber shrink-0" fill="currentColor"><path d="M12 2c1 3-1 4-1 6 0 1.3 1 2 2 2 1.5 0 2-1.3 2-2.3 2 2 3 4.6 3 7a6 6 0 0 1-12 0c0-4 2-6 3-8 .6-1.2.5-3-1-4.7 1.7.2 3.3 1 4 3z"/></svg>
+        <span class="font-mono text-[10px] text-amber tracking-[0.08em] uppercase"><span x-text="$store.progress.streak"></span> Day Streak</span>
       </div>
       <button type="button" @click="$store.zip.openGame()" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white sm:mr-auto">
         <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M5 5 L14 5 L14 12 L19 12 L19 19"/></svg>
@@ -1404,6 +1397,77 @@
   </div>
 </div>
 
+<!-- ════════════ KONAMI CONTROLLER (tap the code — works on phones) ════════════ -->
+<div
+  x-data
+  x-show="$store.konami.open"
+  x-cloak
+  @keydown.escape.window="$store.konami.hide()"
+  class="fixed inset-0 z-[62] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4"
+  @click="$store.konami.hide()"
+  x-transition.opacity
+>
+  <div @click.stop
+    class="bg-ink-800 border border-electric/30 rounded-xl w-full max-w-[380px] shadow-2xl p-5"
+    :class="$store.konami.shake ? 'konami-shake' : ''"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+  >
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <div class="font-mono text-[9px] text-electric tracking-[0.2em] uppercase">Classified Airlift Ops</div>
+        <div class="font-condensed font-extrabold text-white text-base uppercase tracking-wide leading-none mt-0.5">Enter the Code</div>
+      </div>
+      <button @click="$store.konami.hide()" class="w-7 h-7 flex items-center justify-center rounded-sm border border-white/15 text-slate-400 hover:text-white hover:border-white/40 transition-colors">
+        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <!-- sequence progress / hint -->
+    <div class="flex justify-center gap-1 mb-4">
+      <template x-for="(g, i) in $store.konami.glyphs" :key="i">
+        <span class="w-6 h-6 flex items-center justify-center rounded-sm border text-[11px] font-mono transition-colors"
+          :class="i < $store.konami.progress ? 'bg-electric/25 border-electric text-electric' : 'border-white/12 text-slate-600'"
+          x-text="g"></span>
+      </template>
+    </div>
+
+    <!-- NES-style controller -->
+    <div class="mx-auto bg-[#d8d8d0] rounded-lg border-2 border-[#9a9a92] px-4 pt-3 pb-4" style="max-width:340px;">
+      <div class="mb-3 space-y-1">
+        <div class="h-[3px] bg-[#33333a] rounded-full"></div>
+        <div class="h-[3px] bg-[#33333a] rounded-full"></div>
+      </div>
+      <div class="flex items-center justify-between gap-2">
+        <!-- D-pad -->
+        <div class="grid grid-cols-3 grid-rows-3 gap-0.5" style="width:108px;height:108px;">
+          <span></span>
+          <button @click="$store.konami.press('up')" class="konami-btn bg-[#2b2b30] hover:bg-[#3a3a40] active:bg-electric rounded-sm flex items-center justify-center text-white/80" aria-label="Up">▲</button>
+          <span></span>
+          <button @click="$store.konami.press('left')" class="konami-btn bg-[#2b2b30] hover:bg-[#3a3a40] active:bg-electric rounded-sm flex items-center justify-center text-white/80" aria-label="Left">◀</button>
+          <span class="bg-[#2b2b30]"></span>
+          <button @click="$store.konami.press('right')" class="konami-btn bg-[#2b2b30] hover:bg-[#3a3a40] active:bg-electric rounded-sm flex items-center justify-center text-white/80" aria-label="Right">▶</button>
+          <span></span>
+          <button @click="$store.konami.press('down')" class="konami-btn bg-[#2b2b30] hover:bg-[#3a3a40] active:bg-electric rounded-sm flex items-center justify-center text-white/80" aria-label="Down">▼</button>
+          <span></span>
+        </div>
+        <!-- Select / Start (decorative) -->
+        <div class="flex flex-col items-center gap-1">
+          <div class="w-9 h-2.5 rounded-full bg-[#2b2b30]"></div>
+          <div class="w-9 h-2.5 rounded-full bg-[#2b2b30]"></div>
+          <div class="flex gap-1.5 text-[7px] font-mono text-[#55555c] tracking-wide mt-0.5"><span>SELECT</span><span>START</span></div>
+        </div>
+        <!-- B / A -->
+        <div class="flex items-end gap-2.5" style="transform:rotate(-15deg);">
+          <button @click="$store.konami.press('b')" class="konami-btn w-9 h-9 rounded-full bg-[#a52432] hover:bg-[#c02a3b] active:bg-electric text-white font-bold flex items-center justify-center border-2 border-[#7c1a25]" aria-label="B">B</button>
+          <button @click="$store.konami.press('a')" class="konami-btn w-9 h-9 rounded-full bg-[#a52432] hover:bg-[#c02a3b] active:bg-electric text-white font-bold flex items-center justify-center border-2 border-[#7c1a25]" aria-label="A">A</button>
+        </div>
+      </div>
+    </div>
+    <div class="text-center font-mono text-[9px] text-slate-500 tracking-[0.12em] uppercase mt-3">Tap the classic code to deploy</div>
+  </div>
+</div>
+
 <!-- ════════════ SNAKE (hidden — Konami code) ════════════ -->
 <div
   x-data
@@ -2142,33 +2206,12 @@ function getClientId(storageKey) {
   return id;
 }
 
-/* ── Rank progression (USAF-style ladder, Airman Basic → General) + daily streak ── */
+/* ── Daily win streak ── */
 function dayKeyStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-const RANKS = [
-  { name: 'Airman Basic',          abbr: 'AB',      min: 0,   code: 'E1' },
-  { name: 'Airman',                abbr: 'Amn',     min: 2,   code: 'E2' },
-  { name: 'Airman First Class',    abbr: 'A1C',     min: 5,   code: 'E3' },
-  { name: 'Senior Airman',         abbr: 'SrA',     min: 9,   code: 'E4' },
-  { name: 'Staff Sergeant',        abbr: 'SSgt',    min: 14,  code: 'E5' },
-  { name: 'Technical Sergeant',    abbr: 'TSgt',    min: 20,  code: 'E6' },
-  { name: 'Master Sergeant',       abbr: 'MSgt',    min: 27,  code: 'E7' },
-  { name: 'Senior Master Sergeant',abbr: 'SMSgt',   min: 35,  code: 'E8' },
-  { name: 'Chief Master Sergeant', abbr: 'CMSgt',   min: 44,  code: 'E9' },
-  { name: 'Second Lieutenant',     abbr: '2Lt',     min: 54,  code: 'O1' },
-  { name: 'First Lieutenant',      abbr: '1Lt',     min: 65,  code: 'O2' },
-  { name: 'Captain',               abbr: 'Capt',    min: 77,  code: 'O3' },
-  { name: 'Major',                 abbr: 'Maj',     min: 90,  code: 'O4' },
-  { name: 'Lieutenant Colonel',    abbr: 'Lt Col',  min: 104, code: 'O5' },
-  { name: 'Colonel',               abbr: 'Col',     min: 119, code: 'O6' },
-  { name: 'Brigadier General',     abbr: 'Brig Gen',min: 135, code: 'O7' },
-  { name: 'Major General',         abbr: 'Maj Gen', min: 152, code: 'O8' },
-  { name: 'Lieutenant General',    abbr: 'Lt Gen',  min: 170, code: 'O9' },
-  { name: 'General',               abbr: 'Gen',     min: 190, code: 'O10' },
-];
 
 function starPoints(cx, cy, r) {
   const pts = [];
@@ -2180,38 +2223,6 @@ function starPoints(cx, cy, r) {
   return pts.join(' ');
 }
 
-// Official USAF rank insignia structures (enlisted chevrons E1–E9, officer
-// bars/oak leaves/eagle/stars O1–O10). Returned as data URIs for <img> use.
-const ENLISTED_INSIGNIA = {
-  E1: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"></svg>`,
-  E2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><circle cx="50" cy="52" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
-  E3: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><circle cx="50" cy="56" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
-  E4: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><circle cx="50" cy="60" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
-  E5: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M18 61 C 30 75, 70 75, 82 61 C 70 69, 30 69, 18 61 Z" /><circle cx="50" cy="52" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
-  E6: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M18 59 C 30 73, 70 73, 82 59 C 70 67, 30 67, 18 59 Z" /><path d="M16 67 C 30 81, 70 81, 84 67 C 70 75, 30 75, 16 67 Z" /><circle cx="50" cy="48" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
-  E7: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M50 49 L30 29 L40 19 L50 29 L60 19 L70 29 Z" /><path d="M18 59 C 30 73, 70 73, 82 59 C 70 67, 30 67, 18 59 Z" /><path d="M16 67 C 30 81, 70 81, 84 67 C 70 75, 30 75, 16 67 Z" /><circle cx="50" cy="48" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
-  E8: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M50 49 L30 29 L40 19 L50 29 L60 19 L70 29 Z" /><path d="M50 37 L35 22 L45 12 L50 17 L55 12 L65 22 Z" /><path d="M18 59 C 30 73, 70 73, 82 59 C 70 67, 30 67, 18 59 Z" /><path d="M16 67 C 30 81, 70 81, 84 67 C 70 75, 30 75, 16 67 Z" /><circle cx="50" cy="48" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
-  E9: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M50 49 L30 29 L40 19 L50 29 L60 19 L70 29 Z" /><path d="M50 37 L35 22 L45 12 L50 17 L55 12 L65 22 Z" /><path d="M50 25 L40 15 L50 5 L60 15 Z" /><path d="M18 59 C 30 73, 70 73, 82 59 C 70 67, 30 67, 18 59 Z" /><path d="M16 67 C 30 81, 70 81, 84 67 C 70 75, 30 75, 16 67 Z" /><circle cx="50" cy="48" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`
-};
-
-const OFFICER_INSIGNIA = {
-  O1: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="35" y="15" width="30" height="70" rx="5" fill="#DAA520" stroke="#B8860B" stroke-width="2"/></svg>`,
-  O2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="35" y="15" width="30" height="70" rx="5" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="2"/></svg>`,
-  O3: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="15" width="25" height="70" rx="4" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="2"/><rect x="55" y="15" width="25" height="70" rx="4" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="2"/><rect x="45" y="30" width="10" height="10" fill="#D3D3D3"/><rect x="45" y="60" width="10" height="10" fill="#D3D3D3"/></svg>`,
-  O4: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#DAA520"><path d="M50 15 C40 30 25 35 25 55 C25 70 40 75 48 80 L48 90 L52 90 L52 80 C60 75 75 70 75 55 C75 35 60 30 50 15 Z" /></svg>`,
-  O5: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><path d="M50 15 C40 30 25 35 25 55 C25 70 40 75 48 80 L48 90 L52 90 L52 80 C60 75 75 70 75 55 C75 35 60 30 50 15 Z" /></svg>`,
-  O6: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><path d="M50 20 C35 20 20 35 15 55 C30 50 40 55 50 75 C60 55 70 50 85 55 C80 35 65 20 50 20 Z" /><path d="M45 20 L50 12 L55 20 Z" fill="#A9A9A9" /></svg>`,
-  O7: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><polygon points="50,25 57,43 76,43 61,54 67,73 50,62 33,73 39,54 24,43 43,43" /></svg>`,
-  O8: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><polygon points="30,30 35,43 48,43 38,51 42,65 30,56 18,65 22,51 12,43 25,43" /><polygon points="70,30 75,43 88,43 78,51 82,65 70,56 58,65 62,51 52,43 65,43" /></svg>`,
-  O9: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><polygon points="20,35 24,46 35,46 27,53 30,65 20,57 10,65 13,53 5,46 16,46" /><polygon points="50,25 54,36 65,36 57,43 60,55 50,47 40,55 43,43 35,36 46,36" /><polygon points="80,35 84,46 95,46 87,53 90,65 80,57 70,65 73,53 65,46 76,46" /></svg>`,
-  O10: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><polygon points="20,25 24,36 35,36 27,43 30,55 20,47 10,55 13,43 5,46 16,46" /><polygon points="40,25 44,36 55,36 47,43 50,55 40,47 30,55 33,43 25,46 36,46" /><polygon points="60,25 64,36 75,36 67,43 70,55 60,47 50,55 53,43 45,46 56,46" /><polygon points="80,25 84,36 95,36 87,43 90,55 80,47 70,55 73,43 65,46 76,46" /></svg>`
-};
-
-function rankGlyph(rankCode) {
-  const allRanks = { ...ENLISTED_INSIGNIA, ...OFFICER_INSIGNIA };
-  const svgString = allRanks[rankCode] || allRanks['E1'];
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`;
-}
 
 function burstConfetti(container) {
   if (!container) return;
@@ -2235,29 +2246,14 @@ function burstConfetti(container) {
 
 document.addEventListener('alpine:init', () => {
   Alpine.store('progress', {
-    wins: parseInt((() => { try { return localStorage.getItem('rank-wins'); } catch(e) { return null; } })() || '0', 10),
     streak: parseInt((() => { try { return localStorage.getItem('streak-count'); } catch(e) { return null; } })() || '0', 10),
-    rankUpFlash: null,
-    get rankIndex() {
-      let idx = 0;
-      for (let i = 0; i < RANKS.length; i++) { if (this.wins >= RANKS[i].min) idx = i; else break; }
-      return idx;
-    },
-    get rank() { return RANKS[this.rankIndex]; },
-    get nextRank() { return RANKS[this.rankIndex+1] || null; },
     recordWin(game) {
+      // Count one win per game per day toward the daily streak.
       const key = `progress-counted-${game}-${dayKeyStr()}`;
       try {
         if (localStorage.getItem(key)) return;
         localStorage.setItem(key, '1');
-        const prevIdx = this.rankIndex;
-        this.wins++;
-        localStorage.setItem('rank-wins', String(this.wins));
         this._bumpStreak();
-        if (this.rankIndex !== prevIdx) {
-          this.rankUpFlash = this.rank;
-          setTimeout(() => { this.rankUpFlash = null; }, 4000);
-        }
       } catch (e) {}
     },
     _bumpStreak() {
@@ -3002,6 +2998,32 @@ document.addEventListener('alpine:init', () => {
   });
   Alpine.store('snake').init();
 
+  // ── Konami controller: tap-to-enter the code (mobile-friendly path to Snake) ──
+  Alpine.store('konami', {
+    open: false,
+    seq: [],
+    shake: false,
+    TARGET: ['up','up','down','down','left','right','left','right','b','a'],
+    glyphs: ['▲','▲','▼','▼','◀','▶','◀','▶','B','A'],
+    get progress() { return this.seq.length; },
+    show() { this.seq = []; this.shake = false; this.open = true; document.body.classList.add('modal-open'); },
+    hide() { this.open = false; this.seq = []; document.body.classList.remove('modal-open'); },
+    press(btn) {
+      if (btn === this.TARGET[this.seq.length]) {
+        this.seq.push(btn);
+        if (this.seq.length === this.TARGET.length) {
+          this.hide();
+          setTimeout(() => revealSnake(), 160);
+        }
+      } else {
+        // wrong button — reset (allow the press to start a fresh run if it's the first key)
+        this.seq = (btn === this.TARGET[0]) ? [btn] : [];
+        this.shake = true;
+        setTimeout(() => { this.shake = false; }, 320);
+      }
+    },
+  });
+
   // ── Keyboard: Konami unlock + in-game steering ──
   const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
   let konamiPos = 0;
@@ -3049,6 +3071,7 @@ document.addEventListener('alpine:init', () => {
   function revealSnake() {
     if (revealing || Alpine.store('snake').gameOpen) return;
     revealing = true;
+    Alpine.store('konami').hide();
     const cv = document.createElement('canvas');
     cv.width = window.innerWidth; cv.height = window.innerHeight;
     cv.style.cssText = 'position:fixed; inset:0; z-index:70; pointer-events:none;';
