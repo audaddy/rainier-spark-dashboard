@@ -285,6 +285,26 @@
 <div class="scanlines" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
+<!-- Promotion toast -->
+<div
+  x-data
+  x-show="$store.progress.rankUpFlash"
+  x-cloak
+  x-transition:enter="transition ease-out duration-300"
+  x-transition:enter-start="opacity-0 -translate-y-3"
+  x-transition:enter-end="opacity-100 translate-y-0"
+  x-transition:leave="transition ease-in duration-300"
+  x-transition:leave-start="opacity-100 translate-y-0"
+  x-transition:leave-end="opacity-0 -translate-y-3"
+  class="fixed top-4 left-1/2 -translate-x-1/2 z-[80] bg-ink-800 border border-gold/60 rounded-sm px-5 py-3 shadow-2xl flex items-center gap-3"
+>
+  <img class="w-9 h-9 shrink-0 bg-slate-200 rounded-full p-1" alt="" x-show="$store.progress.rankUpFlash" :src="$store.progress.rankUpFlash ? rankGlyph($store.progress.rankUpFlash.code) : ''">
+  <div>
+    <div class="font-mono text-[9px] text-gold tracking-[0.2em] uppercase">Promotion</div>
+    <div class="font-condensed font-bold text-white text-sm uppercase tracking-wide" x-text="$store.progress.rankUpFlash ? $store.progress.rankUpFlash.name : ''"></div>
+  </div>
+</div>
+
 <div x-data="dashboard()" x-cloak class="relative z-10">
 
   <!-- ════════════ TOPBAR ════════════ -->
@@ -377,6 +397,16 @@
         <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Wordle
       </button>
+      <div class="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-sm border border-white/10 bg-ink-950/50"
+        :title="$store.progress.nextRank ? ($store.progress.nextRank.min - $store.progress.wins) + ' win(s) to ' + $store.progress.nextRank.name : 'Top rank reached'">
+        <img class="w-6 h-6 shrink-0 bg-slate-200 rounded-full p-0.5" alt="" :src="rankGlyph($store.progress.rank.code)">
+        <span class="font-mono text-[10px] text-ice tracking-[0.08em] uppercase" x-text="$store.progress.rank.abbr"></span>
+        <span class="w-px h-4 bg-white/15"></span>
+        <span class="inline-flex items-center gap-1 font-mono text-[10px] text-amber tracking-[0.06em]">
+          <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="currentColor"><path d="M12 2c1 3-1 4-1 6 0 1.3 1 2 2 2 1.5 0 2-1.3 2-2.3 2 2 3 4.6 3 7a6 6 0 0 1-12 0c0-4 2-6 3-8 .6-1.2.5-3-1-4.7 1.7.2 3.3 1 4 3z"/></svg>
+          <span x-text="$store.progress.streak"></span>
+        </span>
+      </div>
       <button type="button" @click="$store.zip.openGame()" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white sm:mr-auto">
         <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M5 5 L14 5 L14 12 L19 12 L19 19"/></svg>
         Zip
@@ -1162,7 +1192,7 @@
 
     <div class="p-5">
       <!-- Grid -->
-      <div class="grid grid-rows-6 gap-1.5 mb-5 mx-auto" style="width: min(100%, 280px);">
+      <div id="sparkle-confetti-zone" class="relative grid grid-rows-6 gap-1.5 mb-5 mx-auto" style="width: min(100%, 280px);">
         <template x-for="(row, ri) in $store.sparkle.rows" :key="ri">
           <div class="grid grid-cols-5 gap-1.5">
             <template x-for="(cell, ci) in row" :key="ci">
@@ -1291,7 +1321,7 @@
 
     <div class="p-5">
       <!-- Grid -->
-      <div class="mx-auto mb-4" :style="`position:relative; width:${$store.zip.gridPxWidth}px; height:${$store.zip.gridPxHeight}px; touch-action:none;`">
+      <div id="zip-confetti-zone" class="mx-auto mb-4" :style="`position:relative; width:${$store.zip.gridPxWidth}px; height:${$store.zip.gridPxHeight}px; touch-action:none;`">
         <div :style="`display:grid; grid-template-columns: repeat(${$store.zip.cols}, ${$store.zip.cellPx}px); gap:${$store.zip.gapPx}px;`">
           <template x-for="(cell, i) in $store.zip.cells" :key="i">
             <div
@@ -1368,6 +1398,88 @@
           </template>
         </div>
         <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.zip.leaderboard.length">No times yet today — be the first.</div>
+        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ SNAKE (hidden — Konami code) ════════════ -->
+<div
+  x-data
+  x-show="$store.snake.gameOpen"
+  x-cloak
+  @keydown.escape.window="$store.snake.closeGame()"
+  class="fixed inset-0 z-[60] bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+  @click="$store.snake.closeGame()"
+  x-transition.opacity
+>
+  <div
+    @click.stop
+    class="bg-ink-800 border border-electric/30 rounded max-w-[460px] w-full max-h-[92vh] overflow-y-auto shadow-2xl"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 scale-95"
+    x-transition:enter-end="opacity-100 scale-100"
+  >
+    <!-- Head -->
+    <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-ink-950/60 sticky top-0 z-10">
+      <div>
+        <div class="font-mono text-[9px] text-electric tracking-[0.2em] uppercase">Classified Airlift Ops · Unlocked</div>
+        <div class="font-condensed font-extrabold text-white text-lg uppercase tracking-wide leading-none mt-0.5">SNAKE</div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="font-mono text-sm text-ice tabular-nums" x-text="'PTS ' + $store.snake.score"></div>
+        <button @click="$store.snake.closeGame()" class="w-8 h-8 flex items-center justify-center rounded-sm border border-white/15 text-slate-400 hover:text-white hover:border-white/40 transition-colors">
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="p-5">
+      <!-- Canvas -->
+      <div class="mx-auto mb-3 border border-white/10 rounded-sm bg-ink-950/60" style="width: min(100%, 400px);">
+        <canvas id="snake-canvas" width="400" height="400" class="block w-full h-auto" style="touch-action:none;"></canvas>
+      </div>
+      <div class="text-center font-mono text-[9px] text-slate-500 tracking-[0.1em] uppercase mb-1">Arrows / WASD to steer · swipe on mobile</div>
+
+      <!-- Message -->
+      <div class="h-6 text-center font-condensed font-semibold text-sm tracking-wide uppercase mb-2" :class="$store.snake.msgType === 'error' ? 'text-priority' : 'text-ice'" x-text="$store.snake.message"></div>
+
+      <!-- Start / restart -->
+      <div class="flex justify-center mb-2" x-show="!$store.snake.running">
+        <button @click="$store.snake.start()" class="inline-flex items-center gap-2 border border-electric/50 hover:border-electric hover:bg-electric/15 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-electric">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <span x-text="$store.snake.gameOver ? 'Fly Again' : 'Launch'"></span>
+        </button>
+      </div>
+
+      <!-- Post-game: name entry -->
+      <div x-show="$store.snake.gameOver && !$store.snake.submitted && $store.snake.score > 0" class="border-t border-white/10 pt-4 mt-1">
+        <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to the all-time board (optional)</div>
+        <div class="flex gap-2">
+          <input type="text" x-model="$store.snake.playerName" placeholder="Initials or name" maxlength="20"
+            @keydown.enter="$store.snake.submitScore()"
+            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
+          <button @click="$store.snake.submitScore()" :disabled="$store.snake.submitting" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors disabled:opacity-50">Submit</button>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="border-t border-white/10 pt-4 mt-4">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="font-mono text-[9px] text-ice tracking-[0.18em] uppercase font-bold">All-Time Board</div>
+          <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase">High Score</div>
+        </div>
+        <div class="space-y-1" x-show="$store.snake.leaderboard.length">
+          <template x-for="(e, i) in $store.snake.leaderboard.slice(0,8)" :key="i">
+            <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-sm bg-ink-950/50 border border-white/5">
+              <span class="font-mono text-[10px] text-slate-500 w-4 shrink-0" x-text="i+1"></span>
+              <span class="font-condensed font-semibold text-white text-sm flex-1 truncate" x-text="e.name"></span>
+              <span class="font-mono text-[10px] text-ice" x-text="e.score + ' pts'"></span>
+            </div>
+          </template>
+        </div>
+        <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.snake.leaderboard.length">No flights logged — be the first.</div>
         <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
       </div>
     </div>
@@ -1526,6 +1638,7 @@ function dashboard() {
       [...this.timeline].reverse().forEach(t => {
         (t.events || []).forEach(e => out.push({ m: t.m, e }));
       });
+      out.push({ m: 'ARCADE', e: 'Konami' });
       return out;
     },
 
@@ -2029,6 +2142,137 @@ function getClientId(storageKey) {
   return id;
 }
 
+/* ── Rank progression (USAF-style ladder, Airman Basic → General) + daily streak ── */
+function dayKeyStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+const RANKS = [
+  { name: 'Airman Basic',          abbr: 'AB',      min: 0,   code: 'E1' },
+  { name: 'Airman',                abbr: 'Amn',     min: 2,   code: 'E2' },
+  { name: 'Airman First Class',    abbr: 'A1C',     min: 5,   code: 'E3' },
+  { name: 'Senior Airman',         abbr: 'SrA',     min: 9,   code: 'E4' },
+  { name: 'Staff Sergeant',        abbr: 'SSgt',    min: 14,  code: 'E5' },
+  { name: 'Technical Sergeant',    abbr: 'TSgt',    min: 20,  code: 'E6' },
+  { name: 'Master Sergeant',       abbr: 'MSgt',    min: 27,  code: 'E7' },
+  { name: 'Senior Master Sergeant',abbr: 'SMSgt',   min: 35,  code: 'E8' },
+  { name: 'Chief Master Sergeant', abbr: 'CMSgt',   min: 44,  code: 'E9' },
+  { name: 'Second Lieutenant',     abbr: '2Lt',     min: 54,  code: 'O1' },
+  { name: 'First Lieutenant',      abbr: '1Lt',     min: 65,  code: 'O2' },
+  { name: 'Captain',               abbr: 'Capt',    min: 77,  code: 'O3' },
+  { name: 'Major',                 abbr: 'Maj',     min: 90,  code: 'O4' },
+  { name: 'Lieutenant Colonel',    abbr: 'Lt Col',  min: 104, code: 'O5' },
+  { name: 'Colonel',               abbr: 'Col',     min: 119, code: 'O6' },
+  { name: 'Brigadier General',     abbr: 'Brig Gen',min: 135, code: 'O7' },
+  { name: 'Major General',         abbr: 'Maj Gen', min: 152, code: 'O8' },
+  { name: 'Lieutenant General',    abbr: 'Lt Gen',  min: 170, code: 'O9' },
+  { name: 'General',               abbr: 'Gen',     min: 190, code: 'O10' },
+];
+
+function starPoints(cx, cy, r) {
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const ang = -Math.PI/2 + i*Math.PI/5;
+    const rad = i % 2 === 0 ? r : r*0.42;
+    pts.push(`${(cx+rad*Math.cos(ang)).toFixed(2)},${(cy+rad*Math.sin(ang)).toFixed(2)}`);
+  }
+  return pts.join(' ');
+}
+
+// Official USAF rank insignia structures (enlisted chevrons E1–E9, officer
+// bars/oak leaves/eagle/stars O1–O10). Returned as data URIs for <img> use.
+const ENLISTED_INSIGNIA = {
+  E1: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"></svg>`,
+  E2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><circle cx="50" cy="52" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
+  E3: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><circle cx="50" cy="56" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
+  E4: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><circle cx="50" cy="60" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
+  E5: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M18 61 C 30 75, 70 75, 82 61 C 70 69, 30 69, 18 61 Z" /><circle cx="50" cy="52" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
+  E6: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M18 59 C 30 73, 70 73, 82 59 C 70 67, 30 67, 18 59 Z" /><path d="M16 67 C 30 81, 70 81, 84 67 C 70 75, 30 75, 16 67 Z" /><circle cx="50" cy="48" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
+  E7: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M50 49 L30 29 L40 19 L50 29 L60 19 L70 29 Z" /><path d="M18 59 C 30 73, 70 73, 82 59 C 70 67, 30 67, 18 59 Z" /><path d="M16 67 C 30 81, 70 81, 84 67 C 70 75, 30 75, 16 67 Z" /><circle cx="50" cy="48" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
+  E8: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M50 49 L30 29 L40 19 L50 29 L60 19 L70 29 Z" /><path d="M50 37 L35 22 L45 12 L50 17 L55 12 L65 22 Z" /><path d="M18 59 C 30 73, 70 73, 82 59 C 70 67, 30 67, 18 59 Z" /><path d="M16 67 C 30 81, 70 81, 84 67 C 70 75, 30 75, 16 67 Z" /><circle cx="50" cy="48" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`,
+  E9: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#152B52"><path d="M50 85 L15 50 L25 40 L50 65 L75 40 L85 50 Z" /><path d="M50 73 L20 43 L30 33 L50 53 L70 33 L80 43 Z" /><path d="M50 61 L25 36 L35 26 L50 41 L65 26 L75 36 Z" /><path d="M50 49 L30 29 L40 19 L50 29 L60 19 L70 29 Z" /><path d="M50 37 L35 22 L45 12 L50 17 L55 12 L65 22 Z" /><path d="M50 25 L40 15 L50 5 L60 15 Z" /><path d="M18 59 C 30 73, 70 73, 82 59 C 70 67, 30 67, 18 59 Z" /><path d="M16 67 C 30 81, 70 81, 84 67 C 70 75, 30 75, 16 67 Z" /><circle cx="50" cy="48" r="10" fill="#FFFFFF" stroke="#152B52" stroke-width="4"/></svg>`
+};
+
+const OFFICER_INSIGNIA = {
+  O1: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="35" y="15" width="30" height="70" rx="5" fill="#DAA520" stroke="#B8860B" stroke-width="2"/></svg>`,
+  O2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="35" y="15" width="30" height="70" rx="5" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="2"/></svg>`,
+  O3: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="15" width="25" height="70" rx="4" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="2"/><rect x="55" y="15" width="25" height="70" rx="4" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="2"/><rect x="45" y="30" width="10" height="10" fill="#D3D3D3"/><rect x="45" y="60" width="10" height="10" fill="#D3D3D3"/></svg>`,
+  O4: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#DAA520"><path d="M50 15 C40 30 25 35 25 55 C25 70 40 75 48 80 L48 90 L52 90 L52 80 C60 75 75 70 75 55 C75 35 60 30 50 15 Z" /></svg>`,
+  O5: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><path d="M50 15 C40 30 25 35 25 55 C25 70 40 75 48 80 L48 90 L52 90 L52 80 C60 75 75 70 75 55 C75 35 60 30 50 15 Z" /></svg>`,
+  O6: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><path d="M50 20 C35 20 20 35 15 55 C30 50 40 55 50 75 C60 55 70 50 85 55 C80 35 65 20 50 20 Z" /><path d="M45 20 L50 12 L55 20 Z" fill="#A9A9A9" /></svg>`,
+  O7: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><polygon points="50,25 57,43 76,43 61,54 67,73 50,62 33,73 39,54 24,43 43,43" /></svg>`,
+  O8: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><polygon points="30,30 35,43 48,43 38,51 42,65 30,56 18,65 22,51 12,43 25,43" /><polygon points="70,30 75,43 88,43 78,51 82,65 70,56 58,65 62,51 52,43 65,43" /></svg>`,
+  O9: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><polygon points="20,35 24,46 35,46 27,53 30,65 20,57 10,65 13,53 5,46 16,46" /><polygon points="50,25 54,36 65,36 57,43 60,55 50,47 40,55 43,43 35,36 46,36" /><polygon points="80,35 84,46 95,46 87,53 90,65 80,57 70,65 73,53 65,46 76,46" /></svg>`,
+  O10: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#D3D3D3"><polygon points="20,25 24,36 35,36 27,43 30,55 20,47 10,55 13,43 5,46 16,46" /><polygon points="40,25 44,36 55,36 47,43 50,55 40,47 30,55 33,43 25,46 36,46" /><polygon points="60,25 64,36 75,36 67,43 70,55 60,47 50,55 53,43 45,46 56,46" /><polygon points="80,25 84,36 95,36 87,43 90,55 80,47 70,55 73,43 65,46 76,46" /></svg>`
+};
+
+function rankGlyph(rankCode) {
+  const allRanks = { ...ENLISTED_INSIGNIA, ...OFFICER_INSIGNIA };
+  const svgString = allRanks[rankCode] || allRanks['E1'];
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`;
+}
+
+function burstConfetti(container) {
+  if (!container) return;
+  const colors = ['#c9a449', '#e8b94a', '#6fb47a', '#1a8cff', '#a8c4e6'];
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 26; i++) {
+    const el = document.createElement('div');
+    const size = 6 + Math.random()*5;
+    el.style.cssText = `position:absolute; top:-10px; left:${Math.random()*100}%; width:${size}px; height:${size*0.4}px; background:${colors[i % colors.length]}; opacity:0.95; border-radius:1px; pointer-events:none; z-index:5;`;
+    const dur = 900 + Math.random()*700;
+    const drift = (Math.random()-0.5)*140;
+    el.animate([
+      { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+      { transform: `translate(${drift}px, 260px) rotate(${360 + Math.random()*360}deg)`, opacity: 0 },
+    ], { duration: dur, easing: 'cubic-bezier(.35,.55,.65,1)', fill: 'forwards' });
+    frag.appendChild(el);
+    setTimeout(() => el.remove(), dur + 50);
+  }
+  container.appendChild(frag);
+}
+
+document.addEventListener('alpine:init', () => {
+  Alpine.store('progress', {
+    wins: parseInt((() => { try { return localStorage.getItem('rank-wins'); } catch(e) { return null; } })() || '0', 10),
+    streak: parseInt((() => { try { return localStorage.getItem('streak-count'); } catch(e) { return null; } })() || '0', 10),
+    rankUpFlash: null,
+    get rankIndex() {
+      let idx = 0;
+      for (let i = 0; i < RANKS.length; i++) { if (this.wins >= RANKS[i].min) idx = i; else break; }
+      return idx;
+    },
+    get rank() { return RANKS[this.rankIndex]; },
+    get nextRank() { return RANKS[this.rankIndex+1] || null; },
+    recordWin(game) {
+      const key = `progress-counted-${game}-${dayKeyStr()}`;
+      try {
+        if (localStorage.getItem(key)) return;
+        localStorage.setItem(key, '1');
+        const prevIdx = this.rankIndex;
+        this.wins++;
+        localStorage.setItem('rank-wins', String(this.wins));
+        this._bumpStreak();
+        if (this.rankIndex !== prevIdx) {
+          this.rankUpFlash = this.rank;
+          setTimeout(() => { this.rankUpFlash = null; }, 4000);
+        }
+      } catch (e) {}
+    },
+    _bumpStreak() {
+      const today = dayKeyStr();
+      let last;
+      try { last = localStorage.getItem('streak-last'); } catch(e) { last = null; }
+      if (last === today) return;
+      const y = new Date(); y.setDate(y.getDate()-1);
+      const yesterday = `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;
+      this.streak = (last === yesterday) ? this.streak + 1 : 1;
+      try { localStorage.setItem('streak-count', String(this.streak)); localStorage.setItem('streak-last', today); } catch(e) {}
+    },
+  });
+});
+
 /* ── SPARKLE: daily word game ── */
 document.addEventListener('alpine:init', () => {
   const WORD_BANK = [
@@ -2182,6 +2426,8 @@ document.addEventListener('alpine:init', () => {
         this.won = true; this.gameOver = true;
         this.solveMs = this._startTs ? Date.now() - this._startTs : 0;
         this.message = 'SOLVED · ' + (this.curRow+1) + '/6' + (this.solveMs ? ' · ' + this.fmtMs(this.solveMs) : '');
+        Alpine.store('progress').recordWin('sparkle');
+        burstConfetti(document.getElementById('sparkle-confetti-zone'));
       } else if (this.curRow === 5) {
         this.gameOver = true;
         this.solveMs = this._startTs ? Date.now() - this._startTs : 0;
@@ -2436,6 +2682,12 @@ document.addEventListener('alpine:init', () => {
     hasWall(a, b) { const key = a<b ? a+'-'+b : b+'-'+a; return this.wallSet.has(key); },
     isAdjacentFree(a, b) { return this.isAdjacent(a,b) && !this.hasWall(a,b); },
     flash(msg) { this.message = msg; this.msgType = 'error'; setTimeout(() => { if (this.msgType==='error') this.message=''; }, 1300); },
+    finishWin() {
+      this.won = true; this.gameOver = true; this.stopTimer();
+      this.message = 'SOLVED · ' + this.fmtTime(this.elapsedMs);
+      Alpine.store('progress').recordWin('zip');
+      burstConfetti(document.getElementById('zip-confetti-zone'));
+    },
     persist() {
       try {
         localStorage.setItem(this._stateKey, JSON.stringify({
@@ -2470,10 +2722,7 @@ document.addEventListener('alpine:init', () => {
       if (num !== null && num !== this.nextNumber) { this.flash(`Reach ${this.nextNumber} first`); return false; }
       this.pathArr.push(i); this.pathSet.add(i);
       if (num !== null) this.nextNumber = num+1;
-      if (this.pathArr.length === this.total) {
-        this.won = true; this.gameOver = true; this.stopTimer();
-        this.message = 'SOLVED · ' + this.fmtTime(this.elapsedMs);
-      }
+      if (this.pathArr.length === this.total) this.finishWin();
       this.persist();
       return true;
     },
@@ -2502,10 +2751,7 @@ document.addEventListener('alpine:init', () => {
         this.pathArr.push(idx); this.pathSet.add(idx);
         const num = this.cells[idx].number; if (num !== null) this.nextNumber = num+1;
       });
-      if (this.pathArr.length === this.total) {
-        this.won = true; this.gameOver = true; this.stopTimer();
-        this.message = 'SOLVED · ' + this.fmtTime(this.elapsedMs);
-      }
+      if (this.pathArr.length === this.total) this.finishWin();
       this.persist();
     },
     truncateTo(i) {
@@ -2562,6 +2808,282 @@ document.addEventListener('alpine:init', () => {
   }, { passive: true });
 
   Alpine.store('zip').init();
+});
+
+/* ── SNAKE: hidden easter egg (Konami code ↑↑↓↓←→←→BA) ── */
+document.addEventListener('alpine:init', () => {
+  const GRID = 20, CELL = 20, CANVAS = GRID * CELL;
+
+  // Stylized top-down C-17 (fuselage, swept wings w/ 4 engines, T-tail), nose pointing up.
+  function drawC17(ctx, px, py, dir) {
+    const ang = { up: 0, right: Math.PI/2, down: Math.PI, left: -Math.PI/2 }[dir];
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(ang);
+    ctx.fillStyle = '#c7d2e0';
+    ctx.strokeStyle = '#8fa6bf';
+    ctx.lineWidth = 0.6;
+    // fuselage
+    ctx.beginPath();
+    ctx.moveTo(0, -9);
+    ctx.quadraticCurveTo(2.6, -6, 2.6, -2);
+    ctx.lineTo(2.6, 7);
+    ctx.quadraticCurveTo(2.6, 9, 0, 9);
+    ctx.quadraticCurveTo(-2.6, 9, -2.6, 7);
+    ctx.lineTo(-2.6, -2);
+    ctx.quadraticCurveTo(-2.6, -6, 0, -9);
+    ctx.fill(); ctx.stroke();
+    // swept wings
+    ctx.beginPath();
+    ctx.moveTo(-2.4, -2.5); ctx.lineTo(-9.5, 2.8); ctx.lineTo(-9.5, 4.4); ctx.lineTo(-2.4, 1.4); ctx.closePath();
+    ctx.moveTo(2.4, -2.5); ctx.lineTo(9.5, 2.8); ctx.lineTo(9.5, 4.4); ctx.lineTo(2.4, 1.4); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // engines (4 nacelles)
+    ctx.fillStyle = '#6f96c8';
+    [[-7.2, 2.6], [-4.6, 1.2], [4.6, 1.2], [7.2, 2.6]].forEach(([ex, ey]) => {
+      ctx.fillRect(ex - 0.8, ey - 0.4, 1.6, 3.2);
+    });
+    // T-tail
+    ctx.fillStyle = '#c7d2e0';
+    ctx.beginPath();
+    ctx.moveTo(-4.6, 8.4); ctx.lineTo(4.6, 8.4); ctx.lineTo(4.6, 7); ctx.lineTo(-4.6, 7); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+
+  // Stylized USAF symbol: star with flanking swept wings, ice-blue.
+  function drawUSAF(ctx, px, py, s) {
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.fillStyle = '#a8c4e6';
+    // star
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI/2 + i * Math.PI/5;
+      const r = i % 2 === 0 ? s*0.42 : s*0.18;
+      const x = r*Math.cos(a), y = r*Math.sin(a);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath(); ctx.fill();
+    // wings
+    ctx.beginPath();
+    ctx.moveTo(-s*0.5, -s*0.05); ctx.lineTo(-s*0.16, -s*0.28); ctx.lineTo(-s*0.16, -s*0.1); ctx.lineTo(-s*0.5, s*0.14); ctx.closePath();
+    ctx.moveTo(s*0.5, -s*0.05); ctx.lineTo(s*0.16, -s*0.28); ctx.lineTo(s*0.16, -s*0.1); ctx.lineTo(s*0.5, s*0.14); ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  Alpine.store('snake', {
+    gameOpen: false,
+    running: false,
+    gameOver: false,
+    submitted: false,
+    score: 0,
+    playerName: '',
+    message: '',
+    msgType: 'info',
+    leaderboard: [],
+    submitting: false,
+    _clientId: null,
+    _snake: [], _dir: 'up', _nextDir: 'up', _food: null,
+    _timer: null, _speed: 140,
+
+    init() {
+      this._clientId = getClientId('snake-lb-cid');
+      fetchLeaderboard('snake', 'all').then(lb => { this.leaderboard = lb; });
+    },
+    openGame() {
+      this.gameOpen = true; document.body.classList.add('modal-open');
+      this.message = 'PRESS LAUNCH';
+      this.drawIdle();
+    },
+    closeGame() {
+      this.gameOpen = false; document.body.classList.remove('modal-open');
+      this.running = false;
+      if (this._timer) { clearInterval(this._timer); this._timer = null; }
+    },
+    ctx() {
+      const c = document.getElementById('snake-canvas');
+      return c ? c.getContext('2d') : null;
+    },
+    start() {
+      const mid = Math.floor(GRID/2);
+      this._snake = [{x: mid, y: mid}, {x: mid, y: mid+1}, {x: mid, y: mid+2}];
+      this._dir = 'up'; this._nextDir = 'up';
+      this.score = 0; this._speed = 140;
+      this.gameOver = false; this.submitted = false;
+      this.message = ''; this.msgType = 'info';
+      this.placeFood();
+      this.running = true;
+      this._startInterval();
+      this.draw();
+    },
+    _startInterval() {
+      if (this._timer) clearInterval(this._timer);
+      this._timer = setInterval(() => { if (this.running) { this.tick(); this.draw(); } }, this._speed);
+    },
+    placeFood() {
+      const occupied = new Set(this._snake.map(s => s.x + ',' + s.y));
+      let x, y;
+      do { x = Math.floor(Math.random()*GRID); y = Math.floor(Math.random()*GRID); } while (occupied.has(x + ',' + y));
+      this._food = {x, y};
+    },
+    setDir(d) {
+      const opp = { up:'down', down:'up', left:'right', right:'left' };
+      if (d && d !== opp[this._dir]) this._nextDir = d;
+    },
+    tick() {
+      this._dir = this._nextDir;
+      const head = this._snake[0];
+      const delta = { up:[0,-1], down:[0,1], left:[-1,0], right:[1,0] }[this._dir];
+      const nx = head.x + delta[0], ny = head.y + delta[1];
+      if (nx < 0 || nx >= GRID || ny < 0 || ny >= GRID || this._snake.some(s => s.x === nx && s.y === ny)) {
+        this.crash();
+        return;
+      }
+      this._snake.unshift({x: nx, y: ny});
+      if (this._food && nx === this._food.x && ny === this._food.y) {
+        this.score += 10;
+        this._speed = Math.max(70, this._speed - 2);
+        this._startInterval();
+        this.placeFood();
+      } else {
+        this._snake.pop();
+      }
+    },
+    crash() {
+      this.running = false;
+      this.gameOver = true;
+      if (this._timer) { clearInterval(this._timer); this._timer = null; }
+      this.message = 'DOWN · ' + this.score + ' PTS';
+      this.draw();
+    },
+    draw() {
+      const ctx = this.ctx();
+      if (!ctx) return;
+      ctx.clearRect(0, 0, CANVAS, CANVAS);
+      // faint grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i < GRID; i++) {
+        ctx.beginPath(); ctx.moveTo(i*CELL, 0); ctx.lineTo(i*CELL, CANVAS); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i*CELL); ctx.lineTo(CANVAS, i*CELL); ctx.stroke();
+      }
+      if (this._food) drawUSAF(ctx, this._food.x*CELL + CELL/2, this._food.y*CELL + CELL/2, CELL*0.95);
+      // smoke trail body: fading gray puffs, thinning toward the tail
+      const n = this._snake.length;
+      for (let i = n - 1; i >= 1; i--) {
+        const s = this._snake[i];
+        const t = i / n;
+        ctx.fillStyle = `rgba(199,210,224,${(0.55*(1-t)+0.08).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(s.x*CELL + CELL/2, s.y*CELL + CELL/2, CELL*0.34*(1-t*0.55), 0, Math.PI*2);
+        ctx.fill();
+      }
+      const head = this._snake[0];
+      if (head) drawC17(ctx, head.x*CELL + CELL/2, head.y*CELL + CELL/2, this._dir);
+    },
+    drawIdle() {
+      // preview frame before first launch
+      this._snake = [{x: 10, y: 10}, {x: 10, y: 11}, {x: 10, y: 12}];
+      this._dir = 'up'; this._nextDir = 'up';
+      this._food = {x: 10, y: 5};
+      setTimeout(() => this.draw(), 30);
+    },
+    async submitScore() {
+      if (this.submitting) return;
+      this.submitting = true;
+      const name = (this.playerName || 'Anonymous').trim().slice(0,20) || 'Anonymous';
+      const updated = await postScore('snake', 'all', name, { score: this.score }, this._clientId);
+      if (updated) this.leaderboard = updated;
+      this.submitting = false;
+      this.submitted = true;
+    },
+  });
+  Alpine.store('snake').init();
+
+  // ── Keyboard: Konami unlock + in-game steering ──
+  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let konamiPos = 0;
+  document.addEventListener('keydown', (e) => {
+    const snake = Alpine.store('snake');
+    // steering (and scroll suppression) while the game is open
+    if (snake.gameOpen) {
+      if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+      const dir = { ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right',
+                    w:'up', s:'down', a:'left', d:'right', W:'up', S:'down', A:'left', D:'right' }[e.key];
+      if (dir) { e.preventDefault(); snake.setDir(dir); }
+      return;
+    }
+    // Konami sequence tracking (ignore while typing in a field or other game open)
+    if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (Alpine.store('sparkle').gameOpen || Alpine.store('zip').gameOpen) return;
+    const expected = KONAMI[konamiPos];
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (key === expected) {
+      konamiPos++;
+      if (konamiPos === KONAMI.length) { konamiPos = 0; revealSnake(); }
+    } else {
+      konamiPos = key === KONAMI[0] ? 1 : 0;
+    }
+  });
+
+  // touch swipe steering
+  let touchStart = null;
+  document.addEventListener('touchstart', (e) => {
+    if (!Alpine.store('snake').gameOpen) return;
+    const t = e.touches[0]; touchStart = { x: t.clientX, y: t.clientY };
+  }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    const snake = Alpine.store('snake');
+    if (!snake.gameOpen || !touchStart) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStart.x, dy = t.clientY - touchStart.y;
+    touchStart = null;
+    if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+    snake.setDir(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+  }, { passive: true });
+
+  // ── Reveal: C-17 with smoke trail flies across the live dashboard, then the game opens ──
+  let revealing = false;
+  function revealSnake() {
+    if (revealing || Alpine.store('snake').gameOpen) return;
+    revealing = true;
+    const cv = document.createElement('canvas');
+    cv.width = window.innerWidth; cv.height = window.innerHeight;
+    cv.style.cssText = 'position:fixed; inset:0; z-index:70; pointer-events:none;';
+    document.body.appendChild(cv);
+    const ctx = cv.getContext('2d');
+    const dur = 2400, t0 = performance.now();
+    const midY = cv.height * 0.45, amp = cv.height * 0.16;
+    const trail = [];
+    const timer = setInterval(() => {
+      const p = Math.min(1, (performance.now() - t0) / dur);
+      const x = -40 + p * (cv.width + 80);
+      const y = midY + Math.sin(p * Math.PI * 3) * amp;
+      trail.push({x, y});
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      trail.forEach((pt, i) => {
+        const age = (trail.length - i) / trail.length;
+        ctx.fillStyle = `rgba(199,210,224,${(0.5*(1-age)).toFixed(3)})`;
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 7*(1-age*0.6), 0, Math.PI*2); ctx.fill();
+      });
+      // face direction of travel
+      ctx.save();
+      ctx.translate(x, y);
+      const slope = Math.cos(p * Math.PI * 3) * amp * Math.PI * 3 / (cv.width + 80);
+      ctx.rotate(Math.PI/2 + Math.atan(slope));
+      ctx.scale(2.2, 2.2);
+      drawC17(ctx, 0, 0, 'up');
+      ctx.restore();
+      if (p >= 1) {
+        clearInterval(timer);
+        cv.remove();
+        revealing = false;
+        Alpine.store('snake').openGame();
+      }
+    }, 16);
+  }
 });
 </script>
 
