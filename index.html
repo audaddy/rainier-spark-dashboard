@@ -293,6 +293,9 @@
     .reveal-card[data-bracket="priority"] { animation: none; }
   }
 </style>
+<!-- Cloudflare Web Analytics -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9f55604f3aba482ebf00e7dc11ad334d"}'></script>
+<!-- End Cloudflare Web Analytics -->
 </head>
 <body class="text-slate-100 antialiased">
 
@@ -391,7 +394,7 @@
   <!-- ════════════ CONNECT QUICK-LINKS ════════════ -->
   <div class="border-b border-white/10 bg-ink-950/70 backdrop-blur-sm">
     <div class="max-w-[1480px] mx-auto px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-end gap-x-5 gap-y-2.5">
-      <button type="button" @click="$store.sparkle.openGame()" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+      <button type="button" @click="$store.sparkle.openGame(); trackClick('wordle_open')" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
         <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Wordle
       </button>
@@ -400,7 +403,7 @@
         <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-amber shrink-0" fill="currentColor"><path d="M12 2c1 3-1 4-1 6 0 1.3 1 2 2 2 1.5 0 2-1.3 2-2.3 2 2 3 4.6 3 7a6 6 0 0 1-12 0c0-4 2-6 3-8 .6-1.2.5-3-1-4.7 1.7.2 3.3 1 4 3z"/></svg>
         <span class="font-mono text-[10px] text-amber tracking-[0.08em] uppercase"><span x-text="$store.progress.streak"></span> Day Streak</span>
       </div>
-      <button type="button" @click="$store.zip.openGame()" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white sm:mr-auto">
+      <button type="button" @click="$store.zip.openGame(); trackClick('zip_open')" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white sm:mr-auto">
         <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M5 5 L14 5 L14 12 L19 12 L19 19"/></svg>
         Zip
       </button>
@@ -409,16 +412,16 @@
         Connect with Rainier Spark
       </span>
       <div class="flex flex-wrap items-center gap-2">
-        <a href="#team" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+        <a href="#team" @click="trackClick('team')" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
           <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19v-1a3 3 0 0 0-2.6-3"/></svg>
           Team
         </a>
-        <a href="#visit" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+        <a href="#visit" @click="trackClick('location_hours')" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
           <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
           Location / Hours
         </a>
         <div class="relative" x-data="orgbox()">
-          <button type="button" @click="open = !open" class="inline-flex items-center gap-2 border border-electric/55 text-electric hover:bg-electric hover:text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase">
+          <button type="button" @click="open = !open; if (open) trackClick('email_orgbox')" class="inline-flex items-center gap-2 border border-electric/55 text-electric hover:bg-electric hover:text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase">
             <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
             Email Org Box
           </button>
@@ -1504,7 +1507,22 @@
       <div class="mx-auto mb-3 border border-white/10 rounded-sm bg-ink-950/60" style="width: min(100%, 400px);">
         <canvas id="snake-canvas" width="400" height="400" class="block w-full h-auto" style="touch-action:none;"></canvas>
       </div>
-      <div class="text-center font-mono text-[9px] text-slate-500 tracking-[0.1em] uppercase mb-1">Arrows / WASD to steer · swipe on mobile</div>
+      <div class="text-center font-mono text-[9px] text-slate-500 tracking-[0.1em] uppercase mb-1">Arrows / WASD · swipe or tap the pad</div>
+
+      <!-- On-screen D-pad (phones only) -->
+      <div class="sm:hidden flex justify-center my-3" x-show="$store.snake.gameOpen">
+        <div class="grid grid-cols-3 grid-rows-3 gap-1.5" style="width:156px;height:156px;">
+          <span></span>
+          <button @pointerdown.prevent="$store.snake.setDir('up')" class="konami-btn bg-[#2b2b30] active:bg-electric rounded-md flex items-center justify-center text-white/80 text-lg" style="touch-action:none;" aria-label="Steer up">▲</button>
+          <span></span>
+          <button @pointerdown.prevent="$store.snake.setDir('left')" class="konami-btn bg-[#2b2b30] active:bg-electric rounded-md flex items-center justify-center text-white/80 text-lg" style="touch-action:none;" aria-label="Steer left">◀</button>
+          <span class="bg-[#17171b] rounded-md"></span>
+          <button @pointerdown.prevent="$store.snake.setDir('right')" class="konami-btn bg-[#2b2b30] active:bg-electric rounded-md flex items-center justify-center text-white/80 text-lg" style="touch-action:none;" aria-label="Steer right">▶</button>
+          <span></span>
+          <button @pointerdown.prevent="$store.snake.setDir('down')" class="konami-btn bg-[#2b2b30] active:bg-electric rounded-md flex items-center justify-center text-white/80 text-lg" style="touch-action:none;" aria-label="Steer down">▼</button>
+          <span></span>
+        </div>
+      </div>
 
       <!-- Message -->
       <div class="h-6 text-center font-condensed font-semibold text-sm tracking-wide uppercase mb-2" :class="$store.snake.msgType === 'error' ? 'text-priority' : 'text-ice'" x-text="$store.snake.message"></div>
@@ -2169,6 +2187,19 @@ function dashboard() {
 
 /* ── Leaderboard API (shared leaderboards for Sparkle + Zip) ── */
 const LB_API = 'https://rainier-spark-leaderboard.audaddy.workers.dev';
+
+/* ── Lightweight click tracking (fire-and-forget → Worker /event) ── */
+function trackClick(name) {
+  try {
+    const body = JSON.stringify({ name });
+    // text/plain keeps it a CORS-simple request (no preflight) and survives page unload
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(`${LB_API}/event`, new Blob([body], { type: 'text/plain' }));
+    } else {
+      fetch(`${LB_API}/event`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body, keepalive: true }).catch(() => {});
+    }
+  } catch (e) {}
+}
 
 async function fetchLeaderboard(game, period) {
   try {
@@ -2892,6 +2923,7 @@ document.addEventListener('alpine:init', () => {
       this.gameOpen = true; document.body.classList.add('modal-open');
       this.message = 'PRESS LAUNCH';
       this.drawIdle();
+      trackClick('snake_open');
     },
     closeGame() {
       this.gameOpen = false; document.body.classList.remove('modal-open');
@@ -3006,7 +3038,7 @@ document.addEventListener('alpine:init', () => {
     TARGET: ['up','up','down','down','left','right','left','right','b','a'],
     glyphs: ['▲','▲','▼','▼','◀','▶','◀','▶','B','A'],
     get progress() { return this.seq.length; },
-    show() { this.seq = []; this.shake = false; this.open = true; document.body.classList.add('modal-open'); },
+    show() { this.seq = []; this.shake = false; this.open = true; document.body.classList.add('modal-open'); trackClick('konami_open'); },
     hide() { this.open = false; this.seq = []; document.body.classList.remove('modal-open'); },
     press(btn) {
       if (btn === this.TARGET[this.seq.length]) {

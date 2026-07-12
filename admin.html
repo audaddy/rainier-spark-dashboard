@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Rainier Spark · Admin Metrics</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="robots" content="noindex" />
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0b0d11; color: #e6ecf2;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; padding: 24px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 18px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 2px; }
+  .sub { color: #7c8794; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 20px; }
+  .card { background: #12151b; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  label { display: block; font-size: 11px; color: #9aa6b2; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+  input { width: 100%; background: #0b0d11; border: 1px solid rgba(255,255,255,.15); color: #e6ecf2;
+    border-radius: 5px; padding: 9px 11px; font: inherit; }
+  .row { display: flex; gap: 8px; }
+  button { background: #1a8cff; color: #06121f; border: 0; border-radius: 5px; padding: 9px 16px;
+    font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; cursor: pointer; }
+  button.ghost { background: transparent; color: #9aa6b2; border: 1px solid rgba(255,255,255,.15); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; }
+  th { color: #7c8794; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .big { color: #6fb0ff; font-weight: 700; }
+  .muted { color: #7c8794; }
+  .err { color: #ff6b6b; font-size: 13px; margin-top: 10px; }
+  .note { color: #7c8794; font-size: 11px; line-height: 1.6; margin-top: 4px; }
+  a { color: #6fb0ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Rainier Spark · Metrics</h1>
+  <div class="sub">Button &amp; link clicks · admin only</div>
+
+  <div class="card">
+    <label for="key">Admin key</label>
+    <div class="row">
+      <input id="key" type="password" placeholder="Paste your admin key" autocomplete="off" />
+      <button id="load">Load</button>
+      <button id="forget" class="ghost" title="Clear saved key">Forget</button>
+    </div>
+    <div id="err" class="err" style="display:none"></div>
+    <div class="note">Traffic (visitors, page views, referrers, countries) lives in your
+      <a href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener">Cloudflare Web Analytics</a>
+      dashboard. This page shows the button/link clicks tracked through your Worker.</div>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<script>
+  const LB_API = 'https://rainier-spark-leaderboard.audaddy.workers.dev';
+  const LABELS = {
+    wordle_open: 'Wordle opened', zip_open: 'Zip opened', snake_open: 'Snake opened',
+    konami_open: 'Konami controller', team: 'Team', location_hours: 'Location / Hours',
+    email_orgbox: 'Email Org Box',
+  };
+  const keyInput = document.getElementById('key');
+  const err = document.getElementById('err');
+  const results = document.getElementById('results');
+
+  const saved = localStorage.getItem('rs-admin-key');
+  if (saved) { keyInput.value = saved; load(); }
+
+  function utcDay(offset = 0) {
+    const d = new Date(); d.setUTCDate(d.getUTCDate() - offset);
+    return d.toISOString().slice(0, 10);
+  }
+  function last7Total(days) {
+    let n = 0;
+    for (let i = 0; i < 7; i++) n += days[utcDay(i)] || 0;
+    return n;
+  }
+  function showErr(msg) { err.style.display = 'block'; err.textContent = msg; }
+
+  async function load() {
+    err.style.display = 'none';
+    const key = keyInput.value.trim();
+    if (!key) { showErr('Enter your admin key.'); return; }
+    let res;
+    try {
+      res = await fetch(`${LB_API}/stats`, { headers: { 'X-Admin-Key': key } });
+    } catch (e) { showErr('Network error reaching the Worker.'); return; }
+    if (res.status === 401) { showErr('Wrong admin key (or ADMIN_KEY not set on the Worker).'); return; }
+    if (!res.ok) { showErr('Unexpected error: ' + res.status); return; }
+    localStorage.setItem('rs-admin-key', key);
+    const { events } = await res.json();
+    render(events || {});
+  }
+
+  function render(events) {
+    const names = Object.keys(events).sort((a, b) => (events[b].total || 0) - (events[a].total || 0));
+    if (!names.length) {
+      results.innerHTML = '<div class="card muted">No clicks recorded yet. Once the site is live and people start tapping buttons, they\'ll show up here.</div>';
+      return;
+    }
+    const today = utcDay(0);
+    let rows = '';
+    for (const n of names) {
+      const e = events[n];
+      rows += `<tr>
+        <td>${LABELS[n] || n}<div class="muted" style="font-size:10px">${n}</div></td>
+        <td class="num big">${e.total || 0}</td>
+        <td class="num">${last7Total(e.days || {})}</td>
+        <td class="num">${(e.days || {})[today] || 0}</td>
+      </tr>`;
+    }
+    results.innerHTML = `<div class="card"><table>
+      <thead><tr><th>Action</th><th class="num">All-time</th><th class="num">Last 7 days</th><th class="num">Today</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+  }
+
+  document.getElementById('load').addEventListener('click', load);
+  keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') load(); });
+  document.getElementById('forget').addEventListener('click', () => {
+    localStorage.removeItem('rs-admin-key'); keyInput.value = ''; results.innerHTML = '';
+  });
+</script>
+</body>
+</html>
