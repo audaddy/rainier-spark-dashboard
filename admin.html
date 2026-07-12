@@ -58,8 +58,30 @@
   const LABELS = {
     wordle_open: 'Wordle opened', zip_open: 'Zip opened', snake_open: 'Snake opened',
     konami_open: 'Konami controller', team: 'Team', location_hours: 'Location / Hours',
-    email_orgbox: 'Email Org Box',
+    email_orgbox: 'Email Org Box', instagram: 'Instagram', map: 'Google Maps',
+    vision_open: 'Vision card opened',
+    // filter tabs
+    filter_all: 'Filter · All Lines of Effort', filter_priority: 'Filter · High Priority',
+    filter_suas: 'Filter · sUAS / C-sUAS', filter_hpt: 'Filter · Human Performance',
+    filter_infra: 'Filter · Lab / Infrastructure', filter_am: 'Filter · Additive Manufacturing',
+    filter_spouse: 'Filter · Spouse Employment', filter_vision: 'Filter · Vision (SIF26)',
+    // individual innovation-line cards
+    card_c17_suas: 'Card · C-17 sUAS Inspections', card_hpt_wearables: 'Card · HPT Wearables Rollout',
+    card_lab_infra: 'Card · Lab Modernization', card_additive_mfg: 'Card · Additive Mfg Cell',
+    card_hand_built_drones: 'Card · Hand-Built Drones', card_mindgym: 'Card · MindGym',
+    card_beast_running: 'Card · Rainier Runners', card_medicmind: 'Card · MedicMind',
+    card_go_fish: 'Card · Go FiSH',
   };
+  // Fallback so any new card/filter still reads cleanly without a code change
+  function pretty(name) {
+    if (LABELS[name]) return LABELS[name];
+    const m = name.match(/^(card|filter|vision)_(.+)$/);
+    if (m) {
+      const kind = { card: 'Card', filter: 'Filter', vision: 'Vision' }[m[1]];
+      return kind + ' · ' + m[2].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+    return name;
+  }
   const keyInput = document.getElementById('key');
   const err = document.getElementById('err');
   const results = document.getElementById('results');
@@ -104,7 +126,7 @@
     for (const n of names) {
       const e = events[n];
       rows += `<tr>
-        <td>${LABELS[n] || n}<div class="muted" style="font-size:10px">${n}</div></td>
+        <td>${pretty(n)}<div class="muted" style="font-size:10px">${n}</div></td>
         <td class="num big">${e.total || 0}</td>
         <td class="num">${last7Total(e.days || {})}</td>
         <td class="num">${(e.days || {})[today] || 0}</td>
