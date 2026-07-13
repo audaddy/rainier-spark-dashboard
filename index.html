@@ -1861,7 +1861,6 @@ function dashboard() {
     // Bio directory for clickable Lead / Crew names. Names not found here fall
     // back to a match in the `team` array (see openBio). Drafts marked below.
     people: {
-      'Maj Williston': { initials:'MW', role:'Chief of Innovations', bio:'Chief of Innovations and Human Performance for Rainier Spark at the 62d Airlift Wing, JBLM. Leads the Rainier Spark portfolio across all 62d AW lines of effort — the Human Performance wearables rollout, Spark Lab modernization, and biometric-enabled crew-rest policy.', contact:{ email:'christopher.williston.2@us.af.mil' } },
       'TSgt Dowling': { initials:'TD', role:'Lead · C-17 sUAS Inspections', bio:'Leads the C-17 sUAS aircraft-inspection line of effort — standing up autonomous airframe inspections with the LMCO digital twin, training MX personnel on the Skydio X10D, and driving the effort toward IOC.\n\n[Draft bio — update as needed.]' },
       'Maj Bolling': { initials:'MB', role:'Lead · Rainier Runners', bio:'Leads the Rainier Runners structured running-improvement course for 62d AW Airmen and supports the Human Performance wearables rollout — pairing coached PT-test progressions with HRV and sleep data.\n\n[Draft bio — update as needed.]' },
       'Maj Jordan': { initials:'MJ', role:'Human Performance · Wearables', bio:'Supports the Human Performance wearables rollout — device fielding, opt-in program execution, and the commander readiness dashboard across the 62d AW.\n\n[Draft bio — update as needed.]' },
@@ -2257,11 +2256,14 @@ function dashboard() {
     openCard(p) { this.open = p; document.body.classList.add('modal-open'); },
     openVision(v) { this.open = v; document.body.classList.add('modal-open'); },
     closeModal() { this.open = null; document.body.classList.remove('modal-open'); },
+    // Short display names used in Lead/Crew -> full Team-section names (real bios)
+    bioAliases: { 'Maj Williston': 'Major Chris "Radio" Williston' },
     _findPerson(name) {
       if (!name) return null;
-      if (this.people[name]) return this.people[name];
-      const t = (this.team || []).find(m => m.name === name);
+      const teamName = this.bioAliases[name] || name;
+      const t = (this.team || []).find(m => m.name === teamName);
       if (t) return { role: t.role, bio: t.bio, photo: t.photo, initials: t.initials, contact: t.contact };
+      if (this.people[name]) return this.people[name];
       return null;
     },
     hasBio(name) { return !!this._findPerson(name); },
