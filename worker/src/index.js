@@ -1,4 +1,6 @@
-const GAMES = new Set(['sparkle', 'zip']);
+import { sendPush } from './push.js';
+
+const GAMES = new Set(['sparkle', 'zip', 'snake']);
 const MAX_ENTRIES = 25;
 const MAX_NAME_LEN = 20;
 
@@ -44,16 +46,21 @@ function sortEntries(game, entries) {
   if (game === 'sparkle') {
     return entries.slice().sort((a, b) => a.guesses - b.guesses || a.ms - b.ms);
   }
+  if (game === 'snake') {
+    return entries.slice().sort((a, b) => b.score - a.score);
+  }
   return entries.slice().sort((a, b) => a.timeMs - b.timeMs);
 }
 
 function validScore(game, score) {
   if (game === 'sparkle') return Number.isFinite(score.guesses) && Number.isFinite(score.ms);
+  if (game === 'snake') return Number.isFinite(score.score);
   return Number.isFinite(score.timeMs);
 }
 
 function isBetter(game, a, b) {
   if (game === 'sparkle') return a.guesses < b.guesses || (a.guesses === b.guesses && (a.ms || 0) < (b.ms || 0));
+  if (game === 'snake') return a.score > b.score;
   return a.timeMs < b.timeMs;
 }
 
@@ -181,7 +188,58 @@ async function handleSubscribe(request, env, origin) {
   return json({ ok: true, count: subs.length }, 200, origin);
 }
 
+// Send a notification to every stored subscription; prune ones the push
+// service reports as gone (404/410). Returns { sent, pruned, total }.
+async function broadcastPush(env, payload) {
+  if (!env.VAPID_PRIVATE_JWK || !env.VAPID_PUBLIC_KEY) {
+    return { error: 'push not configured', sent: 0, pruned: 0, total: 0 };
+  }
+  const raw = await env.LEADERBOARD_KV.get(SUBS_KEY);
+  const subs = raw ? JSON.parse(raw) : [];
+  const body = JSON.stringify(payload);
+  const alive = [];
+  let sent = 0, pruned = 0;
+  for (const sub of subs) {
+    try {
+      const res = await sendPush(sub, body, env);
+      if (res.status === 404 || res.status === 410) { pruned++; continue; }
+      alive.push(sub);
+      if (res.ok) sent++;
+    } catch (e) { alive.push(sub); }
+  }
+  if (pruned) await env.LEADERBOARD_KV.put(SUBS_KEY, JSON.stringify(alive));
+  return { sent, pruned, total: subs.length };
+}
+
+// Admin-triggered broadcast (X-Admin-Key). Body: { title, body, url }.
+async function handlePushSend(request, env, origin) {
+  const key = request.headers.get('X-Admin-Key');
+  if (!env.ADMIN_KEY || key !== env.ADMIN_KEY) {
+    return json({ error: 'unauthorized' }, 401, origin);
+  }
+  let payload;
+  try { payload = await request.json(); } catch (e) { payload = {}; }
+  const msg = {
+    title: (payload && payload.title) || 'Rainier Spark',
+    body: (payload && payload.body) || "Today's puzzle is live.",
+    url: (payload && payload.url) || 'https://audaddy.github.io/rainier-spark-dashboard/',
+  };
+  const result = await broadcastPush(env, msg);
+  return json(result, result.error ? 400 : 200, origin);
+}
+
 export default {
+  // Cron-triggered daily nudge. Configure the schedule in wrangler.toml.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(
+      broadcastPush(env, {
+        title: 'Rainier Spark',
+        body: "Today's puzzle is live — keep your streak alive.",
+        url: 'https://audaddy.github.io/rainier-spark-dashboard/',
+      })
+    );
+  },
+
   async fetch(request, env) {
     const origin = request.headers.get('Origin');
     const url = new URL(request.url);
@@ -196,6 +254,10 @@ export default {
     }
     if (url.pathname === '/push/subscribe') {
       if (request.method === 'POST') return handleSubscribe(request, env, origin);
+      return json({ error: 'method not allowed' }, 405, origin);
+    }
+    if (url.pathname === '/push/send') {
+      if (request.method === 'POST') return handlePushSend(request, env, origin);
       return json({ error: 'method not allowed' }, 405, origin);
     }
 

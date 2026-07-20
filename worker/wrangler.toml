@@ -6,3 +6,11 @@ compatibility_date = "2025-01-01"
 kv_namespaces = [
   { binding = "LEADERBOARD_KV", id = "b47f34b74fee44a9ad2bc39115dc33f0" }
 ]
+
+# Daily push nudge — 15:00 UTC ≈ 08:00 Pacific. Fires the scheduled() handler.
+[triggers]
+crons = ["0 15 * * *"]
+
+# Secrets required for push (set via `wrangler secret put`, see scripts/gen-vapid.mjs):
+#   VAPID_PUBLIC_KEY, VAPID_PRIVATE_JWK, VAPID_SUBJECT
+# ADMIN_KEY is also used by /stats and /push/send.
