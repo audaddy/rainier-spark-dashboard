@@ -2550,6 +2550,17 @@ function urlB64ToUint8Array(base64) {
 function pushSupported() {
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 }
+// Current streak state, so the server can target the at-risk nudge.
+function pushStreakInfo() {
+  let streak = 0, lastPlayed = null;
+  try { streak = parseInt(localStorage.getItem('streak-count') || '0', 10) || 0; } catch (e) {}
+  try { lastPlayed = localStorage.getItem('streak-last') || null; } catch (e) {}
+  return { streak, lastPlayed };
+}
+function sendSubscription(sub) {
+  const body = JSON.stringify({ ...sub.toJSON(), ...pushStreakInfo() });
+  return fetch(`${LB_API}/push/subscribe`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+}
 async function subscribePush() {
   if (!pushSupported()) return 'unsupported';
   const perm = await Notification.requestPermission();
@@ -2560,11 +2571,21 @@ async function subscribePush() {
   if (!key) return 'not-configured';
   try {
     const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(key) });
-    const res = await fetch(`${LB_API}/push/subscribe`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub) });
+    const res = await sendSubscription(sub);
     return res.ok ? 'ok' : 'error';
   } catch (e) { return 'error'; }
 }
-window.pushSupported = pushSupported; window.subscribePush = subscribePush;
+// On load: if already subscribed, refresh the stored streak state so the
+// at-risk cron targets accurately. Fire-and-forget, no permission prompt.
+async function resyncPush() {
+  try {
+    if (!pushSupported() || Notification.permission !== 'granted') return;
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) sendSubscription(sub).catch(() => {});
+  } catch (e) {}
+}
+window.pushSupported = pushSupported; window.subscribePush = subscribePush; window.resyncPush = resyncPush;
 
 async function postScore(game, period, name, score, clientId) {
   try {
@@ -3585,6 +3606,9 @@ document.addEventListener('alpine:init', () => {
       refreshed = true;
       window.location.reload();
     });
+
+    // Keep the server's copy of this device's streak fresh for the at-risk cron.
+    if (window.resyncPush) window.resyncPush();
   });
 })();
 </script>

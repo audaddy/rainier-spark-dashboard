@@ -165,6 +165,38 @@ async function handleStats(request, env, origin) {
 // ── Web Push subscriptions ──
 const SUBS_KEY = 'push:subs:v1';
 const MAX_SUBS = 2000;
+const SITE_URL = 'https://audaddy.github.io/rainier-spark-dashboard/';
+
+// Daily nudge copy — rotated by day so it doesn't get tuned out. {{n}} = puzzle #.
+const DAILY_NUDGES = [
+  "Today's Sparkle is live. Solve it before the flight line does.",
+  'Fresh Sparkle + Zip are up. Two minutes, one shot.',
+  'Daily puzzle deployed. Keep the streak alive.',
+  "Today's word is waiting. Beat your squadron to it.",
+  'Sparkle #{{n}} just dropped. Can you clear it in 3?',
+];
+// Streak-at-risk copy — {{n}} = that user's current streak.
+const ATRISK_NUDGES = [
+  'Your {{n}}-day streak ends at midnight. One puzzle saves it.',
+  '{{n}} days and counting — play today to keep it going.',
+  'Your streak resets tonight. Two minutes to protect it.',
+];
+
+function pick(arr, seed) { return arr[((seed % arr.length) + arr.length) % arr.length]; }
+
+// Sparkle puzzle number — mirrors the frontend dayIndex() (epoch 2026-01-01 UTC).
+function sparkleNumber() {
+  const now = new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.floor((today - Date.UTC(2026, 0, 1)) / 86400000) + 1;
+}
+
+// Calendar day (YYYY-MM-DD) in the audience's timezone (McChord ≈ Pacific),
+// optionally offset by N days back.
+function pacificDay(daysBack = 0) {
+  const d = new Date(Date.now() - daysBack * 86400000);
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles' }).format(d);
+}
 
 // Return the public VAPID key so the browser can subscribe.
 function handleVapid(env, origin) {
@@ -178,37 +210,44 @@ async function handleSubscribe(request, env, origin) {
   if (!sub || typeof sub.endpoint !== 'string' || !sub.endpoint.startsWith('https://')) {
     return json({ error: 'invalid subscription' }, 400, origin);
   }
+  // Streak state (optional) lets the evening cron target only at-risk users.
+  const streak = Number.isFinite(sub.streak) ? Math.max(0, Math.floor(sub.streak)) : 0;
+  const lastPlayed = typeof sub.lastPlayed === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(sub.lastPlayed) ? sub.lastPlayed : null;
   const raw = await env.LEADERBOARD_KV.get(SUBS_KEY);
   const subs = raw ? JSON.parse(raw) : [];
   const i = subs.findIndex((s) => s.endpoint === sub.endpoint);
-  const record = { endpoint: sub.endpoint, keys: sub.keys || null, ts: Date.now() };
+  const record = { endpoint: sub.endpoint, keys: sub.keys || null, ts: Date.now(), streak, lastPlayed };
   if (i !== -1) subs[i] = record;
   else if (subs.length < MAX_SUBS) subs.push(record);
   await env.LEADERBOARD_KV.put(SUBS_KEY, JSON.stringify(subs));
   return json({ ok: true, count: subs.length }, 200, origin);
 }
 
-// Send a notification to every stored subscription; prune ones the push
-// service reports as gone (404/410). Returns { sent, pruned, total }.
-async function broadcastPush(env, payload) {
+// Send a notification to stored subscriptions; prune ones the push service
+// reports as gone (404/410). `build` is either a { title, body, url } object or
+// a (sub) => payload function (for per-user text). `filter` narrows the target
+// set; non-targets are preserved untouched. Returns counts.
+async function broadcastPush(env, build, filter) {
   if (!env.VAPID_PRIVATE_JWK || !env.VAPID_PUBLIC_KEY) {
-    return { error: 'push not configured', sent: 0, pruned: 0, total: 0 };
+    return { error: 'push not configured', sent: 0, pruned: 0, total: 0, targeted: 0 };
   }
   const raw = await env.LEADERBOARD_KV.get(SUBS_KEY);
   const subs = raw ? JSON.parse(raw) : [];
-  const body = JSON.stringify(payload);
   const alive = [];
-  let sent = 0, pruned = 0;
+  let sent = 0, pruned = 0, targeted = 0;
   for (const sub of subs) {
+    if (filter && !filter(sub)) { alive.push(sub); continue; }
+    targeted++;
+    const payload = typeof build === 'function' ? build(sub) : build;
     try {
-      const res = await sendPush(sub, body, env);
+      const res = await sendPush(sub, JSON.stringify(payload), env);
       if (res.status === 404 || res.status === 410) { pruned++; continue; }
       alive.push(sub);
       if (res.ok) sent++;
     } catch (e) { alive.push(sub); }
   }
   if (pruned) await env.LEADERBOARD_KV.put(SUBS_KEY, JSON.stringify(alive));
-  return { sent, pruned, total: subs.length };
+  return { sent, pruned, total: subs.length, targeted };
 }
 
 // Admin-triggered broadcast (X-Admin-Key). Body: { title, body, url }.
@@ -229,13 +268,36 @@ async function handlePushSend(request, env, origin) {
 }
 
 export default {
-  // Cron-triggered daily nudge. Configure the schedule in wrangler.toml.
+  // Two cron triggers (see wrangler.toml), distinguished by event.cron:
+  //   "0 15 * * *" → morning: daily puzzle-live nudge (everyone)
+  //   "0 2 * * *"  → evening: streak-at-risk nudge (only mid-streak users)
   async scheduled(event, env, ctx) {
+    const daySeed = Math.floor(Date.now() / 86400000);
+
+    if (event.cron === '0 2 * * *') {
+      const yesterday = pacificDay(1);
+      ctx.waitUntil(
+        broadcastPush(
+          env,
+          (s) => ({
+            title: "Don't break the chain 🔥",
+            body: pick(ATRISK_NUDGES, daySeed).replace('{{n}}', s.streak),
+            url: SITE_URL,
+          }),
+          // Played yesterday but not yet today → exactly one day from losing it.
+          (s) => s.streak > 0 && s.lastPlayed === yesterday
+        )
+      );
+      return;
+    }
+
+    // Default: daily puzzle-live nudge to everyone.
+    const n = sparkleNumber();
     ctx.waitUntil(
       broadcastPush(env, {
         title: 'Rainier Spark',
-        body: "Today's puzzle is live — keep your streak alive.",
-        url: 'https://audaddy.github.io/rainier-spark-dashboard/',
+        body: pick(DAILY_NUDGES, daySeed).replace('{{n}}', n),
+        url: SITE_URL,
       })
     );
   },

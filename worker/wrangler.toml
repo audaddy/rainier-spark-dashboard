@@ -7,9 +7,11 @@ kv_namespaces = [
   { binding = "LEADERBOARD_KV", id = "b47f34b74fee44a9ad2bc39115dc33f0" }
 ]
 
-# Daily push nudge — 15:00 UTC ≈ 08:00 Pacific. Fires the scheduled() handler.
+# Push crons — both fire scheduled(); the handler branches on event.cron.
+#   0 15 * * *  → 15:00 UTC ≈ 08:00 Pacific: daily puzzle-live nudge (everyone)
+#   0 2  * * *  → 02:00 UTC ≈ 18:00 Pacific: streak-at-risk nudge (mid-streak only)
 [triggers]
-crons = ["0 15 * * *"]
+crons = ["0 15 * * *", "0 2 * * *"]
 
 # Secrets required for push (set via `wrangler secret put`, see scripts/gen-vapid.mjs):
 #   VAPID_PUBLIC_KEY, VAPID_PRIVATE_JWK, VAPID_SUBJECT
