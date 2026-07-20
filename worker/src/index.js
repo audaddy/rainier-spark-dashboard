@@ -2,6 +2,13 @@ const GAMES = new Set(['sparkle', 'zip']);
 const MAX_ENTRIES = 25;
 const MAX_NAME_LEN = 20;
 
+// Squadron affiliation for unit-vs-unit standings. Keep in sync with index.html.
+const SQUADRONS = new Set(['62 OG', '62 MXG', '62 MXS', '62 APS', '62 AMXS', '446 AW', 'OSS', 'CES', 'FSS', 'Other']);
+function sanitizeSquadron(raw) {
+  const s = String(raw || '').trim();
+  return SQUADRONS.has(s) ? s : null;
+}
+
 const DEFAULT_ORIGIN = 'https://audaddy.github.io';
 const ALLOWED_ORIGINS = [/^https:\/\/audaddy\.github\.io$/, /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
 
@@ -12,7 +19,7 @@ function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key',
     Vary: 'Origin',
   };
 }
@@ -73,16 +80,17 @@ async function handlePost(request, env, origin) {
     return json({ error: 'invalid JSON body' }, 400, origin);
   }
 
-  const { game, period, name, score, clientId } = body || {};
+  const { game, period, name, score, clientId, squadron } = body || {};
   if (!GAMES.has(game) || !period || typeof score !== 'object' || score === null || !validScore(game, score)) {
     return json({ error: 'invalid payload' }, 400, origin);
   }
+  const sq = sanitizeSquadron(squadron);
 
   const key = `${game}:${period}`;
   const raw = await env.LEADERBOARD_KV.get(key);
   const entries = raw ? JSON.parse(raw) : [];
 
-  const entry = { name: sanitizeName(name), clientId: clientId || null, ...score };
+  const entry = { name: sanitizeName(name), clientId: clientId || null, ...(sq ? { squadron: sq } : {}), ...score };
   // one row per player: resubmits from the same client keep their best score
   const existing = clientId ? entries.findIndex((e) => e.clientId === clientId) : -1;
   if (existing !== -1) {
@@ -96,6 +104,83 @@ async function handlePost(request, env, origin) {
   return json({ leaderboard: redact(sorted) }, 200, origin);
 }
 
+// ── Click tracking (button/link events) ──
+const EVENTS_KEY = 'events:v1';
+const EVENT_NAME_RE = /^[a-z0-9_]{1,40}$/;
+const MAX_EVENT_NAMES = 100;
+const MAX_EVENT_DAYS = 120;
+
+function utcDay() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+}
+
+async function handleEvent(request, env, origin) {
+  let name = '';
+  try {
+    const body = JSON.parse(await request.text());
+    if (body && typeof body.name === 'string') name = body.name;
+  } catch (e) {
+    return json({ error: 'invalid body' }, 400, origin);
+  }
+  if (!EVENT_NAME_RE.test(name)) {
+    return json({ error: 'invalid name' }, 400, origin);
+  }
+
+  const raw = await env.LEADERBOARD_KV.get(EVENTS_KEY);
+  const data = raw ? JSON.parse(raw) : {};
+  if (!data[name]) {
+    if (Object.keys(data).length >= MAX_EVENT_NAMES) {
+      return json({ ok: false }, 200, origin); // ignore new names past the cap
+    }
+    data[name] = { total: 0, days: {} };
+  }
+  const day = utcDay();
+  data[name].total = (data[name].total || 0) + 1;
+  data[name].days[day] = (data[name].days[day] || 0) + 1;
+  // bound stored history to the most recent MAX_EVENT_DAYS days per event
+  const days = Object.keys(data[name].days).sort();
+  if (days.length > MAX_EVENT_DAYS) {
+    for (const d of days.slice(0, days.length - MAX_EVENT_DAYS)) delete data[name].days[d];
+  }
+  await env.LEADERBOARD_KV.put(EVENTS_KEY, JSON.stringify(data));
+  return json({ ok: true }, 200, origin);
+}
+
+async function handleStats(request, env, origin) {
+  const key = request.headers.get('X-Admin-Key');
+  if (!env.ADMIN_KEY || key !== env.ADMIN_KEY) {
+    return json({ error: 'unauthorized' }, 401, origin);
+  }
+  const raw = await env.LEADERBOARD_KV.get(EVENTS_KEY);
+  return json({ events: raw ? JSON.parse(raw) : {} }, 200, origin);
+}
+
+// ── Web Push subscriptions ──
+const SUBS_KEY = 'push:subs:v1';
+const MAX_SUBS = 2000;
+
+// Return the public VAPID key so the browser can subscribe.
+function handleVapid(env, origin) {
+  return json({ key: env.VAPID_PUBLIC_KEY || null }, 200, origin);
+}
+
+// Store a PushSubscription (deduped by endpoint).
+async function handleSubscribe(request, env, origin) {
+  let sub;
+  try { sub = await request.json(); } catch (e) { return json({ error: 'invalid JSON' }, 400, origin); }
+  if (!sub || typeof sub.endpoint !== 'string' || !sub.endpoint.startsWith('https://')) {
+    return json({ error: 'invalid subscription' }, 400, origin);
+  }
+  const raw = await env.LEADERBOARD_KV.get(SUBS_KEY);
+  const subs = raw ? JSON.parse(raw) : [];
+  const i = subs.findIndex((s) => s.endpoint === sub.endpoint);
+  const record = { endpoint: sub.endpoint, keys: sub.keys || null, ts: Date.now() };
+  if (i !== -1) subs[i] = record;
+  else if (subs.length < MAX_SUBS) subs.push(record);
+  await env.LEADERBOARD_KV.put(SUBS_KEY, JSON.stringify(subs));
+  return json({ ok: true, count: subs.length }, 200, origin);
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin');
@@ -104,15 +189,29 @@ export default {
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
-    if (url.pathname !== '/leaderboard') {
-      return json({ error: 'not found' }, 404, origin);
+
+    if (url.pathname === '/push/vapid') {
+      if (request.method === 'GET') return handleVapid(env, origin);
+      return json({ error: 'method not allowed' }, 405, origin);
     }
-    if (request.method === 'GET') {
-      return handleGet(url, env, origin);
+    if (url.pathname === '/push/subscribe') {
+      if (request.method === 'POST') return handleSubscribe(request, env, origin);
+      return json({ error: 'method not allowed' }, 405, origin);
     }
-    if (request.method === 'POST') {
-      return handlePost(request, env, origin);
+
+    if (url.pathname === '/leaderboard') {
+      if (request.method === 'GET') return handleGet(url, env, origin);
+      if (request.method === 'POST') return handlePost(request, env, origin);
+      return json({ error: 'method not allowed' }, 405, origin);
     }
-    return json({ error: 'method not allowed' }, 405, origin);
+    if (url.pathname === '/event') {
+      if (request.method === 'POST') return handleEvent(request, env, origin);
+      return json({ error: 'method not allowed' }, 405, origin);
+    }
+    if (url.pathname === '/stats') {
+      if (request.method === 'GET') return handleStats(request, env, origin);
+      return json({ error: 'method not allowed' }, 405, origin);
+    }
+    return json({ error: 'not found' }, 404, origin);
   },
 };

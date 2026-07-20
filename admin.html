@@ -6,30 +6,48 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="robots" content="noindex" />
 <style>
-  :root { color-scheme: dark; }
+  :root { color-scheme: dark; --accent:#1a8cff; --accent-soft:#6fb0ff; --bg:#0b0d11; --panel:#12151b; --line:rgba(255,255,255,.08); --muted:#7c8794; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: #0b0d11; color: #e6ecf2;
+  body { margin: 0; background: var(--bg); color: #e6ecf2;
     font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; padding: 24px; }
-  .wrap { max-width: 760px; margin: 0 auto; }
+  .wrap { max-width: 960px; margin: 0 auto; }
   h1 { font-size: 18px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 2px; }
-  .sub { color: #7c8794; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 20px; }
-  .card { background: #12151b; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .sub { color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 20px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
   label { display: block; font-size: 11px; color: #9aa6b2; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
-  input { width: 100%; background: #0b0d11; border: 1px solid rgba(255,255,255,.15); color: #e6ecf2;
+  input { width: 100%; background: var(--bg); border: 1px solid rgba(255,255,255,.15); color: #e6ecf2;
     border-radius: 5px; padding: 9px 11px; font: inherit; }
   .row { display: flex; gap: 8px; }
-  button { background: #1a8cff; color: #06121f; border: 0; border-radius: 5px; padding: 9px 16px;
+  button { background: var(--accent); color: #06121f; border: 0; border-radius: 5px; padding: 9px 16px;
     font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; cursor: pointer; }
   button.ghost { background: transparent; color: #9aa6b2; border: 1px solid rgba(255,255,255,.15); }
   table { width: 100%; border-collapse: collapse; }
   th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; }
-  th { color: #7c8794; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
+  th { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { color: #cbd5e1; }
+  th .arrow { color: var(--accent-soft); }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .big { color: #6fb0ff; font-weight: 700; }
-  .muted { color: #7c8794; }
+  .big { color: var(--accent-soft); font-weight: 700; }
+  .muted { color: var(--muted); }
   .err { color: #ff6b6b; font-size: 13px; margin-top: 10px; }
-  .note { color: #7c8794; font-size: 11px; line-height: 1.6; margin-top: 4px; }
-  a { color: #6fb0ff; }
+  .note { color: var(--muted); font-size: 11px; line-height: 1.6; margin-top: 4px; }
+  a { color: var(--accent-soft); }
+
+  /* KPI tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+  .tile .k { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+  .tile .v { font-size: 26px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; margin-top: 4px; line-height: 1; }
+  .tile .d { font-size: 11px; color: var(--muted); margin-top: 5px; }
+  .tile .v.accent { color: var(--accent-soft); }
+
+  .chead { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .chead h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin: 0; color: #cbd5e1; }
+  .chead .legend { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .barwrap { width: 100%; overflow-x: auto; }
+  .spark { display: block; }
+  .actioncell b { color: #e6ecf2; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -42,6 +60,7 @@
     <div class="row">
       <input id="key" type="password" placeholder="Paste your admin key" autocomplete="off" />
       <button id="load">Load</button>
+      <button id="refresh" class="ghost" title="Reload data">Refresh</button>
       <button id="forget" class="ghost" title="Clear saved key">Forget</button>
     </div>
     <div id="err" class="err" style="display:none"></div>
@@ -55,11 +74,13 @@
 
 <script>
   const LB_API = 'https://rainier-spark-leaderboard.audaddy.workers.dev';
+  const CHART_DAYS = 30;   // site-wide activity window
+  const SPARK_DAYS = 14;   // per-action sparkline window
   const LABELS = {
     wordle_open: 'Wordle opened', zip_open: 'Zip opened', snake_open: 'Snake opened',
-    konami_open: 'Konami controller', team: 'Team', location_hours: 'Location / Hours',
-    email_orgbox: 'Email Org Box', instagram: 'Instagram', map: 'Google Maps',
-    vision_open: 'Vision card opened',
+    konami_open: 'Konami controller', palette_open: 'Command palette', team: 'Team',
+    location_hours: 'Location / Hours', email_orgbox: 'Email Org Box', instagram: 'Instagram',
+    map: 'Google Maps', vision_open: 'Vision card opened',
     // filter tabs
     filter_all: 'Filter · All Lines of Effort', filter_priority: 'Filter · High Priority',
     filter_suas: 'Filter · sUAS / C-sUAS', filter_hpt: 'Filter · Human Performance',
@@ -82,9 +103,21 @@
     }
     return name;
   }
+  function category(name) {
+    if (/^(wordle|zip|snake|konami)_/.test(name)) return 'Games';
+    if (name === 'palette_open') return 'Navigation';
+    if (name.startsWith('filter_')) return 'Filters';
+    if (name.startsWith('card_')) return 'Cards';
+    if (name.startsWith('vision')) return 'Vision';
+    return 'Connect';
+  }
+
   const keyInput = document.getElementById('key');
   const err = document.getElementById('err');
   const results = document.getElementById('results');
+  let lastEvents = null;        // cache for re-sorts without refetch
+  let sortKey = 'total';        // total | last7 | today | name
+  let sortDir = -1;             // -1 desc, 1 asc
 
   const saved = localStorage.getItem('rs-admin-key');
   if (saved) { keyInput.value = saved; load(); }
@@ -93,10 +126,16 @@
     const d = new Date(); d.setUTCDate(d.getUTCDate() - offset);
     return d.toISOString().slice(0, 10);
   }
-  function last7Total(days) {
-    let n = 0;
-    for (let i = 0; i < 7; i++) n += days[utcDay(i)] || 0;
-    return n;
+  // Ordered list of the last n UTC dates (oldest -> newest).
+  function lastNDays(n) {
+    const out = [];
+    for (let i = n - 1; i >= 0; i--) out.push(utcDay(i));
+    return out;
+  }
+  function windowTotal(days, n) {
+    let t = 0;
+    for (let i = 0; i < n; i++) t += days[utcDay(i)] || 0;
+    return t;
   }
   function showErr(msg) { err.style.display = 'block'; err.textContent = msg; }
 
@@ -112,35 +151,158 @@
     if (!res.ok) { showErr('Unexpected error: ' + res.status); return; }
     localStorage.setItem('rs-admin-key', key);
     const { events } = await res.json();
-    render(events || {});
+    lastEvents = events || {};
+    render();
   }
 
-  function render(events) {
-    const names = Object.keys(events).sort((a, b) => (events[b].total || 0) - (events[a].total || 0));
+  // ── Inline SVG charts (no dependencies) ──
+  function barChart(dates, values) {
+    const W = 920, H = 150, padB = 22, padT = 10, padL = 4, padR = 4;
+    const max = Math.max(1, ...values);
+    const n = values.length;
+    const gap = 3;
+    const bw = (W - padL - padR) / n - gap;
+    const plotH = H - padB - padT;
+    const today = utcDay(0);
+    let bars = '', ticks = '';
+    values.forEach((v, i) => {
+      const x = padL + i * (bw + gap);
+      const h = Math.round((v / max) * plotH);
+      const y = padT + plotH - h;
+      const isToday = dates[i] === today;
+      bars += `<rect x="${x.toFixed(1)}" y="${y}" width="${bw.toFixed(1)}" height="${h}" rx="1.5"
+        fill="${isToday ? '#6fb0ff' : '#1a8cff'}" opacity="${v ? (isToday ? 1 : 0.85) : 0.18}">
+        <title>${dates[i]} — ${v} click${v === 1 ? '' : 's'}</title></rect>`;
+      // date tick every ~5 days and on the last bar
+      if (i % 5 === 0 || i === n - 1) {
+        ticks += `<text x="${(x + bw / 2).toFixed(1)}" y="${H - 6}" text-anchor="middle"
+          font-size="9" fill="#7c8794">${dates[i].slice(5)}</text>`;
+      }
+    });
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Daily clicks, last ${n} days">
+      <line x1="${padL}" y1="${padT + plotH + 0.5}" x2="${W - padR}" y2="${padT + plotH + 0.5}" stroke="rgba(255,255,255,.12)"/>
+      ${bars}${ticks}</svg>`;
+  }
+
+  function sparkline(days) {
+    const dates = lastNDays(SPARK_DAYS);
+    const vals = dates.map((d) => days[d] || 0);
+    const W = 108, H = 26, n = vals.length, gap = 1.5;
+    const max = Math.max(1, ...vals);
+    const bw = (W) / n - gap;
+    let bars = '';
+    vals.forEach((v, i) => {
+      const h = Math.max(v ? 1 : 0, Math.round((v / max) * (H - 2)));
+      bars += `<rect x="${(i * (bw + gap)).toFixed(1)}" y="${H - h}" width="${bw.toFixed(1)}" height="${h}" rx="1"
+        fill="#6fb0ff" opacity="${v ? 0.9 : 0.15}"><title>${dates[i].slice(5)}: ${v}</title></rect>`;
+    });
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">${bars}</svg>`;
+  }
+
+  function th(key, label, cls) {
+    const active = sortKey === key;
+    const arrow = active ? `<span class="arrow">${sortDir === -1 ? '↓' : '↑'}</span>` : '';
+    return `<th class="sortable ${cls || ''}" data-sort="${key}">${label} ${arrow}</th>`;
+  }
+
+  function render() {
+    const events = lastEvents || {};
+    const names = Object.keys(events);
     if (!names.length) {
       results.innerHTML = '<div class="card muted">No clicks recorded yet. Once the site is live and people start tapping buttons, they\'ll show up here.</div>';
       return;
     }
-    const today = utcDay(0);
-    let rows = '';
+
+    // ── Aggregate site-wide daily totals ──
+    const dates = lastNDays(CHART_DAYS);
+    const dayIndex = Object.create(null);
+    dates.forEach((d) => (dayIndex[d] = 0));
+    let allTime = 0;
     for (const n of names) {
-      const e = events[n];
+      allTime += events[n].total || 0;
+      const days = events[n].days || {};
+      for (const d in days) if (d in dayIndex) dayIndex[d] += days[d];
+    }
+    const chartVals = dates.map((d) => dayIndex[d]);
+    const today = utcDay(0);
+    const last7 = names.reduce((s, n) => s + windowTotal(events[n].days || {}, 7), 0);
+    const todayTotal = names.reduce((s, n) => s + ((events[n].days || {})[today] || 0), 0);
+    const prev7 = names.reduce((s, n) => {
+      const days = events[n].days || {};
+      let t = 0; for (let i = 7; i < 14; i++) t += days[utcDay(i)] || 0; return s + t;
+    }, 0);
+    const wowDelta = prev7 === 0 ? (last7 ? '+∞' : '—') : (((last7 - prev7) / prev7) * 100).toFixed(0).replace(/^(?!-)/, '+') + '%';
+    let peakDay = dates[0], peakVal = -1;
+    dates.forEach((d) => { if (dayIndex[d] > peakVal) { peakVal = dayIndex[d]; peakDay = d; } });
+
+    // ── Category breakdown ──
+    const cats = {};
+    for (const n of names) { const c = category(n); cats[c] = (cats[c] || 0) + (events[n].total || 0); }
+    const catRows = Object.entries(cats).sort((a, b) => b[1] - a[1])
+      .map(([c, v]) => `${c} <b style="color:#e6ecf2">${v}</b>`).join(' &nbsp;·&nbsp; ');
+
+    // ── KPI tiles ──
+    const tiles = `<div class="tiles">
+      <div class="tile"><div class="k">Total clicks</div><div class="v">${allTime}</div><div class="d">${names.length} actions tracked</div></div>
+      <div class="tile"><div class="k">Last 7 days</div><div class="v accent">${last7}</div><div class="d">${wowDelta} vs prior 7</div></div>
+      <div class="tile"><div class="k">Today (UTC)</div><div class="v">${todayTotal}</div><div class="d">${today}</div></div>
+      <div class="tile"><div class="k">Busiest day</div><div class="v">${peakVal}</div><div class="d">${peakDay}</div></div>
+    </div>`;
+
+    // ── Site-wide activity chart ──
+    const chart = `<div class="card">
+      <div class="chead"><h2>Daily activity · last ${CHART_DAYS} days</h2><span class="legend">${catRows}</span></div>
+      <div class="barwrap">${barChart(dates, chartVals)}</div>
+    </div>`;
+
+    // ── Per-action table (sortable) ──
+    const rowData = names.map((n) => ({
+      name: n, label: pretty(n), total: events[n].total || 0,
+      last7: windowTotal(events[n].days || {}, 7), today: (events[n].days || {})[today] || 0,
+      days: events[n].days || {},
+    }));
+    rowData.sort((a, b) => {
+      if (sortKey === 'name') return sortDir * a.label.localeCompare(b.label);
+      return sortDir * ((a[sortKey] || 0) - (b[sortKey] || 0));
+    });
+    let rows = '';
+    for (const r of rowData) {
       rows += `<tr>
-        <td>${pretty(n)}<div class="muted" style="font-size:10px">${n}</div></td>
-        <td class="num big">${e.total || 0}</td>
-        <td class="num">${last7Total(e.days || {})}</td>
-        <td class="num">${(e.days || {})[today] || 0}</td>
+        <td class="actioncell"><b>${r.label}</b><div class="muted" style="font-size:10px">${r.name}</div></td>
+        <td class="num big">${r.total}</td>
+        <td class="num">${r.last7}</td>
+        <td class="num">${r.today}</td>
+        <td style="text-align:right">${sparkline(r.days)}</td>
       </tr>`;
     }
-    results.innerHTML = `<div class="card"><table>
-      <thead><tr><th>Action</th><th class="num">All-time</th><th class="num">Last 7 days</th><th class="num">Today</th></tr></thead>
+    const table = `<div class="card"><table>
+      <thead><tr>
+        ${th('name', 'Action')}
+        ${th('total', 'All-time', 'num')}
+        ${th('last7', 'Last 7d', 'num')}
+        ${th('today', 'Today', 'num')}
+        <th class="num">${SPARK_DAYS}-day trend</th>
+      </tr></thead>
       <tbody>${rows}</tbody></table></div>`;
+
+    results.innerHTML = tiles + chart + table;
+
+    // wire sortable headers
+    results.querySelectorAll('th.sortable').forEach((el) => {
+      el.addEventListener('click', () => {
+        const k = el.dataset.sort;
+        if (sortKey === k) { sortDir *= -1; }
+        else { sortKey = k; sortDir = k === 'name' ? 1 : -1; }
+        render();
+      });
+    });
   }
 
   document.getElementById('load').addEventListener('click', load);
+  document.getElementById('refresh').addEventListener('click', load);
   keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') load(); });
   document.getElementById('forget').addEventListener('click', () => {
-    localStorage.removeItem('rs-admin-key'); keyInput.value = ''; results.innerHTML = '';
+    localStorage.removeItem('rs-admin-key'); keyInput.value = ''; results.innerHTML = ''; lastEvents = null;
   });
 </script>
 </body>

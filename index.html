@@ -302,9 +302,70 @@
 <div class="scanlines" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
-<div x-data="dashboard()" x-cloak class="relative z-10">
+<div x-data="dashboard()" x-cloak class="relative z-10"
+  @keydown.window="if(($event.metaKey||$event.ctrlKey) && ($event.key==='k'||$event.key==='K')){ $event.preventDefault(); paletteOpen ? closePalette() : openPalette(); }">
+
+  <!-- ════════════ COMMAND PALETTE (⌘K / Ctrl-K) ════════════ -->
+  <div x-show="paletteOpen" x-cloak
+    class="fixed inset-0 z-[80] bg-black/70 backdrop-blur-sm flex items-start justify-center px-4 pt-[12vh]"
+    x-transition.opacity
+    @click="closePalette()"
+    @keydown.escape.window="closePalette()">
+    <div class="w-full max-w-[560px] bg-ink-900 border border-electric/40 rounded-lg shadow-2xl shadow-black/70 overflow-hidden"
+      @click.stop>
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+        <svg viewBox="0 0 24 24" class="w-5 h-5 text-electric/70 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="palette-input" type="text" x-model="paletteQuery"
+          @input="paletteActive = 0"
+          @keydown.down.prevent="paletteMove(1)"
+          @keydown.up.prevent="paletteMove(-1)"
+          @keydown.enter.prevent="paletteExec()"
+          @keydown.escape.prevent="closePalette()"
+          placeholder="Search lines, initiatives, calendar, sections…"
+          autocomplete="off" spellcheck="false"
+          class="flex-1 min-w-0 bg-transparent outline-none border-0 text-white placeholder:text-slate-500 font-condensed text-lg tracking-wide" />
+        <kbd class="font-mono text-[10px] leading-none border border-white/20 rounded px-1.5 py-1 text-slate-400">ESC</kbd>
+      </div>
+      <div class="max-h-[52vh] overflow-y-auto py-2">
+        <template x-for="(item, i) in paletteResults" :key="item.group + item.label + i">
+          <button type="button" :data-palette-idx="i"
+            @click="paletteExec(item)" @mousemove="paletteActive = i"
+            class="w-full flex items-center gap-3 text-left px-4 py-2.5 transition-colors"
+            :class="paletteActive === i ? 'bg-electric/15' : 'hover:bg-white/5'">
+            <span class="font-mono text-[9px] shrink-0 w-[92px] uppercase tracking-[0.12em]"
+              :class="paletteActive === i ? 'text-electric' : 'text-slate-500'" x-text="item.group"></span>
+            <span class="flex-1 min-w-0">
+              <span class="block text-white font-condensed text-[15px] leading-tight truncate" x-text="item.label"></span>
+              <span x-show="item.hint" class="block text-slate-400 font-mono text-[10px] truncate mt-0.5" x-text="item.hint"></span>
+            </span>
+            <svg x-show="paletteActive === i" viewBox="0 0 24 24" class="w-4 h-4 text-electric/70 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </template>
+        <div x-show="paletteResults.length === 0" class="px-4 py-8 text-center text-slate-500 font-mono text-[12px]">
+          No matches for "<span x-text="paletteQuery"></span>"
+        </div>
+      </div>
+      <div class="flex items-center gap-4 px-4 py-2 border-t border-white/10 bg-ink-950/50 font-mono text-[10px] text-slate-500">
+        <span><kbd class="text-slate-400">↑↓</kbd> navigate</span>
+        <span><kbd class="text-slate-400">↵</kbd> open</span>
+        <span class="ml-auto" x-text="paletteResults.length + ' result' + (paletteResults.length === 1 ? '' : 's')"></span>
+      </div>
+    </div>
+  </div>
+
 
   <!-- ════════════ TOPBAR ════════════ -->
+  <!-- Streak milestone celebration -->
+  <div x-show="$store.progress.milestoneShow > 0" x-cloak
+    x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-3" x-transition:enter-end="opacity-100 translate-y-0"
+    class="fixed top-4 left-1/2 -translate-x-1/2 z-[85] flex items-center gap-3 bg-gradient-to-r from-gold/95 to-amber/95 text-ink-950 px-5 py-3 rounded-lg shadow-2xl shadow-black/60 border border-white/20">
+    <svg viewBox="0 0 24 24" class="w-6 h-6 shrink-0" fill="currentColor"><path d="M12 2c1 3-1 4-1 6 0 1.3 1 2 2 2 1.5 0 2-1.3 2-2.3 2 2 3 4.6 3 7a6 6 0 0 1-12 0c0-4 2-6 3-8 .6-1.2.5-3-1-4.7 1.7.2 3.3 1 4 3z"/></svg>
+    <div>
+      <div class="font-condensed font-extrabold text-lg leading-none uppercase tracking-wide"><span x-text="$store.progress.milestoneShow"></span>-Day Streak!</div>
+      <div class="font-mono text-[10px] tracking-wide uppercase opacity-80 mt-0.5">Rainier Spark · keep it going</div>
+    </div>
+  </div>
+
   <header class="sticky top-0 z-40 backdrop-blur-md bg-ink-950/90 border-b border-white/10">
     <div class="max-w-[1480px] mx-auto px-4 sm:px-8 py-3 sm:py-4 flex items-center gap-3 sm:gap-6">
       <!-- Rainier Spark crest -->
@@ -398,11 +459,17 @@
         <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Wordle
       </button>
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-white/10 bg-ink-950/50"
-        x-show="$store.progress.streak > 0" x-cloak title="Daily win streak">
+      <button type="button"
+        x-show="$store.progress.streak > 0" x-cloak
+        @click="$store.progress.atRisk && ($store.sparkle.openGame(), trackClick('streak_nudge'))"
+        :title="$store.progress.atRisk ? 'Play today to keep your streak alive' : 'Daily win streak'"
+        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border transition-colors"
+        :class="$store.progress.atRisk ? 'border-amber/70 bg-amber/10 animate-pulse cursor-pointer' : 'border-white/10 bg-ink-950/50'">
         <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-amber shrink-0" fill="currentColor"><path d="M12 2c1 3-1 4-1 6 0 1.3 1 2 2 2 1.5 0 2-1.3 2-2.3 2 2 3 4.6 3 7a6 6 0 0 1-12 0c0-4 2-6 3-8 .6-1.2.5-3-1-4.7 1.7.2 3.3 1 4 3z"/></svg>
-        <span class="font-mono text-[10px] text-amber tracking-[0.08em] uppercase"><span x-text="$store.progress.streak"></span> Day Streak</span>
-      </div>
+        <span class="font-mono text-[10px] text-amber tracking-[0.08em] uppercase">
+          <span x-text="$store.progress.streak"></span> Day Streak<span x-show="$store.progress.atRisk"> · Play Today</span>
+        </span>
+      </button>
       <button type="button" @click="$store.zip.openGame(); trackClick('zip_open')" class="inline-flex items-center gap-2 border border-electric/45 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white sm:mr-auto">
         <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M5 5 L14 5 L14 12 L19 12 L19 19"/></svg>
         Zip
@@ -412,6 +479,18 @@
         Connect with Rainier Spark
       </span>
       <div class="flex flex-wrap items-center gap-2">
+        <button type="button" @click="openPalette(); trackClick('palette_open')" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          Search
+          <kbd class="hidden sm:inline font-mono text-[10px] leading-none border border-white/20 rounded px-1.5 py-1 text-slate-300 tracking-normal">⌘K</kbd>
+        </button>
+        <button type="button" x-data="{ st: 'idle' }" x-show="pushSupported()" x-cloak
+          @click="st='working'; subscribePush().then(r => { st = r; trackClick('push_optin'); if (r !== 'ok') setTimeout(() => st = 'idle', 4000); })"
+          :title="st==='not-configured' ? 'Push not set up on the server yet' : 'Get a nudge when the daily puzzle drops'"
+          class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span x-text="st==='ok' ? 'Reminders On' : st==='denied' ? 'Blocked' : st==='not-configured' ? 'Coming Soon' : st==='working' ? '…' : 'Remind Me'"></span>
+        </button>
         <a href="#team" @click="trackClick('team')" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
           <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19v-1a3 3 0 0 0-2.6-3"/></svg>
           Team
@@ -449,7 +528,7 @@
     </div>
 
     <!-- ════════════ SECTION 01 — STATUS BOARD ════════════ -->
-    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-4 pb-3 border-b border-white/10">
+    <div id="sec-status" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-4 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 01 / STATUS BOARD</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Active Innovation Lines</h2>
       <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase" x-text="`${visibleProjects.length} of ${projects.length} shown`"></span>
@@ -643,7 +722,7 @@
     </div>
 
     <!-- ════════════ SECTION 02 — MISSION IMPACT ════════════ -->
-    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
+    <div id="sec-impact" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 02 / MISSION IMPACT</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">62d Airlift Wing · ROI Summary</h2>
       <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase">FY26 Actuals · FY27 Forecast</span>
@@ -714,7 +793,7 @@
     </div>
 
     <!-- ════════════ SECTION 03 — VISION INITIATIVES ════════════ -->
-    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
+    <div id="sec-vision" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-green tracking-[0.2em]">§ 03 / VISION · SIF26</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Authored Initiatives · Squadron Innovation Fund</h2>
       <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase" x-text="`${vision.length} APPS · ${visionTotal.toLocaleString()} TOKENS FUNDED`"></span>
@@ -817,7 +896,7 @@
     </div>
 
     <!-- ════════════ SECTION 04 — ENGAGEMENT TIMELINE ════════════ -->
-    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
+    <div id="sec-engagement" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 04 / ENGAGEMENT</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Q1–Q3 FY26 Calendar</h2>
       <span class="ml-auto font-mono text-[10px] text-ice tracking-[0.14em] uppercase">NOW · JUL 26</span>
@@ -1317,6 +1396,11 @@
       <!-- Post-game: name entry -->
       <div x-show="$store.sparkle.gameOver && !$store.sparkle.submitted" class="border-t border-white/10 pt-4 mt-1">
         <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to today's board (optional)</div>
+        <select x-data="{ sq: getSquadron() }" x-model="sq" @change="setSquadron(sq)"
+          class="w-full mb-2 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white">
+          <option value="">Squadron — optional</option>
+          <template x-for="s in SQUADRONS" :key="s"><option :value="s" x-text="s"></option></template>
+        </select>
         <div class="flex gap-2">
           <input type="text" x-model="$store.sparkle.playerName" placeholder="Initials or name" maxlength="20"
             @keydown.enter="$store.sparkle.submitScore()"
@@ -1325,8 +1409,13 @@
         </div>
       </div>
 
-      <!-- Post-game: play again -->
-      <div class="flex justify-center mt-3" x-show="$store.sparkle.gameOver">
+      <!-- Post-game: share + play again -->
+      <div class="flex flex-wrap gap-2 justify-center mt-3" x-show="$store.sparkle.gameOver">
+        <button @click="$store.sparkle.share()"
+          class="inline-flex items-center gap-2 bg-electric hover:bg-white text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-bold text-[12px] tracking-[0.1em] uppercase">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+          <span x-text="$store.sparkle.shareState === 'done' ? 'Copied!' : $store.sparkle.shareState === 'fail' ? 'Copy failed' : 'Share Result'"></span>
+        </button>
         <button @click="$store.sparkle.playAgain()" class="inline-flex items-center gap-2 border border-electric/50 hover:border-electric hover:bg-electric/15 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-electric">
           <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 3-6.7M3 3v5h5"/></svg>
           Play Again · New Word
@@ -1433,6 +1522,11 @@
       <!-- Post-game: name entry -->
       <div x-show="$store.zip.gameOver && !$store.zip.submitted" class="border-t border-white/10 pt-4 mt-1">
         <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to today's board (optional)</div>
+        <select x-data="{ sq: getSquadron() }" x-model="sq" @change="setSquadron(sq)"
+          class="w-full mb-2 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white">
+          <option value="">Squadron — optional</option>
+          <template x-for="s in SQUADRONS" :key="s"><option :value="s" x-text="s"></option></template>
+        </select>
         <div class="flex gap-2">
           <input type="text" x-model="$store.zip.playerName" placeholder="Initials or name" maxlength="20"
             @keydown.enter="$store.zip.submitScore()"
@@ -1441,8 +1535,13 @@
         </div>
       </div>
 
-      <!-- Post-game: play again -->
-      <div class="flex justify-center mt-3" x-show="$store.zip.gameOver">
+      <!-- Post-game: share + play again -->
+      <div class="flex flex-wrap gap-2 justify-center mt-3" x-show="$store.zip.gameOver">
+        <button @click="$store.zip.share()"
+          class="inline-flex items-center gap-2 bg-electric hover:bg-white text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-bold text-[12px] tracking-[0.1em] uppercase">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+          <span x-text="$store.zip.shareState === 'done' ? 'Copied!' : $store.zip.shareState === 'fail' ? 'Copy failed' : 'Share Result'"></span>
+        </button>
         <button @click="$store.zip.reset()" class="inline-flex items-center gap-2 border border-electric/50 hover:border-electric hover:bg-electric/15 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-electric">
           <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 3-6.7M3 3v5h5"/></svg>
           Play Again · Beat Your Time
@@ -1598,17 +1697,27 @@
       <!-- Message -->
       <div class="h-6 text-center font-condensed font-semibold text-sm tracking-wide uppercase mb-2" :class="$store.snake.msgType === 'error' ? 'text-priority' : 'text-ice'" x-text="$store.snake.message"></div>
 
-      <!-- Start / restart -->
-      <div class="flex justify-center mb-2" x-show="!$store.snake.running">
+      <!-- Start / restart + share -->
+      <div class="flex flex-wrap justify-center gap-2 mb-2" x-show="!$store.snake.running">
         <button @click="$store.snake.start()" class="inline-flex items-center gap-2 border border-electric/50 hover:border-electric hover:bg-electric/15 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.1em] uppercase text-electric">
           <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
           <span x-text="$store.snake.gameOver ? 'Fly Again' : 'Launch'"></span>
+        </button>
+        <button @click="$store.snake.share()" x-show="$store.snake.gameOver && $store.snake.score > 0"
+          class="inline-flex items-center gap-2 bg-electric hover:bg-white text-ink-950 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-bold text-[12px] tracking-[0.1em] uppercase">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+          <span x-text="$store.snake.shareState === 'done' ? 'Copied!' : $store.snake.shareState === 'fail' ? 'Copy failed' : 'Share'"></span>
         </button>
       </div>
 
       <!-- Post-game: name entry -->
       <div x-show="$store.snake.gameOver && !$store.snake.submitted && $store.snake.score > 0" class="border-t border-white/10 pt-4 mt-1">
         <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Add your name to the all-time board (optional)</div>
+        <select x-data="{ sq: getSquadron() }" x-model="sq" @change="setSquadron(sq)"
+          class="w-full mb-2 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white">
+          <option value="">Squadron — optional</option>
+          <template x-for="s in SQUADRONS" :key="s"><option :value="s" x-text="s"></option></template>
+        </select>
         <div class="flex gap-2">
           <input type="text" x-model="$store.snake.playerName" placeholder="Initials or name" maxlength="20"
             @keydown.enter="$store.snake.submitScore()"
@@ -2276,6 +2385,77 @@ function dashboard() {
     },
     closeBio() { this.bio = null; if (this.open === null) document.body.classList.remove('modal-open'); },
 
+    // ── Command palette (⌘K / Ctrl-K) ──
+    paletteOpen: false,
+    paletteQuery: '',
+    paletteActive: 0,
+    get paletteItems() {
+      const items = [];
+      [
+        ['Status Board · Active Innovation Lines', 'sec-status'],
+        ['Mission Impact · ROI Summary', 'sec-impact'],
+        ['Vision · SIF26', 'sec-vision'],
+        ['Engagement · FY26 Calendar', 'sec-engagement'],
+        ['Team · Innovation Cell', 'team'],
+        ['Visit · Find the Lab', 'visit'],
+      ].forEach(([label, id]) => items.push({ group: 'Jump to', label, hint: '', run: () => this.paletteScroll(id) }));
+      this.projects.forEach((p) => items.push({ group: 'Innovation Line', label: p.title, hint: p.eyebrow || p.sub || '', run: () => this.openCard(p) }));
+      this.vision.forEach((v) => items.push({ group: 'Vision · SIF26', label: v.title, hint: v.eyebrow || v.sub || '', run: () => this.openVision(v) }));
+      this.timeline.forEach((t) => (t.events || []).forEach((e) => items.push({ group: 'Calendar', label: e, hint: t.m, run: () => this.paletteScroll('sec-engagement') })));
+      return items;
+    },
+    get paletteResults() {
+      const q = this.paletteQuery.trim().toLowerCase();
+      if (!q) return this.paletteItems.filter((it) => it.group === 'Jump to');
+      const terms = q.split(/\s+/);
+      return this.paletteItems
+        .map((it) => ({ it, score: this._paletteScore(it, terms) }))
+        .filter((x) => x.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 14)
+        .map((x) => x.it);
+    },
+    _paletteScore(it, terms) {
+      const label = it.label.toLowerCase();
+      const hay = (it.label + ' ' + it.hint + ' ' + it.group).toLowerCase();
+      let score = 0;
+      for (const t of terms) {
+        if (hay.indexOf(t) === -1) return 0;
+        const li = label.indexOf(t);
+        score += li === 0 ? 5 : li > 0 ? 3 : 1;
+      }
+      // Prefer navigable targets (sections, lines, vision) over calendar chatter.
+      const weight = { 'Jump to': 4, 'Innovation Line': 3, 'Vision · SIF26': 2, Calendar: 0 };
+      return score + (weight[it.group] || 0);
+    },
+    openPalette() {
+      this.paletteOpen = true;
+      this.paletteQuery = '';
+      this.paletteActive = 0;
+      document.body.classList.add('modal-open');
+      this.$nextTick(() => { const el = document.getElementById('palette-input'); if (el) el.focus(); });
+    },
+    closePalette() {
+      this.paletteOpen = false;
+      if (!this.open) document.body.classList.remove('modal-open');
+    },
+    paletteMove(d) {
+      const n = this.paletteResults.length;
+      if (!n) return;
+      this.paletteActive = (this.paletteActive + d + n) % n;
+      this.$nextTick(() => { const el = document.querySelector('[data-palette-idx="' + this.paletteActive + '"]'); if (el) el.scrollIntoView({ block: 'nearest' }); });
+    },
+    paletteExec(item) {
+      const it = item || this.paletteResults[this.paletteActive];
+      if (!it) return;
+      this.closePalette();
+      it.run();
+    },
+    paletteScroll(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+
     iconSvg(name) {
       const icons = {
         drone: '<svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8 8 L16 16 M16 8 L8 16"/><circle cx="12" cy="12" r="2"/></svg>',
@@ -2303,6 +2483,30 @@ function trackClick(name) {
   } catch (e) {}
 }
 
+/* ── Shareable results (Web Share API → clipboard fallback) ── */
+const SHARE_URL = 'https://audaddy.github.io/rainier-spark-dashboard/';
+async function shareResult(text, evName) {
+  const payload = text + '\n' + SHARE_URL;
+  // Native share sheet on mobile; clipboard everywhere else.
+  try {
+    if (navigator.share) { await navigator.share({ text: payload }); if (evName) trackClick(evName); return 'ok'; }
+  } catch (e) { if (e && e.name === 'AbortError') return 'cancel'; }
+  try {
+    await navigator.clipboard.writeText(payload);
+    if (evName) trackClick(evName);
+    return 'copied';
+  } catch (e) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = payload; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand('copy'); ta.remove();
+      if (evName) trackClick(evName);
+      return 'copied';
+    } catch (e2) { return 'fail'; }
+  }
+}
+
 async function fetchLeaderboard(game, period) {
   try {
     const res = await fetch(`${LB_API}/leaderboard?game=${game}&period=${encodeURIComponent(period)}`);
@@ -2314,12 +2518,61 @@ async function fetchLeaderboard(game, period) {
   }
 }
 
+/* ── Squadron affiliation (unit-vs-unit standings) — keep in sync with worker ── */
+const SQUADRONS = ['62 OG', '62 MXG', '62 MXS', '62 APS', '62 AMXS', '446 AW', 'OSS', 'CES', 'FSS', 'Other'];
+function getSquadron() {
+  try { return localStorage.getItem('rs-squadron') || ''; } catch (e) { return ''; }
+}
+function setSquadron(v) {
+  try { if (SQUADRONS.includes(v)) localStorage.setItem('rs-squadron', v); } catch (e) {}
+}
+// Expose for Alpine expression scope.
+window.SQUADRONS = SQUADRONS; window.getSquadron = getSquadron; window.setSquadron = setSquadron;
+
+/* Tally squadron representation from a leaderboard's returned entries.
+   Returns [{ squadron, players }] sorted desc — a lightweight "standings" view. */
+function squadronStandings(entries) {
+  const tally = {};
+  (entries || []).forEach((e) => { if (e && e.squadron) tally[e.squadron] = (tally[e.squadron] || 0) + 1; });
+  return Object.entries(tally).map(([squadron, players]) => ({ squadron, players })).sort((a, b) => b.players - a.players);
+}
+window.squadronStandings = squadronStandings;
+
+/* ── Web Push opt-in ── */
+function urlB64ToUint8Array(base64) {
+  const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(b64);
+  const arr = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+function pushSupported() {
+  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+}
+async function subscribePush() {
+  if (!pushSupported()) return 'unsupported';
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') return 'denied';
+  const reg = await navigator.serviceWorker.ready;
+  let key;
+  try { key = (await (await fetch(`${LB_API}/push/vapid`)).json()).key; } catch (e) { return 'error'; }
+  if (!key) return 'not-configured';
+  try {
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(key) });
+    const res = await fetch(`${LB_API}/push/subscribe`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub) });
+    return res.ok ? 'ok' : 'error';
+  } catch (e) { return 'error'; }
+}
+window.pushSupported = pushSupported; window.subscribePush = subscribePush;
+
 async function postScore(game, period, name, score, clientId) {
   try {
+    const squadron = getSquadron() || undefined;
     const res = await fetch(`${LB_API}/leaderboard`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ game, period, name, score, clientId }),
+      body: JSON.stringify({ game, period, name, score, clientId, squadron }),
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -2380,6 +2633,24 @@ function burstConfetti(container) {
 document.addEventListener('alpine:init', () => {
   Alpine.store('progress', {
     streak: parseInt((() => { try { return localStorage.getItem('streak-count'); } catch(e) { return null; } })() || '0', 10),
+    playedToday: false,
+    milestoneShow: 0,   // >0 => celebration banner for that milestone
+    MILESTONES: [3, 7, 14, 30, 50, 100],
+    init() {
+      const today = dayKeyStr();
+      let last = null;
+      try { last = localStorage.getItem('streak-last'); } catch (e) {}
+      // A streak only survives if the last win was today or yesterday.
+      if (last !== today && last !== this._yesterday()) { this.streak = 0; }
+      this.playedToday = last === today;
+    },
+    _yesterday() {
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      return `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;
+    },
+    // Has an active streak but hasn't played yet today → one play from losing it.
+    get atRisk() { return this.streak > 0 && !this.playedToday; },
+    get nextMilestone() { return this.MILESTONES.find((m) => m > this.streak) || null; },
     recordWin(game) {
       // Count one win per game per day toward the daily streak.
       const key = `progress-counted-${game}-${dayKeyStr()}`;
@@ -2393,11 +2664,15 @@ document.addEventListener('alpine:init', () => {
       const today = dayKeyStr();
       let last;
       try { last = localStorage.getItem('streak-last'); } catch(e) { last = null; }
-      if (last === today) return;
-      const y = new Date(); y.setDate(y.getDate()-1);
-      const yesterday = `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;
-      this.streak = (last === yesterday) ? this.streak + 1 : 1;
+      if (last === today) { this.playedToday = true; return; }
+      this.streak = (last === this._yesterday()) ? this.streak + 1 : 1;
+      this.playedToday = true;
       try { localStorage.setItem('streak-count', String(this.streak)); localStorage.setItem('streak-last', today); } catch(e) {}
+      if (this.MILESTONES.includes(this.streak)) {
+        this.milestoneShow = this.streak;
+        try { burstConfetti(document.getElementById('sparkle-confetti-zone') || document.getElementById('zip-confetti-zone')); } catch (e) {}
+        setTimeout(() => { this.milestoneShow = 0; }, 5000);
+      }
     },
   });
 });
@@ -2434,6 +2709,7 @@ document.addEventListener('alpine:init', () => {
     gameOpen: false,
     answer: WORD_BANK[dayIndex() % WORD_BANK.length],
     rows: Array.from({length:6}, () => Array.from({length:5}, () => ({letter:'', state:'empty'}))),
+    shareState: 'idle',
     curRow: 0,
     guessArr: ['','','','',''],
     correctPos: [false,false,false,false,false],
@@ -2577,6 +2853,25 @@ document.addEventListener('alpine:init', () => {
       this.submitting = false;
       this.submitted = true;
       this.persist();
+    },
+    shareText() {
+      const emoji = { correct: '🟩', present: '🟨', absent: '⬛' };
+      const lastRow = this.won ? this.curRow : 5;
+      const grid = [];
+      for (let r = 0; r <= lastRow; r++) {
+        const row = this.rows[r];
+        if (!row || row.every((c) => c.state === 'empty' || c.state === 'typing')) break;
+        grid.push(row.map((c) => emoji[c.state] || '⬛').join(''));
+      }
+      const n = dayIndex() + 1;
+      const score = this.won ? (this.curRow + 1) + '/6' : 'X/6';
+      return `Rainier Spark · Sparkle #${n} · ${score}\n${grid.join('\n')}`;
+    },
+    async share() {
+      const res = await shareResult(this.shareText(), 'share_sparkle');
+      if (res === 'cancel') return;
+      this.shareState = res === 'fail' ? 'fail' : 'done';
+      setTimeout(() => { this.shareState = 'idle'; }, 1600);
     },
     playAgain() {
       let w = this.answer;
@@ -2751,6 +3046,7 @@ document.addEventListener('alpine:init', () => {
     nextNumber: 1,
     dragging: false,
     gameOver: false, won: false, submitted: false,
+    shareState: 'idle',
     playerName: '',
     message: '', msgType: 'info',
     startedAt: null, elapsedMs: 0, timeDisplay: '0:00',
@@ -2902,6 +3198,17 @@ document.addEventListener('alpine:init', () => {
       this.nextNumber = this.pathArr.length ? this.maxNumberUpTo(this.pathArr) : 1;
       this.persist();
     },
+    shareText() {
+      const tag = (this.dayLabel || '').trim();
+      const head = 'Rainier Spark · Zip' + (tag ? ' · ' + tag : '');
+      return this.won ? `${head}\n✅ Solved in ${this.timeDisplay}` : `${head}\n⏱ ${this.timeDisplay}`;
+    },
+    async share() {
+      const res = await shareResult(this.shareText(), 'share_zip');
+      if (res === 'cancel') return;
+      this.shareState = res === 'fail' ? 'fail' : 'done';
+      setTimeout(() => { this.shareState = 'idle'; }, 1600);
+    },
     reset() {
       this.pathArr = []; this.pathSet = new Set();
       this.nextNumber = 1; this.gameOver = false; this.won = false; this.submitted = false;
@@ -3007,6 +3314,7 @@ document.addEventListener('alpine:init', () => {
     running: false,
     gameOver: false,
     submitted: false,
+    shareState: 'idle',
     score: 0,
     playerName: '',
     message: '',
@@ -3129,6 +3437,12 @@ document.addEventListener('alpine:init', () => {
       this.submitting = false;
       this.submitted = true;
     },
+    async share() {
+      const res = await shareResult(`Rainier Spark · Snake\n🐍 ${this.score} PTS`, 'share_snake');
+      if (res === 'cancel') return;
+      this.shareState = res === 'fail' ? 'fail' : 'done';
+      setTimeout(() => { this.shareState = 'idle'; }, 1600);
+    },
   });
   Alpine.store('snake').init();
 
@@ -3242,6 +3556,37 @@ document.addEventListener('alpine:init', () => {
     }, 16);
   }
 });
+</script>
+
+<script>
+/* ── PWA: register the service worker for install + offline support ── */
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      // When a new SW is found and finishes installing while one already
+      // controls the page, activate it immediately so updates aren't stuck a
+      // navigation behind.
+      reg.addEventListener('updatefound', function () {
+        var sw = reg.installing;
+        if (!sw) return;
+        sw.addEventListener('statechange', function () {
+          if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+            sw.postMessage('SKIP_WAITING');
+          }
+        });
+      });
+    }).catch(function () {/* SW is an enhancement; ignore failures */});
+
+    // Reload once when the controlling SW changes, so the fresh build renders.
+    var refreshed = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (refreshed) return;
+      refreshed = true;
+      window.location.reload();
+    });
+  });
+})();
 </script>
 
 </body>
