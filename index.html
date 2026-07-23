@@ -1382,7 +1382,7 @@
                   {
                     'bg-green/80 text-ink-950': $store.sparkle.keyState[k] === 'correct',
                     'bg-amber/80 text-ink-950': $store.sparkle.keyState[k] === 'present',
-                    'bg-ink-700 text-slate-500': $store.sparkle.keyState[k] === 'absent',
+                    'bg-ink-800 text-slate-400 opacity-50': $store.sparkle.keyState[k] === 'absent',
                     'bg-steel-700/50 text-white hover:bg-steel-600/60': !$store.sparkle.keyState[k],
                   }
                 ]"
@@ -1594,15 +1594,6 @@
       <button @click="$store.konami.hide()" class="w-7 h-7 flex items-center justify-center rounded-sm border border-white/15 text-slate-400 hover:text-white hover:border-white/40 transition-colors">
         <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
-    </div>
-
-    <!-- sequence progress / hint -->
-    <div class="flex justify-center gap-1 mb-4">
-      <template x-for="(g, i) in $store.konami.glyphs" :key="i">
-        <span class="w-6 h-6 flex items-center justify-center rounded-sm border text-[11px] font-mono transition-colors"
-          :class="i < $store.konami.progress ? 'bg-electric/25 border-electric text-electric' : 'border-white/12 text-slate-600'"
-          x-text="g"></span>
-      </template>
     </div>
 
     <!-- NES-style controller -->
