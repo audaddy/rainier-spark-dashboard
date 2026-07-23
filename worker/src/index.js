@@ -111,21 +111,37 @@ async function handlePost(request, env, origin) {
   return json({ leaderboard: redact(sorted) }, 200, origin);
 }
 
-// ── Click tracking (button/link events) ──
+// ── Click tracking + anonymous unique-visitor analytics ──
 const EVENTS_KEY = 'events:v1';
 const EVENT_NAME_RE = /^[a-z0-9_]{1,40}$/;
+const VID_RE = /^[A-Za-z0-9_-]{8,64}$/;      // anonymous browser token (no PII)
 const MAX_EVENT_NAMES = 100;
 const MAX_EVENT_DAYS = 120;
+const MAX_VISITORS = 20000;                  // cap the visitor registry size
+const MAX_VISITOR_DAYS = 90;                 // per-visitor active-day history
 
 function utcDay() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
 }
 
+// Read the analytics blob, migrating the old flat { [name]: {...} } shape into
+// the { actions, visitors } structure so existing data is preserved.
+async function loadAnalytics(env) {
+  const raw = await env.LEADERBOARD_KV.get(EVENTS_KEY);
+  const data = raw ? JSON.parse(raw) : null;
+  if (!data) return { actions: {}, visitors: {} };
+  if (!data.actions) return { actions: data, visitors: {} }; // legacy → migrate
+  if (!data.visitors) data.visitors = {};
+  return data;
+}
+
 async function handleEvent(request, env, origin) {
   let name = '';
+  let vid = null;
   try {
     const body = JSON.parse(await request.text());
     if (body && typeof body.name === 'string') name = body.name;
+    if (body && typeof body.vid === 'string' && VID_RE.test(body.vid)) vid = body.vid;
   } catch (e) {
     return json({ error: 'invalid body' }, 400, origin);
   }
@@ -133,24 +149,87 @@ async function handleEvent(request, env, origin) {
     return json({ error: 'invalid name' }, 400, origin);
   }
 
-  const raw = await env.LEADERBOARD_KV.get(EVENTS_KEY);
-  const data = raw ? JSON.parse(raw) : {};
-  if (!data[name]) {
-    if (Object.keys(data).length >= MAX_EVENT_NAMES) {
+  const data = await loadAnalytics(env);
+  const day = utcDay();
+
+  // ── Click counts per action (unchanged semantics) ──
+  const actions = data.actions;
+  if (!actions[name]) {
+    if (Object.keys(actions).length >= MAX_EVENT_NAMES) {
       return json({ ok: false }, 200, origin); // ignore new names past the cap
     }
-    data[name] = { total: 0, days: {} };
+    actions[name] = { total: 0, days: {} };
   }
-  const day = utcDay();
-  data[name].total = (data[name].total || 0) + 1;
-  data[name].days[day] = (data[name].days[day] || 0) + 1;
-  // bound stored history to the most recent MAX_EVENT_DAYS days per event
-  const days = Object.keys(data[name].days).sort();
-  if (days.length > MAX_EVENT_DAYS) {
-    for (const d of days.slice(0, days.length - MAX_EVENT_DAYS)) delete data[name].days[d];
+  actions[name].total = (actions[name].total || 0) + 1;
+  actions[name].days[day] = (actions[name].days[day] || 0) + 1;
+  const adays = Object.keys(actions[name].days).sort();
+  if (adays.length > MAX_EVENT_DAYS) {
+    for (const d of adays.slice(0, adays.length - MAX_EVENT_DAYS)) delete actions[name].days[d];
   }
+
+  // ── Per-visitor registry (anonymous device token) ──
+  if (vid) {
+    let v = data.visitors[vid];
+    if (!v) {
+      if (Object.keys(data.visitors).length < MAX_VISITORS) {
+        v = data.visitors[vid] = { first: day, last: day, days: {}, actions: {} };
+      }
+    }
+    if (v) {
+      v.last = day;
+      if (!v.first) v.first = day;
+      v.days[day] = (v.days[day] || 0) + 1;
+      v.actions[name] = (v.actions[name] || 0) + 1;
+      const vdays = Object.keys(v.days).sort();
+      if (vdays.length > MAX_VISITOR_DAYS) {
+        for (const d of vdays.slice(0, vdays.length - MAX_VISITOR_DAYS)) delete v.days[d];
+      }
+    }
+  }
+
   await env.LEADERBOARD_KV.put(EVENTS_KEY, JSON.stringify(data));
   return json({ ok: true }, 200, origin);
+}
+
+// Aggregate the visitor registry into compact metrics (payload stays small
+// regardless of how many visitors are stored).
+function computePeople(visitors) {
+  const vids = Object.keys(visitors);
+  const today = utcDay();
+  const window7 = new Set();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setUTCDate(d.getUTCDate() - i);
+    window7.add(d.toISOString().slice(0, 10));
+  }
+  const daily = {};             // day → unique visitors active
+  const perAction = {};         // action → unique visitors who clicked it
+  const perActionClicks = {};   // action → clicks from tracked visitors
+  let dauToday = 0, active7 = 0, newToday = 0, trackedClicks = 0;
+
+  for (const vid of vids) {
+    const v = visitors[vid];
+    const vdays = Object.keys(v.days || {});
+    for (const d of vdays) daily[d] = (daily[d] || 0) + 1;
+    if (v.days && v.days[today]) dauToday++;
+    if (vdays.some((d) => window7.has(d))) active7++;
+    if (v.first === today) newToday++;
+    for (const a in (v.actions || {})) {
+      perAction[a] = (perAction[a] || 0) + 1;
+      perActionClicks[a] = (perActionClicks[a] || 0) + v.actions[a];
+      trackedClicks += v.actions[a];
+    }
+  }
+  return {
+    uniqueTotal: vids.length,
+    dauToday,
+    active7,
+    newToday,
+    returningToday: Math.max(0, dauToday - newToday),
+    avgClicksPerVisitor: vids.length ? +(trackedClicks / vids.length).toFixed(1) : 0,
+    perAction,
+    perActionClicks,
+    daily,
+  };
 }
 
 async function handleStats(request, env, origin) {
@@ -158,8 +237,8 @@ async function handleStats(request, env, origin) {
   if (!env.ADMIN_KEY || key !== env.ADMIN_KEY) {
     return json({ error: 'unauthorized' }, 401, origin);
   }
-  const raw = await env.LEADERBOARD_KV.get(EVENTS_KEY);
-  return json({ events: raw ? JSON.parse(raw) : {} }, 200, origin);
+  const data = await loadAnalytics(env);
+  return json({ events: data.actions, people: computePeople(data.visitors) }, 200, origin);
 }
 
 // ── Web Push subscriptions ──

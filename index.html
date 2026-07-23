@@ -2461,9 +2461,22 @@ function dashboard() {
 const LB_API = 'https://rainier-spark-leaderboard.audaddy.workers.dev';
 
 /* ── Lightweight click tracking (fire-and-forget → Worker /event) ── */
+// Anonymous per-browser token so analytics can count unique people (not PII —
+// just a random id; a new browser or cleared storage = a new "visitor").
+function getVisitorId() {
+  try {
+    let id = localStorage.getItem('rs-vid');
+    if (!id) {
+      id = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      localStorage.setItem('rs-vid', id);
+    }
+    return id;
+  } catch (e) { return null; }
+}
+
 function trackClick(name) {
   try {
-    const body = JSON.stringify({ name });
+    const body = JSON.stringify({ name, vid: getVisitorId() });
     // text/plain keeps it a CORS-simple request (no preflight) and survives page unload
     if (navigator.sendBeacon) {
       navigator.sendBeacon(`${LB_API}/event`, new Blob([body], { type: 'text/plain' }));
@@ -2471,6 +2484,17 @@ function trackClick(name) {
       fetch(`${LB_API}/event`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body, keepalive: true }).catch(() => {});
     }
   } catch (e) {}
+}
+
+// Count a daily unique visit even if the person never clicks a card. Fires at
+// most once per browser per day to stay easy on the KV write budget.
+function pingVisit() {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem('rs-last-visit') === today) return;
+    localStorage.setItem('rs-last-visit', today);
+  } catch (e) {}
+  trackClick('visit');
 }
 
 /* ── Shareable results (Web Share API → clipboard fallback) ── */
@@ -3599,6 +3623,9 @@ document.addEventListener('alpine:init', () => {
 
     // Keep the server's copy of this device's streak fresh for the at-risk cron.
     if (window.resyncPush) window.resyncPush();
+
+    // Count this visit toward unique-visitor / daily-active metrics.
+    if (window.pingVisit) window.pingVisit();
   });
 })();
 </script>

@@ -78,7 +78,9 @@
   const SPARK_DAYS = 14;   // per-action sparkline window
   const LABELS = {
     wordle_open: 'Wordle opened', zip_open: 'Zip opened', snake_open: 'Snake opened',
-    konami_open: 'Konami controller', palette_open: 'Command palette', team: 'Team',
+    visit: 'Page visit', konami_open: 'Konami controller', palette_open: 'Command palette',
+    push_optin: 'Push opt-in', streak_nudge: 'Streak nudge', streak_optin: 'Streak opt-in',
+    share_sparkle: 'Share · Wordle', share_zip: 'Share · Zip', share_snake: 'Share · Snake', team: 'Team',
     location_hours: 'Location / Hours', email_orgbox: 'Email Org Box', instagram: 'Instagram',
     map: 'Google Maps', vision_open: 'Vision card opened',
     // filter tabs
@@ -116,7 +118,8 @@
   const err = document.getElementById('err');
   const results = document.getElementById('results');
   let lastEvents = null;        // cache for re-sorts without refetch
-  let sortKey = 'total';        // total | last7 | today | name
+  let lastPeople = null;        // unique-visitor aggregates (null on old Worker)
+  let sortKey = 'total';        // total | last7 | today | people | name
   let sortDir = -1;             // -1 desc, 1 asc
 
   const saved = localStorage.getItem('rs-admin-key');
@@ -150,8 +153,9 @@
     if (res.status === 401) { showErr('Wrong admin key (or ADMIN_KEY not set on the Worker).'); return; }
     if (!res.ok) { showErr('Unexpected error: ' + res.status); return; }
     localStorage.setItem('rs-admin-key', key);
-    const { events } = await res.json();
+    const { events, people } = await res.json();
     lastEvents = events || {};
+    lastPeople = people || null;
     render();
   }
 
@@ -255,10 +259,31 @@
       <div class="barwrap">${barChart(dates, chartVals)}</div>
     </div>`;
 
+    // ── People: anonymous unique-visitor metrics ──
+    const people = lastPeople;
+    let peopleSection = '';
+    if (people) {
+      const uniqDaily = dates.map((d) => (people.daily && people.daily[d]) || 0);
+      peopleSection = `<div class="tiles">
+        <div class="tile"><div class="k">Unique visitors</div><div class="v" style="color:#a78bfa">${people.uniqueTotal}</div><div class="d">distinct browsers</div></div>
+        <div class="tile"><div class="k">Active today</div><div class="v">${people.dauToday}</div><div class="d">${people.newToday} new · ${people.returningToday} returning</div></div>
+        <div class="tile"><div class="k">Active last 7d</div><div class="v">${people.active7}</div><div class="d">unique people</div></div>
+        <div class="tile"><div class="k">Clicks / person</div><div class="v">${people.avgClicksPerVisitor}</div><div class="d">avg engagement</div></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h2>Unique visitors · last ${CHART_DAYS} days</h2><span class="legend">distinct people per day</span></div>
+        <div class="barwrap">${barChart(dates, uniqDaily)}</div>
+      </div>`;
+    } else {
+      peopleSection = `<div class="card muted" style="font-size:12px">Unique-visitor metrics activate once the updated Worker is deployed (<code>wrangler deploy</code>). Click counts above are already live.</div>`;
+    }
+
     // ── Per-action table (sortable) ──
     const rowData = names.map((n) => ({
       name: n, label: pretty(n), total: events[n].total || 0,
       last7: windowTotal(events[n].days || {}, 7), today: (events[n].days || {})[today] || 0,
+      people: (people && people.perAction && people.perAction[n]) || 0,
+      pclicks: (people && people.perActionClicks && people.perActionClicks[n]) || 0,
       days: events[n].days || {},
     }));
     rowData.sort((a, b) => {
@@ -267,11 +292,14 @@
     });
     let rows = '';
     for (const r of rowData) {
+      const ratio = r.people ? (r.pclicks / r.people).toFixed(1) : '—';
       rows += `<tr>
         <td class="actioncell"><b>${r.label}</b><div class="muted" style="font-size:10px">${r.name}</div></td>
         <td class="num big">${r.total}</td>
         <td class="num">${r.last7}</td>
         <td class="num">${r.today}</td>
+        <td class="num" style="color:#a78bfa;font-weight:700">${people ? r.people : '—'}</td>
+        <td class="num muted">${people ? ratio : '—'}</td>
         <td style="text-align:right">${sparkline(r.days)}</td>
       </tr>`;
     }
@@ -281,11 +309,13 @@
         ${th('total', 'All-time', 'num')}
         ${th('last7', 'Last 7d', 'num')}
         ${th('today', 'Today', 'num')}
+        ${th('people', 'People', 'num')}
+        <th class="num" title="Tracked clicks per unique person">×/person</th>
         <th class="num">${SPARK_DAYS}-day trend</th>
       </tr></thead>
       <tbody>${rows}</tbody></table></div>`;
 
-    results.innerHTML = tiles + chart + table;
+    results.innerHTML = tiles + chart + peopleSection + table;
 
     // wire sortable headers
     results.querySelectorAll('th.sortable').forEach((el) => {

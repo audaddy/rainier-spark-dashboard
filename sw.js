@@ -8,7 +8,7 @@
  *   - CDN libs & fonts   → stale-while-revalidate
  *   - API / analytics    → not intercepted (always live network)
  */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const SHELL_CACHE = `rainier-shell-${VERSION}`;
 const RUNTIME_CACHE = `rainier-runtime-${VERSION}`;
 const SCOPE = self.registration.scope;
