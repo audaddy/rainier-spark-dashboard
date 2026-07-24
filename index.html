@@ -479,6 +479,10 @@
         Connect with Rainier Spark
       </span>
       <div class="flex flex-wrap items-center gap-2">
+        <button type="button" @click="openCalendar(); trackClick('calendar_open')" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+          Calendar
+        </button>
         <button type="button" @click="openPalette(); trackClick('palette_open')" class="inline-flex items-center gap-2 border border-white/15 hover:border-electric hover:bg-steel-600/30 px-3.5 py-1.5 rounded-sm transition-colors font-condensed font-semibold text-[12px] tracking-[0.12em] uppercase text-electric hover:text-white">
           <svg viewBox="0 0 24 24" class="w-4 h-4 text-electric/80 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           Search
@@ -520,12 +524,15 @@
 
   <main class="max-w-[1480px] mx-auto px-4 sm:px-8 py-6 sm:py-10 pb-24">
 
-    <!-- ════════════ PUGET SOUND SUMMIT ════════════ -->
-    <div class="reveal-card mb-8 border border-ice/30 rounded bg-gradient-to-r from-steel-700/45 to-ink-900/80 px-5 py-4 flex flex-wrap items-center gap-x-4 gap-y-2" x-init="$nextTick(()=>window.__reveal($el))">
+    <!-- ════════════ HPPSS SUMMIT ════════════ -->
+    <button type="button" @click="openCalendar(); trackClick('hppss_banner')" class="reveal-card w-full mb-8 border border-ice/30 rounded bg-gradient-to-r from-steel-700/45 to-ink-900/80 px-5 py-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-left hover:border-ice/60 transition-colors" x-init="$nextTick(()=>window.__reveal($el))">
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 00 / EVENT</span>
-      <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Puget Sound Summit</h2>
-      <span class="ml-auto font-mono text-[10px] text-gold tracking-[0.18em] uppercase border border-gold/40 px-2.5 py-1 rounded-sm">Coming Soon</span>
-    </div>
+      <div>
+        <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase leading-tight">HPPSS <span class="text-ice">·</span> Human Performance Puget Sound Summit</h2>
+        <div class="font-mono text-[10px] text-slate-400 tracking-[0.14em] uppercase mt-1">Tap to view the FY26 calendar</div>
+      </div>
+      <span class="ml-auto font-mono text-[10px] text-gold tracking-[0.18em] uppercase border border-gold/40 px-2.5 py-1 rounded-sm shrink-0">Tentative · Dec 2026</span>
+    </button>
 
     <!-- ════════════ SECTION 01 — STATUS BOARD ════════════ -->
     <div id="sec-status" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-4 pb-3 border-b border-white/10">
@@ -547,6 +554,50 @@
           <span x-text="f.l"></span>
           <span class="font-mono text-[10px] opacity-70" x-text="f.n"></span>
         </button>
+      </template>
+    </div>
+
+    <!-- Meet the Team, per LOE -->
+    <div class="flex flex-wrap items-center gap-2 mb-2.5">
+      <span class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase mr-0.5">Meet the Team</span>
+      <template x-for="f in filters.filter(f => !['all','priority','vision'].includes(f.k))" :key="'team-' + f.k">
+        <button
+          @click="teamLoeOpen = (teamLoeOpen === f.k ? null : f.k); trackClick('team_loe_' + f.k)"
+          :class="teamLoeOpen === f.k
+            ? 'bg-steel-600 border-steel-400 text-white'
+            : 'bg-steel-700/15 border-white/10 text-slate-400 hover:border-steel-400 hover:text-white'"
+          class="border font-condensed font-semibold text-[11px] tracking-[0.08em] uppercase px-3 py-1 rounded-sm transition-all flex items-center gap-1.5"
+        >
+          <svg viewBox="0 0 24 24" class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19v-1a3 3 0 0 0-2.6-3"/></svg>
+          <span x-text="f.l"></span>
+        </button>
+      </template>
+    </div>
+
+    <!-- Meet the Team, expanded panel -->
+    <div x-show="teamLoeOpen" x-cloak x-transition class="mb-6 border border-white/10 rounded bg-ink-950/40 p-4">
+      <template x-if="teamLoeOpen">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="font-mono text-[10px] text-ice tracking-[0.16em] uppercase font-bold" x-text="((filters.find(f => f.k === teamLoeOpen)) || {}).l + ' · Team'"></div>
+            <button @click="teamLoeOpen = null" class="text-slate-400 hover:text-white text-lg leading-none">×</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" x-show="teamForLoe(teamLoeOpen).length">
+            <template x-for="m in teamForLoe(teamLoeOpen)" :key="m.name">
+              <button @click="openBio(m.name)" class="text-left flex items-center gap-3 border border-white/10 hover:border-ice/50 rounded-sm p-3 bg-ink-900/50 transition-colors">
+                <div class="w-11 h-11 rounded-sm border border-ice/30 bg-steel-700/25 flex items-center justify-center overflow-hidden shrink-0">
+                  <template x-if="m.photo"><img :src="m.photo" :alt="m.name" class="w-full h-full object-cover" /></template>
+                  <template x-if="!m.photo"><span class="font-condensed font-extrabold text-ice text-sm" x-text="m.initials || ''"></span></template>
+                </div>
+                <div class="min-w-0">
+                  <div class="font-condensed font-bold text-white text-sm uppercase leading-tight truncate" x-text="m.name"></div>
+                  <div class="text-[11px] text-ice mt-0.5 leading-snug truncate" x-text="m.role"></div>
+                </div>
+              </button>
+            </template>
+          </div>
+          <p class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!teamForLoe(teamLoeOpen).length">No bios on file for this line of effort yet.</p>
+        </div>
       </template>
     </div>
 
@@ -626,6 +677,11 @@
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase" x-text="p.eyebrow"></span>
+                <template x-if="hasUpdate(p)">
+                  <span class="bg-amber/15 text-amber border border-amber/40 font-condensed font-bold text-[9px] tracking-[0.16em] uppercase px-2 py-0.5 rounded-sm flex items-center gap-1.5">
+                    <span class="w-1 h-1 bg-amber rounded-full pulse-dot"></span>Updated
+                  </span>
+                </template>
                 <template x-if="p.priority">
                   <span class="bg-priority text-white font-condensed font-bold text-[9px] tracking-[0.16em] uppercase px-2 py-0.5 rounded-sm flex items-center gap-1.5">
                     <span class="w-1 h-1 bg-white rounded-full pulse-dot"></span>HIGH PRIORITY
@@ -715,7 +771,22 @@
                 </span>
               </template>
             </span>
-            <span class="det-chip text-ice border border-white/15 px-2.5 py-1 rounded-sm group-hover:border-ice transition inline-flex items-center gap-1.5 shrink-0">DETAIL <span class="det-arrow">→</span></span>
+            <span class="flex items-center gap-2 shrink-0">
+              <span
+                role="button"
+                tabindex="0"
+                @click.stop="toggleWatch(p)"
+                @keydown.enter.stop="toggleWatch(p)"
+                @keydown.space.stop.prevent="toggleWatch(p)"
+                :title="isWatched(p) ? 'Watching — you\'ll see a badge here when this changes' : 'Notify me when this project changes'"
+                class="relative w-7 h-7 flex items-center justify-center rounded-sm border transition-colors cursor-pointer"
+                :class="isWatched(p) ? 'border-electric/60 bg-electric/15 text-electric' : 'border-white/15 text-slate-400 hover:text-white hover:border-white/40'"
+              >
+                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" :fill="isWatched(p) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.7"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                <span x-show="hasUpdate(p)" x-cloak class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber border border-ink-900 pulse-dot"></span>
+              </span>
+              <span class="det-chip text-ice border border-white/15 px-2.5 py-1 rounded-sm group-hover:border-ice transition inline-flex items-center gap-1.5 shrink-0">DETAIL <span class="det-arrow">→</span></span>
+            </span>
           </div>
         </button>
       </template>
@@ -898,7 +969,7 @@
     <!-- ════════════ SECTION 04 — ENGAGEMENT TIMELINE ════════════ -->
     <div id="sec-engagement" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 04 / ENGAGEMENT</span>
-      <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Q1–Q3 FY26 Calendar</h2>
+      <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">FY26–27 Calendar</h2>
       <span class="ml-auto font-mono text-[10px] text-ice tracking-[0.14em] uppercase">NOW · JUL 26</span>
     </div>
     <div class="bg-gradient-to-b from-ink-700/70 to-ink-900/95 border border-white/10 rounded p-6 relative">
@@ -1022,9 +1093,54 @@
       </template>
     </div>
 
-    <!-- ════════════ SECTION 06 — VISIT ════════════ -->
+    <!-- ════════════ SECTION 06 — SUCCESS STORIES ════════════ -->
+    <div id="sec-success" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 mt-12 pb-3 border-b border-white/10">
+      <span class="font-mono text-[11px] text-gold tracking-[0.2em]">§ 06 / SUCCESS STORIES</span>
+      <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Mission Wins · Archive</h2>
+      <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase" x-text="`${successStories.length} Archived`"></span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12" x-show="successStories.length">
+      <template x-for="s in successStories" :key="s.id">
+        <div x-init="$nextTick(()=>window.__reveal($el))" class="reveal-card brackets bg-gradient-to-b from-ink-700/70 to-ink-900/95 border border-gold/25 hover:border-gold/50 hover:-translate-y-0.5 transition-all rounded flex flex-col overflow-hidden shadow-card">
+          <template x-if="s.img">
+            <div class="relative h-28 border-b border-white/10 overflow-hidden">
+              <img :src="s.img" :alt="s.title" class="w-full h-full object-cover" x-on:error="$event.target.style.display='none'" />
+              <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink-900 to-transparent pointer-events-none"></div>
+            </div>
+          </template>
+          <div class="p-5 flex flex-col gap-3 flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="inline-flex items-center gap-1.5 bg-gold/15 text-gold border border-gold/40 font-condensed font-bold text-[9px] tracking-[0.16em] uppercase px-2 py-0.5 rounded-sm">
+                <svg viewBox="0 0 24 24" class="w-2.5 h-2.5 shrink-0" fill="currentColor"><path d="M12 2 L14.5 8.5 L21.5 9 L16.2 13.4 L17.8 20.5 L12 16.7 L6.2 20.5 L7.8 13.4 L2.5 9 L9.5 8.5 Z"/></svg>
+                Success Story
+              </span>
+              <span class="font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase" x-text="s.completed"></span>
+            </div>
+            <div class="font-condensed font-bold text-white text-[18px] uppercase leading-tight" x-text="s.title"></div>
+            <p class="text-xs text-slate-300 leading-relaxed" x-text="s.story"></p>
+            <ul class="border-t border-dashed border-white/10 pt-3 space-y-1.5 mt-auto" x-show="s.impact && s.impact.length">
+              <template x-for="i in (s.impact || [])" :key="i">
+                <li class="text-xs text-slate-200 leading-snug flex gap-2">
+                  <span class="w-1.5 h-1.5 mt-1.5 bg-gold rotate-45 shrink-0"></span>
+                  <span x-text="i"></span>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="border border-dashed border-white/15 rounded p-8 text-center mb-12" x-show="!successStories.length">
+      <svg viewBox="0 0 24 24" class="w-8 h-8 text-gold/60 mx-auto mb-3" fill="currentColor"><path d="M12 2 L14.5 8.5 L21.5 9 L16.2 13.4 L17.8 20.5 L12 16.7 L6.2 20.5 L7.8 13.4 L2.5 9 L9.5 8.5 Z"/></svg>
+      <div class="font-condensed font-bold text-white text-lg uppercase tracking-wide">No Success Stories Archived Yet</div>
+      <p class="font-mono text-[10px] text-slate-500 tracking-[0.1em] uppercase mt-2 max-w-md mx-auto leading-relaxed">As Innovation Lines are fielded and accomplished, they'll be archived here as mission-win stories.</p>
+    </div>
+
+    <!-- ════════════ SECTION 07 — VISIT ════════════ -->
     <div id="visit" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 mt-12 pb-3 border-b border-white/10">
-      <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 06 / VISIT</span>
+      <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 07 / VISIT</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Find the Lab</h2>
       <div class="ml-auto flex items-center gap-3">
         <span class="font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase">Bldg 307 · McChord AFB</span>
@@ -1207,7 +1323,19 @@
                 </span>
               </template>
             </span>
-            <span class="shrink-0"><b class="text-ice" x-text="open.status"></b></span>
+            <span class="flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                @click.stop="toggleWatch(open)"
+                :title="isWatched(open) ? 'Watching — you\'ll see a badge here when this changes' : 'Notify me when this project changes'"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm border transition-colors normal-case"
+                :class="isWatched(open) ? 'border-electric/60 bg-electric/15 text-electric' : 'border-white/15 text-slate-400 hover:text-white hover:border-white/40'"
+              >
+                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" :fill="isWatched(open) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.7"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                <span class="font-mono text-[10px] tracking-[0.1em] uppercase" x-text="isWatched(open) ? 'Watching' : 'Notify Me'"></span>
+              </button>
+              <b class="text-ice" x-text="open.status"></b>
+            </span>
           </div>
         </div>
       </template>
@@ -1304,6 +1432,58 @@
         </div>
       </div>
     </template>
+  </div>
+
+  <!-- ════════════ CALENDAR MODAL ════════════ -->
+  <div
+    x-show="calendarOpen"
+    x-cloak
+    @keydown.escape.window="closeCalendar()"
+    class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+    @click="closeCalendar()"
+    x-transition.opacity
+  >
+    <div
+      @click.stop
+      class="bg-ink-800 border border-white/20 rounded max-w-xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl"
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="opacity-0 scale-95"
+      x-transition:enter-end="opacity-100 scale-100"
+    >
+      <div class="px-5 sm:px-7 py-5 border-b border-white/10 bg-gradient-to-b from-steel-700/25 to-transparent flex items-start gap-4">
+        <div class="w-12 h-12 border border-white/10 bg-steel-700/20 text-ice rounded-sm flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-mono text-[10px] text-ice tracking-[0.2em] uppercase">Rainier Spark · Calendar</div>
+          <h3 class="font-condensed font-bold text-white text-2xl uppercase tracking-wide leading-tight">FY26–27 Events</h3>
+        </div>
+        <button @click="closeCalendar()" class="text-slate-300 hover:text-white border border-white/15 hover:border-ice w-9 h-9 rounded-sm text-xl leading-none shrink-0">×</button>
+      </div>
+      <div class="px-5 sm:px-7 py-6 overflow-y-auto scrollbar-thin space-y-5">
+        <template x-for="m in timeline" :key="m.m">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2 h-2 rounded-full shrink-0" :class="m.now ? 'bg-ice shadow-[0_0_8px_#a8c4e6]' : 'bg-steel-600'"></span>
+              <span class="font-condensed font-bold tracking-[0.14em] uppercase" :class="m.now ? 'text-ice' : 'text-slate-300'" x-text="m.m"></span>
+              <span x-show="m.now" class="font-mono text-[9px] text-ice tracking-[0.16em] uppercase border border-ice/40 px-1.5 py-0.5 rounded-sm">Now</span>
+            </div>
+            <ul class="space-y-1.5 pl-4 border-l border-white/10 ml-1">
+              <template x-for="e in m.events" :key="e">
+                <li class="text-[13px] text-slate-200 leading-snug flex gap-2">
+                  <span class="w-1.5 h-1.5 mt-1.5 bg-ice rotate-45 shrink-0"></span>
+                  <span x-html="e"></span>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </template>
+      </div>
+      <div class="px-7 py-3.5 border-t border-white/10 bg-ink-950/60 flex items-center justify-between font-mono text-[10px] text-slate-400 tracking-wider uppercase">
+        <span>62D AW <span class="text-ice">·</span> RAINIER SPARK</span>
+        <span x-text="dtg"></span>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -1915,7 +2095,8 @@ function dashboard() {
       { m: 'APR 26', events: ['3rd MDTF print site instr'] },
       { m: 'MAY 26', events: ['SIF token distribution pending','sUAS IT submitted · pending AFSOC approval'] },
       { m: 'JUN 26', events: ['sUAS IT approved · AFSOC/A3OU — MX X10D qualification begins','Rainier Runners Session 2 begins (15 Jun–7 Aug)','HP & Biosystems Summit · D.C.','Lab renovation walkthrough'] },
-      { m: 'JUL 26', now: true, events: ['Rainier Runners Session 2 in progress (thru 7 Aug)','C-17 sUAS operational test · 62d AMXS ramp','3D printing — carbon-fiber printer GPC auth in progress','Puget Sound Summit — coming soon'] },
+      { m: 'JUL 26', now: true, events: ['Rainier Runners Session 2 in progress (thru 7 Aug)','C-17 sUAS operational test · 62d AMXS ramp','3D printing — carbon-fiber printer GPC auth in progress','HPPSS planning underway'] },
+      { m: 'DEC 26', events: ['HPPSS · Human Performance Puget Sound Summit — tentative'] },
     ],
 
     team: [
@@ -2326,6 +2507,11 @@ function dashboard() {
         app:'$5K–$10K requested for SafeGuard license and predictive-algorithm development. Uses existing Garmin/Oura wearable data (Stress, Body Battery, HRV) to passively correlate with PHQ-8 mental health scores. Pilot showed strong correlations and improved wellness during JBLM effort. Enables early flagging of at-risk personnel without constant surveys. Scalable to 500+ users with low hardware cost. Supports proactive mental health monitoring for JBLM and AMC.' },
     ],
 
+    // Archive of accomplished initiatives. Add an entry here once a Line of Effort is fielded:
+    // { id, title, loe, completed: 'MON YYYY', story: '...narrative...', impact: ['...'], img: 'data:...' }
+    successStories: [
+    ],
+
     get visibleProjects() {
       const f = this.activeFilter;
       if (f === 'all' || f === 'vision') return this.projects;
@@ -2352,9 +2538,22 @@ function dashboard() {
     stageProjects(k) { return this.visibleProjects.filter(p => this.stageOf(p) === k); },
     dotColor(c) { return ({ amber:'#e8b94a', green:'#6fb47a', blue:'#a8c4e6' })[c] || '#a8c4e6'; },
 
-    openCard(p) { this.open = p; document.body.classList.add('modal-open'); },
+    openCard(p) { this.open = p; this.markSeen(p); document.body.classList.add('modal-open'); },
     openVision(v) { this.open = v; document.body.classList.add('modal-open'); },
     closeModal() { this.open = null; document.body.classList.remove('modal-open'); },
+
+    // ── Watch / notify-on-change for LOE projects (client-side only — no push backend) ──
+    watched: (() => { try { return JSON.parse(localStorage.getItem('rs-watched-projects') || '{}'); } catch (e) { return {}; } })(),
+    _saveWatched() { try { localStorage.setItem('rs-watched-projects', JSON.stringify(this.watched)); } catch (e) {} },
+    _projSignature(p) { return JSON.stringify({ status: p.status, progress: p.progress, bullets: p.bullets, metrics: p.metrics, change: p.change, detail: p.detail }); },
+    isWatched(p) { return this.watched[p.id] !== undefined; },
+    hasUpdate(p) { return this.isWatched(p) && this.watched[p.id] !== this._projSignature(p); },
+    toggleWatch(p) {
+      if (this.isWatched(p)) { delete this.watched[p.id]; trackClick('unwatch_' + p.id.replace(/-/g,'_')); }
+      else { this.watched[p.id] = this._projSignature(p); trackClick('watch_' + p.id.replace(/-/g,'_')); }
+      this._saveWatched();
+    },
+    markSeen(p) { if (this.isWatched(p)) { this.watched[p.id] = this._projSignature(p); this._saveWatched(); } },
     // Short display names used in Lead/Crew -> full Team-section names (real bios)
     bioAliases: { 'Maj Williston': 'Major Chris "Radio" Williston' },
     _findPerson(name) {
@@ -2366,6 +2565,19 @@ function dashboard() {
       return null;
     },
     hasBio(name) { return !!this._findPerson(name); },
+    // ── Meet the Team, per LOE (resolved from each LOE's project leads/crew) ──
+    teamLoeOpen: null,
+    teamForLoe(k) {
+      const names = new Set();
+      this.projects.filter(p => p.loe === k).forEach(p => {
+        if (p.lead) names.add(p.lead);
+        (p.crew || []).forEach(c => names.add(c));
+      });
+      return Array.from(names).map(n => {
+        const person = this._findPerson(n);
+        return person ? { name: n, ...person } : null;
+      }).filter(Boolean);
+    },
     openBio(name) {
       const p = this._findPerson(name);
       if (!p) return;
@@ -2374,6 +2586,11 @@ function dashboard() {
       trackClick('bio_' + name.replace(/[^a-z0-9]+/gi, '_').toLowerCase());
     },
     closeBio() { this.bio = null; if (this.open === null) document.body.classList.remove('modal-open'); },
+
+    // ── Calendar modal ──
+    calendarOpen: false,
+    openCalendar() { this.calendarOpen = true; document.body.classList.add('modal-open'); },
+    closeCalendar() { this.calendarOpen = false; document.body.classList.remove('modal-open'); },
 
     // ── Command palette (⌘K / Ctrl-K) ──
     paletteOpen: false,
@@ -2386,12 +2603,14 @@ function dashboard() {
         ['Mission Impact · ROI Summary', 'sec-impact'],
         ['Vision · SIF26', 'sec-vision'],
         ['Engagement · FY26 Calendar', 'sec-engagement'],
+        ['Success Stories · Archive', 'sec-success'],
         ['Team · Innovation Cell', 'team'],
         ['Visit · Find the Lab', 'visit'],
       ].forEach(([label, id]) => items.push({ group: 'Jump to', label, hint: '', run: () => this.paletteScroll(id) }));
+      items.push({ group: 'Jump to', label: 'Open Full Calendar', hint: 'All FY26–27 events', run: () => this.openCalendar() });
       this.projects.forEach((p) => items.push({ group: 'Innovation Line', label: p.title, hint: p.eyebrow || p.sub || '', run: () => this.openCard(p) }));
       this.vision.forEach((v) => items.push({ group: 'Vision · SIF26', label: v.title, hint: v.eyebrow || v.sub || '', run: () => this.openVision(v) }));
-      this.timeline.forEach((t) => (t.events || []).forEach((e) => items.push({ group: 'Calendar', label: e, hint: t.m, run: () => this.paletteScroll('sec-engagement') })));
+      this.timeline.forEach((t) => (t.events || []).forEach((e) => items.push({ group: 'Calendar', label: e, hint: t.m, run: () => this.openCalendar() })));
       return items;
     },
     get paletteResults() {
