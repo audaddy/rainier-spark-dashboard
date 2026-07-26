@@ -143,6 +143,21 @@
   .group:hover .det-chip { box-shadow: 0 0 14px rgba(168,196,230,.25); }
   @media (prefers-reduced-motion: reduce) { .det-arrow { transition: none; } }
 
+  /* Stretched-link card pattern. The card itself is an <article>, not a <button>,
+     so nested controls (watch bell, bio names) stay real buttons instead of being
+     flattened to presentational by the outer button role. The primary "detail"
+     button carries a transparent overlay spanning the whole card, which keeps the
+     click-anywhere affordance while exposing exactly one control per card to AT.
+     Sibling controls sit above the overlay via .card-action. */
+  .card-link::after { content: ''; position: absolute; inset: 0; z-index: 0; }
+  .card-action { position: relative; z-index: 1; }
+
+  /* Visible keyboard focus. Tailwind's preflight removes the UA outline, and the
+     card overlay has no box of its own, so focus is drawn on the card instead. */
+  :focus-visible { outline: 2px solid #a8c4e6; outline-offset: 2px; border-radius: 2px; }
+  .card-link:focus-visible { outline: none; }
+  .card-link:focus-visible::after { outline: 2px solid #a8c4e6; outline-offset: -3px; border-radius: 3px; }
+
   /* ── Top / hero liveliness ── */
   /* Slow drift + breathe on the topo backdrop */
   @keyframes mtn-drift {
@@ -381,10 +396,12 @@
           McCHORD AFB <span class="text-ice">·</span> Q2 FY26 <span class="text-ice">·</span> <b class="text-ice font-semibold" x-text="dtg"></b>
         </div>
       </div>
-      <!-- Stat pills -->
-      <div class="hidden md:flex items-stretch gap-0 pl-6 border-l border-white/10">
+      <!-- Stat pills — only shown once there is room for them alongside the title.
+           Below lg the title block needs the full row; see the min-width math in the
+           pill class below (4 × 120px + padding) which is what crushed the h1 at md. -->
+      <div class="hidden lg:flex shrink-0 items-stretch gap-0 pl-6 border-l border-white/10">
         <template x-for="s in topStats" :key="s.l">
-          <div class="px-7 min-w-[130px] flex flex-col gap-1 border-r border-white/10 last:border-r-0 last:pr-0 first:pl-0 justify-center">
+          <div class="px-5 min-w-[120px] flex flex-col gap-1 border-r border-white/10 last:border-r-0 last:pr-0 first:pl-0 justify-center">
             <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase" x-text="s.l"></div>
             <div class="font-mono text-sm text-white font-medium flex items-center gap-1.5">
               <span x-show="s.live" class="w-2 h-2 rounded-full bg-green pulse-dot shadow-[0_0_10px_#6fb47a]"></span>
@@ -638,8 +655,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
       <template x-for="p in visibleProjects" :key="p.id">
-        <button
-          @click="openCard(p); trackClick('card_' + p.id.replace(/-/g,'_'))"
+        <article
           x-init="$nextTick(()=>window.__reveal($el))"
           :data-bracket="p.priority ? 'priority' : ''"
           :class="p.priority
@@ -699,7 +715,7 @@
                   ></span>
                 </template>
               </div>
-              <div class="font-condensed font-bold text-white text-[19px] uppercase leading-tight" x-text="p.title"></div>
+              <h3 class="font-condensed font-bold text-white text-[19px] uppercase leading-tight" x-text="p.title"></h3>
               <div class="text-xs text-slate-400 mt-1 leading-snug" x-text="p.sub"></div>
             </div>
           </div>
@@ -760,35 +776,49 @@
           <div class="px-5 py-3 border-t border-white/10 bg-ink-950/40 flex items-start justify-between gap-3 font-mono text-[10px] text-slate-400 tracking-wider uppercase">
             <span class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
               <span>LEAD ·</span>
-              <span @click.stop="openBio(p.lead)" :class="hasBio(p.lead) ? 'cursor-pointer text-white font-semibold hover:text-ice underline decoration-dotted decoration-slate-500 hover:decoration-ice underline-offset-2 transition' : 'text-white font-semibold'" x-text="p.lead">TSGT DOWLING</span>
+              <template x-if="hasBio(p.lead)">
+                <button type="button" @click="openBio(p.lead)" class="card-action text-white font-semibold hover:text-ice underline decoration-dotted decoration-slate-500 hover:decoration-ice underline-offset-2 transition uppercase tracking-wider" x-text="p.lead"></button>
+              </template>
+              <template x-if="!hasBio(p.lead)">
+                <span class="text-white font-semibold" x-text="p.lead"></span>
+              </template>
               <template x-if="p.crew && p.crew.length">
-                <span class="text-slate-500">· CREW ·</span>
+                <span class="text-slate-400">· CREW ·</span>
               </template>
               <template x-for="(c, ci) in (p.crew || [])" :key="c">
                 <span class="inline-flex items-center">
-                  <span @click.stop="openBio(c)" :class="hasBio(c) ? 'cursor-pointer text-slate-200 hover:text-ice underline decoration-dotted decoration-slate-600 hover:decoration-ice underline-offset-2 transition' : 'text-slate-200'" x-text="c"></span>
-                  <span x-show="ci < (p.crew.length - 1)" class="text-slate-500">,&nbsp;</span>
+                  <template x-if="hasBio(c)">
+                    <button type="button" @click="openBio(c)" class="card-action text-slate-200 hover:text-ice underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2 transition uppercase tracking-wider" x-text="c"></button>
+                  </template>
+                  <template x-if="!hasBio(c)">
+                    <span class="text-slate-200" x-text="c"></span>
+                  </template>
+                  <span x-show="ci < (p.crew.length - 1)" class="text-slate-400">,&nbsp;</span>
                 </span>
               </template>
             </span>
             <span class="flex items-center gap-2 shrink-0">
-              <span
-                role="button"
-                tabindex="0"
-                @click.stop="toggleWatch(p)"
-                @keydown.enter.stop="toggleWatch(p)"
-                @keydown.space.stop.prevent="toggleWatch(p)"
+              <button
+                type="button"
+                @click="toggleWatch(p)"
+                :aria-pressed="isWatched(p) ? 'true' : 'false'"
+                :aria-label="(isWatched(p) ? 'Stop watching ' : 'Watch ') + p.title + ' for updates'"
                 :title="isWatched(p) ? 'Watching — you\'ll see a badge here when this changes' : 'Notify me when this project changes'"
-                class="relative w-7 h-7 flex items-center justify-center rounded-sm border transition-colors cursor-pointer"
+                class="card-action w-7 h-7 flex items-center justify-center rounded-sm border transition-colors"
                 :class="isWatched(p) ? 'border-electric/60 bg-electric/15 text-electric' : 'border-white/15 text-slate-400 hover:text-white hover:border-white/40'"
               >
-                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" :fill="isWatched(p) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.7"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" :fill="isWatched(p) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
                 <span x-show="hasUpdate(p)" x-cloak class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber border border-ink-900 pulse-dot"></span>
-              </span>
-              <span class="det-chip text-ice border border-white/15 px-2.5 py-1 rounded-sm group-hover:border-ice transition inline-flex items-center gap-1.5 shrink-0">DETAIL <span class="det-arrow">→</span></span>
+              </button>
+              <button
+                type="button"
+                @click="openCard(p); trackClick('card_' + p.id.replace(/-/g,'_'))"
+                :aria-label="'View details for ' + p.title"
+                class="card-link det-chip text-ice border border-white/15 px-2.5 py-1 rounded-sm group-hover:border-ice transition inline-flex items-center gap-1.5 shrink-0"
+              >DETAIL <span class="det-arrow" aria-hidden="true">→</span></button>
             </span>
           </div>
-        </button>
+        </article>
       </template>
     </div>
 
@@ -1220,7 +1250,7 @@
           <div class="font-condensed font-bold text-white text-base sm:text-lg uppercase tracking-wide leading-none mt-0.5">Reach the whole cell</div>
         </div>
       </div>
-      <button type="button" @click="copy()" :title="copied ? 'Copied!' : 'Click to copy'" class="font-mono text-sm sm:text-[15px] text-ice hover:text-white break-all justify-self-start sm:justify-self-center transition underline decoration-dotted decoration-ice/40 hover:decoration-ice underline-offset-4 cursor-pointer"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a99f9be8fe87fbc8c0c7c0ccdb87fad9c8dbc2e9dcda87c8cf87c4c0c5">[email&#160;protected]</a></button>
+      <button type="button" @click="copy()" :title="copied ? 'Copied!' : 'Click to copy'" class="font-mono text-sm sm:text-[15px] text-ice hover:text-white break-all justify-self-start sm:justify-self-center transition underline decoration-dotted decoration-ice/40 hover:decoration-ice underline-offset-4 cursor-pointer">62AW.Rainier.Spark@us.af.mil</button>
       <button type="button" @click="copy()" class="inline-flex items-center justify-center gap-2 bg-ice hover:bg-white text-ink-950 px-4 py-2 rounded-sm transition-colors font-condensed font-bold text-[12px] tracking-[0.14em] uppercase justify-self-start sm:justify-self-end">
         <svg x-show="!copied" viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
         <svg x-show="copied" x-cloak viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
@@ -1299,7 +1329,10 @@
             <div>
               <div class="font-mono text-[10px] text-ice tracking-[0.16em] uppercase font-bold mb-2">Milestones</div>
               <div class="space-y-0">
-                <template x-for="ms in open.detail.milestones" :key="ms.d">
+                <!-- Key on index, not ms.d: two milestones legitimately share a date
+                     (e.g. C-17 has two MAY 2026 entries), and duplicate x-for keys
+                     make Alpine throw while patching the list. -->
+                <template x-for="(ms, msi) in open.detail.milestones" :key="msi">
                   <div class="flex gap-4 text-sm py-2 border-b border-white/5 last:border-b-0">
                     <span class="font-mono text-ice tracking-[0.08em] min-w-[80px]" x-text="ms.d">MAY 2026</span>
                     <span class="text-slate-200" x-text="ms.e">SAD Therapy Lighting &amp; 3d printing initiatives funded 
@@ -1920,7 +1953,7 @@
 
 <!-- Bottom classification banner removed per request -->
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ── Liveliness helpers: reveal-on-scroll (staggered) + count-ups ── */
 /* Scroll-position based (not IntersectionObserver) so it works in every
    environment, including non-visible preview iframes. */
