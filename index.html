@@ -436,7 +436,7 @@
           <div class="font-mono text-[9px] text-slate-400 tracking-[0.2em] uppercase">Live Feed</div>
           <div class="font-mono text-sm text-white font-medium flex items-center gap-2 whitespace-nowrap">
             <span class="w-2 h-2 rounded-full bg-green pulse-dot shadow-[0_0_10px_#6fb47a]"></span>
-            <span>9 LOEs <span class="text-ice">/</span> 6 VISION</span>
+            <span>10 LOEs <span class="text-ice">/</span> 5 VISION</span>
           </div>
         </div>
       </div>
@@ -954,7 +954,7 @@
           </div>
           <div class="mt-5 bg-ink-950/50 border border-white/10 px-4 py-3.5 grid grid-cols-3 gap-3">
             <div class="text-center border-r border-white/10 pr-3">
-              <div class="js-count font-condensed font-extrabold text-amber text-2xl leading-none" x-init="$nextTick(()=>window.__countup($el))">9</div>
+              <div class="js-count font-condensed font-extrabold text-amber text-2xl leading-none" x-init="$nextTick(()=>window.__countup($el))" x-text="projects.length"></div>
               <div class="text-[10px] text-slate-400 tracking-[0.14em] uppercase mt-1">Active LOEs</div>
             </div>
             <div class="text-center border-r border-white/10 pr-3">
@@ -2221,7 +2221,7 @@ function dashboard() {
     },
 
     topStats: [
-      { l: 'ACTIVE LOEs', v: '9 LIVE' },
+      { l: 'ACTIVE LOEs', v: '10 LIVE' },
       { l: 'SIF26 FUNDED', v: '58.5K' },
       { l: 'FY27 PROJECTED', v: '$2.6M' },
       { l: 'STATUS', v: 'NOMINAL', live: true },
@@ -2232,7 +2232,7 @@ function dashboard() {
     roiTiles: [
       { val: '$2.6', unit: 'M', lbl: 'Projected FY27 Cost Savings', delta: 'FY27 Forecast' },
       { val: '16.2', unit: 'K hrs', lbl: 'Projected FY27 Airman Hours Returned', delta: 'FY27 Forecast' },
-      { val: '2,709', unit: '', lbl: 'Airmen on Wearable Programs', delta: '+439 Q2' },
+      { val: '2,759', unit: '', lbl: 'Airmen on Wearable Programs', delta: '+439 Q2' },
       { val: '$1.9', unit: 'M', lbl: 'Joint Funding · FY26 Projected', delta: 'CPE-CBRND' },
     ],
 
@@ -2300,14 +2300,14 @@ function dashboard() {
     },
 
     filters: [
-      { k:'all',      l:'All Lines of Effort', n: 9 },
+      { k:'all',      l:'All Lines of Effort', n: 10 },
       { k:'priority', l:'High Priority',       n: 2 },
-      { k:'suas',     l:'sUAS / C-sUAS',       n: 2 },
+      { k:'suas',     l:'sUAS / C-sUAS',       n: 3 },
       { k:'hpt',      l:'Human Performance',   n: 4 },
       { k:'infra',    l:'Lab · Infrastructure',n: 1 },
       { k:'am',       l:'3D Printing', n: 1 },
       { k:'spouse',   l:'Spouse Employment',   n: 1 },
-      { k:'vision',   l:'VISION (SIF26)',      n: 6 },
+      { k:'vision',   l:'VISION (SIF26)',      n: 5 },
     ],
 
     projects: [
@@ -2344,6 +2344,7 @@ function dashboard() {
             { d:'MAY 2026', e:'IT courseware submitted to AFSOC for approval' },
             { d:'20 MAY 26', e:'METL working group convenes — METP dev' },
             { d:'JUN 2026', e:'IT courseware approved · AFSOC/A3OU — MX X10D qualification begins' },
+            { d:'AUG 2026', e:'Skydio instructional classes begin — 20 students, METL in development' },
             { d:'JUN 2026', e:'Operational test: 62d AMXS ramp' },
             { d:'AUG 2026', e:'Transition decision · AMC review' },
           ],
@@ -2362,7 +2363,7 @@ function dashboard() {
         metrics: [
           { k:'Outside Funding', v:'$3.1M', big:true },
           { k:'Dashboard IOC', v:'NOV 26', big:true },
-          { k:'Devices in Pipeline', v:'2,709', lg:true },
+          { k:'Devices Distributed', v:'2,759', lg:true },
           { k:'Garmin (next batch)', v:'78', lg:true },
         ],
         bullets: [
@@ -2379,6 +2380,7 @@ function dashboard() {
           milestones: [
             { d:'NOW–AUG 26', e:'Finalize $3M procurement action w/ T2S' },
             { d:'JUN–SEP 26', e:'Launch opt-in program · informed consent / IRB' },
+            { d:'AUG 26', e:'CPE-CBRND device delivery complete — all AF members eligible' },
             { d:'SEP–NOV 26', e:'Commander dashboard deployment · IOC' },
             { d:'NOV 26+', e:'Author Value Assessment · AMC/AF policy dev' },
           ],
@@ -2390,11 +2392,11 @@ function dashboard() {
         eyebrow: 'Innovation Ventures · SIF',
         sub: 'Bldg 307 Spark Lab refit (EST Companies) · 3 subject areas',
         icon: 'lab', priority: false,
-        img: 'img/lab-infra.jpg',
+        img: 'img/lab-render.jpg', imgFit: 'cover',
         status: 'TOKENS PENDING', statusColor: 'amber', progress: 35,
         loe: 'infra',
         metrics: [
-          { k:'SIF26 Allocated', v:'$36K', big:true },
+          { k:'Equipment Package', v:'$50.2K', big:true },
           { k:'Refit POP', v:'210 DAYS', big:true },
           { k:'Refit Scope', v:'3 ROOMS' },
         ],
@@ -2404,6 +2406,7 @@ function dashboard() {
           note: 'Refocused FY26 SIF allocation toward the Spark Lab refit and in-house additive manufacturing.',
         },
         bullets: [
+          '<b>$50,250.43 equipment package</b> fully specced — held at CPTS pending a GPC card limit increase; <b>funds lapse 31 JUL 26</b>.',
           '<b>Bldg 307 refit</b> (EST Companies SOW, 27 APR 26) — store, lab &amp; main rooms across 3 subject areas (R-N-8 / R-N-4&amp;4A / R-N-7).',
           '<b>Store + lab rooms</b> — 1,000 sq ft carpet, 1,139 sq ft repaint, epoxy floor coating, 6 workstations &amp; steel storage lockers.',
           '<b>Main room</b> — new glass-walled conference room, U-shaped 14-person table + Crestron/BIAMP VTC AV, 3 sit-stand L-desks.',
@@ -2414,7 +2417,7 @@ function dashboard() {
           solution: 'Execute the Bldg 307 Spark Lab refit (EST Companies SOW, 27 APR 26) across three subject areas: R-N-8 store room (epoxy floor coating, steel storage lockers), R-N-4/4A lab room (1,000 sq ft carpet, 1,139 sq ft repaint, 6 single-sided workstations, personal lockers), and R-N-7 main room (3 sit-stand L-desks, custom U-shaped 14-person conference table, small-conference seating, ~330 sq ft glass wall partitions, and a Crestron/BIAMP/Extron VTC AV suite with dual 98" displays). 3D-printing equipment is resourced under the 3D Printing LOE.',
           impact: ['Modernized 3-room lab footprint scales throughput','New glass-walled VTC conference room','Co-located HPT recovery space','Co-located HPT + 3D printing accelerates iteration'],
           milestones: [
-            { d:'NOW', e:'Awaiting SIF token distribution — expected soon' },
+            { d:'BY 31 JUL 26', e:'Funds expire — GPC limit increase ($10K→$15K) needed to purchase' },
             { d:'JUN 2026', e:'Lab renovation walkthrough — final estimate' },
             { d:'UPON RECEIPT', e:'EST refit award · 150-day product lead time' },
             { d:'+210 DAYS', e:'Install complete (60-day build) · 3rd MDTF lab' },
@@ -2455,6 +2458,40 @@ function dashboard() {
             { d:'OCT 26+', e:'Cross-LOE production · 3rd MDTF instructional lab' },
           ],
         },
+      },
+      {
+        id: 'one-radar', kind: 'project', stage: 'pilot',
+        title: 'One Radar',
+        eyebrow: 'sUAS · Counter-sUAS LOE',
+        sub: 'Passive detection radar · BDOC array augmentation · 62d SFS',
+        icon: 'drone', priority: false,
+        img: 'img/one-radar.jpg', imgPos: '50% 40%',
+        status: 'TEST & EVALUATION', statusColor: 'amber', progress: 45,
+        loe: 'suas',
+        metrics: [
+          { k:'Investment', v:'$1.5M', big:true },
+          { k:'Delivered', v:'09 MAR 26', big:true },
+          { k:'Role', v:'PASSIVE DETECT', lg:true },
+          { k:'Integration', v:'BDOC ARRAY', lg:true },
+        ],
+        bullets: [
+          '<b>Delivered 9 MAR 26</b> — $1.5M invested; test and evaluation in progress.',
+          '<b>Passive detection radar</b> adding to the existing BDOC array for counter-sUAS coverage.',
+          '<b>BDOC &amp; 62d SFS informed</b> — integration path coordinated with defence operations.',
+          '<b>LOS signature</b> — Col Thompson.',
+        ],
+        lead: 'Maj Williston', crew: ['TSgt Audett'], tag: 'IN TEST',
+        detail: {
+          problem: 'The base defence operations centre array relies on active sensors for small-UAS detection, which are emitting, power-hungry, and limited against low-signature airframes approaching the field.',
+          solution: 'Field a passive detection radar to augment the BDOC array — detecting small UAS without emitting, and extending counter-sUAS awareness around McChord Field. Currently in test and evaluation with BDOC and 62d SFS coordinated on the integration path.',
+          impact: ['Passive detection — no emissions signature','Augments the existing BDOC sensor array','Extends counter-sUAS coverage at McChord Field','$1.5M capability already delivered on site'],
+          milestones: [
+            { d:'09 MAR 26', e:'Delivered on site — $1.5M invested' },
+            { d:'NOW', e:'Test and evaluation in progress' },
+            { d:'NEXT', e:'BDOC array integration decision' },
+          ],
+        },
+        status2: '',
       },
       {
         id: 'hand-built-drones', kind: 'project', stage: 'concept',
@@ -2550,6 +2587,7 @@ function dashboard() {
           milestones: [
             { d:'23 MAR 26', e:'Session 1 kickoff · cohort enrolled' },
             { d:'MAY 2026', e:'Session 1 complete · PT-test re-eval + injury data review' },
+            { d:'JUN 26', e:'Session 1 complete — 22 started, 7 finished, average 2-mile time down 3:55' },
             { d:'15 JUN 26', e:'Session 2 begins' },
             { d:'7 AUG 26', e:'Session 2 concludes · PT-test re-eval' },
           ],
@@ -2652,15 +2690,18 @@ function dashboard() {
       { id:'sif26-tokens', title:'FY26 SIF Tokens Secured', loe:'infra', completed:'MAY 2026',
         story:'Rainier Spark managed SIF token allocation on behalf of 14 squadron commanders — claiming every token before the HAF pull-back deadline, then crowdsourcing them into a smaller number of higher-impact initiatives rather than letting them fragment.',
         impact:['All Sq CC tokens claimed by 2 MAR 26 — none returned to HAF','Every token allocated to an initiative by 1 MAY 26','Tokens pooled across 14 squadrons to fund larger builds'] },
-      { id:'dive-spool', title:'3D-Printed Dive Spools · 22 STS', loe:'am', completed:'2026',
+      { id:'dive-spool', title:'3D-Printed Dive Spools · 22 STS', loe:'am', completed:'2026', img:'img/printed-case.jpg',
         story:'The Spark Lab designed and printed scuba gear spools for 22nd Special Tactics Squadron underwater dives. Tested and operational — fabricated in-house with no procurement action and no lead time.',
         impact:['Tested and in operational use by 22 STS','No procurement action or vendor lead time','Reprintable on demand from stock filament'] },
       { id:'oura-98', title:'98 Oura Rings Delivered', loe:'hpt', completed:'FEB 2026',
         story:'First tranche of the wearables rollout: 98 Oura Gen 4 rings sized, ordered and issued to 62d AW Airmen, standing up the physiological baseline the Human Performance line of effort now builds on.',
-        impact:['98 devices sized and issued','Seeded the wearables programme now at 2,709 devices','Baseline data for fatigue and readiness work'] },
+        impact:['98 devices sized and issued','Seeded the wearables programme now at 2,759 devices','Baseline data for fatigue and readiness work'] },
       { id:'briefing-sticks', title:'C-17A Briefing Sticks · 57 WPS', loe:'am', completed:'2026',
         story:'Printed 10 replacement C-17A briefing stick models for the 57th Weapons Squadron, plus 1/3-scale threat and weapons replicas for recognition and employment training. All printed in PLA in-house.',
         impact:['10× C-17A briefing sticks replaced','~$3,050 commercial cost avoided for ~$64 of filament','Threat/weapons replicas added for aircrew training'] },
+      { id:'outreach', title:'346 Airmen Through the Lab', loe:'infra', completed:'JUL 2025 – 2026',
+        story:'Rainier Spark has run monthly innovation-lab tours for the First Term Enlisted Course since July 2025, alongside continuous-improvement sessions for the NCO Foundations Course and an instructional print day for Army counterparts.',
+        impact:['14 FTEC lab tours · 346 Airmen (180 in 2026)','4 NCO Foundations classes · 56 Airmen, 62d AW & 446th','10 soldiers from 3rd MDTF trained at the print site'] },
       { id:'sts-pilots', title:'22 STS Airmen Trained for Red Flag', loe:'suas',  completed:'MAY 2026',
         story:'Rainier Spark trained 22 Special Tactics Squadron personnel on sUAS operation ahead of Red Flag Alaska — hands-on manual piloting reps on in-house built airframes rather than tying up high-cost COTS platforms.',
         impact:['22 STS personnel trained and deployed to Red Flag AK','Training flown on in-house built airframes','Fed the AFSOC-approved instructional course now standing up'] },
