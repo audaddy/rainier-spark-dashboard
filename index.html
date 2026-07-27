@@ -654,7 +654,7 @@
           class="border font-condensed font-semibold text-sm tracking-[0.1em] uppercase px-4 py-1.5 rounded-sm transition-all flex items-center gap-2 shrink-0 whitespace-nowrap"
         >
           <span x-text="f.l"></span>
-          <span class="font-mono text-[10px] opacity-70" x-text="f.n"></span>
+          <span class="font-mono text-[10px] opacity-70" x-text="filterCount(f.k)"></span>
         </button>
       </template>
     </div>
@@ -662,7 +662,7 @@
     <!-- Meet the Team, per LOE. Same treatment as the filter pills above. -->
     <div class="flex items-center gap-2 mb-2.5 flex-nowrap overflow-x-auto scrollbar-thin -mx-4 px-4 pb-1
                 sm:flex-wrap sm:overflow-visible sm:mx-0 sm:px-0 sm:pb-0">
-      <span class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mr-0.5 shrink-0">Meet the Team</span>
+      <span class="font-condensed font-semibold text-sm text-ice tracking-[0.1em] uppercase underline decoration-ice/50 underline-offset-4 mr-1 shrink-0">Meet the Team</span>
       <template x-for="f in filters.filter(f => !['all','priority','vision'].includes(f.k))" :key="'team-' + f.k">
         <button
           @click="teamLoeOpen = (teamLoeOpen === f.k ? null : f.k); trackClick('team_loe_' + f.k)"
@@ -1236,7 +1236,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12" x-show="successStories.length">
       <template x-for="s in successStories" :key="s.id">
-        <div x-init="$nextTick(()=>window.__reveal($el))" class="reveal-card brackets bg-gradient-to-b from-ink-700/70 to-ink-900/95 border border-gold/25 hover:border-gold/50 hover:-translate-y-0.5 transition-all rounded flex flex-col overflow-hidden shadow-card">
+        <article x-init="$nextTick(()=>window.__reveal($el))" class="group relative reveal-card brackets bg-gradient-to-b from-ink-700/70 to-ink-900/95 border border-gold/25 hover:border-gold/50 hover:-translate-y-0.5 transition-all rounded flex flex-col overflow-hidden shadow-card">
           <template x-if="s.img">
             <div class="relative h-28 border-b border-white/10 overflow-hidden">
               <img loading="lazy" decoding="async" :src="s.img" :alt="s.title" class="w-full h-full object-cover" x-on:error="$event.target.style.display='none'" />
@@ -1251,8 +1251,8 @@
               </span>
               <span class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase" x-text="s.completed"></span>
             </div>
-            <div class="font-condensed font-bold text-white text-[18px] uppercase leading-tight" x-text="s.title"></div>
-            <p class="text-xs text-slate-300 leading-relaxed" x-text="s.story"></p>
+            <h3 class="font-condensed font-bold text-white text-[18px] uppercase leading-tight" x-text="s.title"></h3>
+            <p class="text-xs text-slate-300 leading-relaxed line-clamp-3" x-text="s.story"></p>
             <ul class="border-t border-dashed border-white/10 pt-3 space-y-1.5 mt-auto" x-show="s.impact && s.impact.length">
               <template x-for="i in (s.impact || [])" :key="i">
                 <li class="text-xs text-slate-200 leading-snug flex gap-2">
@@ -1261,8 +1261,15 @@
                 </li>
               </template>
             </ul>
+            <div class="flex items-center justify-between gap-3 pt-3 border-t border-white/10 font-mono text-[10px] text-slate-400 tracking-wider uppercase">
+              <span class="font-condensed font-bold text-gold text-[15px] tracking-wide tabular-nums" x-text="s.year"></span>
+              <button type="button" @click="openWin(s); trackClick('win_' + s.id.replace(/-/g,'_'))"
+                :aria-label="'View milestones for ' + s.title"
+                class="card-link det-chip text-gold border border-gold/30 px-2.5 py-1 rounded-sm group-hover:border-gold transition inline-flex items-center gap-1.5 shrink-0"
+              >Milestones <span class="det-arrow" aria-hidden="true">→</span></button>
+            </div>
           </div>
-        </div>
+        </article>
       </template>
     </div>
 
@@ -1451,7 +1458,7 @@
               </div>
             </div>
           </div>
-          <div class="px-7 py-3.5 border-t border-white/10 bg-ink-950/60 flex items-start justify-between gap-3 font-mono text-[10px] text-slate-400 tracking-wider uppercase">
+          <div class="px-5 sm:px-7 py-3.5 border-t border-white/10 bg-ink-950/60 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2.5 sm:gap-3 font-mono text-[10px] text-slate-400 tracking-wider uppercase">
             <span class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
               <span>LEAD ·</span>
               <span @click.stop="openBio(open.lead)" :class="hasBio(open.lead) ? 'cursor-pointer text-white font-semibold hover:text-ice underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2 transition' : 'text-white font-semibold'" x-text="open.lead"></span>
@@ -1467,7 +1474,7 @@
                 </span>
               </template>
             </span>
-            <span class="flex items-center gap-3 shrink-0">
+            <span class="flex items-center gap-3 shrink-0 self-end sm:self-auto">
               <button
                 type="button"
                 @click.stop="toggleWatch(open)"
@@ -1573,6 +1580,70 @@
           <template x-if="bio.contact && bio.contact.email">
             <a :href="'mailto:' + bio.contact.email" class="mt-4 inline-flex items-center gap-2 font-mono text-xs text-slate-200 hover:text-ice transition underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2" x-text="bio.contact.email"></a>
           </template>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <!-- ════════════ MISSION WIN MODAL ════════════ -->
+  <div x-show="win !== null" x-cloak @keydown.escape.window="closeWin()"
+    class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+    @click="closeWin()" x-transition.opacity>
+    <template x-if="win">
+      <div @click.stop class="bg-ink-800 border border-gold/30 rounded max-w-2xl w-full max-h-[88vh] overflow-hidden flex flex-col shadow-2xl"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+        <div class="px-5 sm:px-7 py-5 border-b border-white/10 bg-gradient-to-b from-gold/10 to-transparent flex items-start gap-4">
+          <div class="w-12 h-12 border border-gold/35 bg-gold/10 text-gold rounded-sm flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor"><path d="M12 2 L14.5 8.5 L21.5 9 L16.2 13.4 L17.8 20.5 L12 16.7 L6.2 20.5 L7.8 13.4 L2.5 9 L9.5 8.5 Z"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-mono text-[10px] text-gold tracking-[0.2em] uppercase">Mission Win · <span x-text="win.year"></span></div>
+            <h3 class="font-condensed font-bold text-white text-2xl uppercase tracking-wide leading-tight" x-text="win.title"></h3>
+            <div class="font-mono text-[10px] text-slate-400 tracking-[0.16em] uppercase mt-1" x-text="win.completed"></div>
+          </div>
+          <button @click="closeWin()" aria-label="Close" class="text-slate-300 hover:text-white border border-white/15 hover:border-gold w-9 h-9 rounded-sm text-xl leading-none shrink-0">×</button>
+        </div>
+        <div class="px-5 sm:px-7 py-6 overflow-y-auto scrollbar-thin space-y-6">
+          <p class="text-sm text-slate-200 leading-relaxed" x-text="win.story"></p>
+
+          <div>
+            <div class="font-mono text-[10px] text-gold tracking-[0.16em] uppercase font-bold mb-2">What we achieved</div>
+            <ul class="space-y-1.5">
+              <template x-for="i in (win.impact || [])" :key="i">
+                <li class="flex gap-2.5 text-sm text-slate-200 leading-snug">
+                  <span class="w-1.5 h-1.5 mt-1.5 bg-gold rotate-45 shrink-0"></span><span x-text="i"></span>
+                </li>
+              </template>
+            </ul>
+          </div>
+
+          <div>
+            <div class="font-mono text-[10px] text-gold tracking-[0.16em] uppercase font-bold mb-2">Milestones</div>
+            <div class="space-y-0">
+              <template x-for="(ms, mi) in (win.milestones || [])" :key="mi">
+                <div class="flex gap-4 text-sm py-2 border-b border-white/5 last:border-b-0">
+                  <span class="font-mono text-gold tracking-[0.08em] min-w-[86px] shrink-0" x-text="ms.d"></span>
+                  <span class="text-slate-200" x-text="ms.e"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="border border-white/10 rounded-sm bg-ink-950/50 p-4">
+              <div class="font-mono text-[10px] text-ice tracking-[0.16em] uppercase font-bold mb-1.5">What's next</div>
+              <p class="text-sm text-slate-200 leading-snug" x-text="win.next"></p>
+            </div>
+            <div class="border border-white/10 rounded-sm bg-ink-950/50 p-4">
+              <div class="font-mono text-[10px] text-green tracking-[0.16em] uppercase font-bold mb-1.5">Final goal</div>
+              <p class="text-sm text-slate-200 leading-snug" x-text="win.goal"></p>
+            </div>
+          </div>
+        </div>
+        <div class="px-7 py-3.5 border-t border-white/10 bg-ink-950/60 flex items-center justify-between font-mono text-[10px] text-slate-400 tracking-wider uppercase">
+          <span>62d AW <span class="text-gold">·</span> Rainier Spark</span>
+          <span class="text-gold">● Complete</span>
         </div>
       </div>
     </template>
@@ -2237,14 +2308,15 @@ function dashboard() {
     ],
 
     timeline: [
-      { m: 'JAN 26', events: ['62d AW Immersion · 13 DoW partners','Oura Gen 4 sizing window'] },
-      { m: 'FEB 26', events: ['98× Oura Gen 4 delivered','SAWS 26 · HPT briefing'] },
-      { m: 'MAR 26', events: ['One Radio delivered (sUAS)','Rainier Runners pilot launch'] },
-      { m: 'APR 26', events: ['3rd MDTF print site instr'] },
-      { m: 'MAY 26', events: ['SIF token distribution pending','sUAS IT submitted · pending AFSOC approval'] },
-      { m: 'JUN 26', events: ['sUAS IT approved · AFSOC/A3OU — MX X10D qualification begins','Rainier Runners Session 2 begins (15 Jun–7 Aug)','HP & Biosystems Summit · D.C.','Lab renovation walkthrough'] },
-      { m: 'JUL 26', now: true, events: ['Rainier Runners Session 2 in progress (thru 7 Aug)','C-17 sUAS operational test · 62d AMXS ramp','3D printing — Prusa XL procured (UFR), carbon-fibre capable','HPPSS planning underway'] },
-      { m: 'DEC 26', events: ['HPPSS · Human Performance Puget Sound Summit — tentative'] },
+      { m: "JAN '26", events: ['62d AW Immersion · 13 DoW (Department of War) partners','Oura Gen 4 sizing window opens'] },
+      { m: "FEB '26", events: ['98× Oura Gen 4 rings delivered','05 FEB · MindGym demo completed','SAWS 26 · HPT (Human Performance Team) briefing'] },
+      { m: "MAR '26", events: ['09 MAR · One Radar delivered — $1.5M passive detection radar','02 MAR · All squadron SIF tokens claimed','Rainier Runners pilot launch'] },
+      { m: "APR '26", events: ['09 APR · 3rd MDTF (Multi-Domain Task Force) print-site instruction — 10 soldiers','27 APR · Spark Lab refit statement of work issued'] },
+      { m: "MAY '26", events: ['01 MAY · All SIF tokens allocated to an initiative','20 MAY · METL (Mission Essential Task List) working group convenes','sUAS Initial Training submitted · pending AFSOC approval','22 STS personnel trained for Red Flag Alaska'] },
+      { m: "JUN '26", events: ['sUAS IT approved · AFSOC/A3OU — MX X10D qualification begins','Rainier Runners Session 2 begins (15 Jun–7 Aug)','HP & Biosystems Summit · D.C.','Lab renovation walkthrough'] },
+      { m: "JUL '26", now: true, events: ['Rainier Runners Session 2 in progress (thru 7 Aug)','C-17 sUAS operational test · 62d AMXS ramp','3D printing — Prusa XL procured (UFR), carbon-fibre capable','HPPSS planning underway'] },
+      { m: "AUG '26", events: ['Skydio instructional classes begin — 20 students','CPE-CBRND (Chem/Bio/Radiological/Nuclear Defense) device delivery complete (~EOM AUG)','07 AUG · Rainier Runners Session 2 ends'] },
+      { m: "DEC '26", events: ['HPPSS · Human Performance Puget Sound Summit — tentative'] },
     ],
 
     team: [
@@ -2299,22 +2371,30 @@ function dashboard() {
       'Lt Col Blume': { initials:'LB', role:'Human Performance · Crew', bio:'Human Performance crew — supports the wearables rollout and HP lines of effort.\n\n[Draft bio — real bio coming.]' },
     },
 
+    // Counts are derived (see filterCount) so they cannot drift from the data
+    // when a project or VISION record is added or removed.
     filters: [
-      { k:'all',      l:'All Lines of Effort', n: 10 },
-      { k:'priority', l:'High Priority',       n: 2 },
-      { k:'suas',     l:'sUAS / C-sUAS',       n: 3 },
-      { k:'hpt',      l:'Human Performance',   n: 4 },
-      { k:'infra',    l:'Lab · Infrastructure',n: 1 },
-      { k:'am',       l:'3D Printing', n: 1 },
-      { k:'spouse',   l:'Spouse Employment',   n: 1 },
-      { k:'vision',   l:'VISION (SIF26)',      n: 5 },
+      { k:'all',      l:'All Lines of Effort' },
+      { k:'priority', l:'High Priority' },
+      { k:'suas',     l:'sUAS / C-sUAS' },
+      { k:'hpt',      l:'Human Performance' },
+      { k:'infra',    l:'Lab · Infrastructure' },
+      { k:'am',       l:'3D Printing' },
+      { k:'spouse',   l:'Spouse Employment' },
+      { k:'vision',   l:'VISION (SIF26)' },
     ],
+    filterCount(k) {
+      if (k === 'all')      return this.projects.length;
+      if (k === 'priority') return this.projects.filter(p => p.priority).length;
+      if (k === 'vision')   return this.vision.length;
+      return this.projects.filter(p => p.loe === k).length;
+    },
 
     projects: [
       {
         id: 'c17-suas', kind: 'project',
         title: 'C-17 sUAS Aircraft Inspections',
-        eyebrow: 'sUAS · Counter-sUAS LOE',
+        eyebrow: 'sUAS (small Unmanned Aircraft System) · Counter-sUAS LOE',
         sub: 'Autonomous airframe inspection · LMCO digital twin · 62d MXG / 446th',
         icon: 'drone', priority: true,
         img: 'img/c17-suas.jpg',
@@ -2329,9 +2409,9 @@ function dashboard() {
         bullets: [
           '<b>Autonomous sUAS</b> performing pre/post-flight visual inspections — replaces 4-person ladder teams.',
           '<b>LMCO digital twin &amp; issue-detection software</b> — automated FOD/corrosion flagging on every scan.',
-          '<b>22 STS personnel trained May 26</b> for Red Flag AK.',
-          '<b>IT courseware approved by AFSOC/A3OU</b> — now qualifying MX personnel to fly the Skydio X10D toward IOC.',
-          '<b>METL working group convenes 20 May 26</b> — mission essential training program dev.',
+          '<b>22 STS (Special Tactics Squadron) personnel trained May 26</b> for Red Flag AK.',
+          '<b>Initial Training courseware approved by AFSOC (Air Force Special Operations Command)</b> — now qualifying MX personnel to fly the Skydio X10D toward IOC.',
+          '<b>METL (Mission Essential Task List) working group convenes 20 May 26</b> — mission essential training program dev.',
         ],
         lead: 'TSgt Dowling', crew: ['TSgt Audett','TSgt Russel'], tag: 'HIGH PRIORITY',
         detail: {
@@ -2353,8 +2433,8 @@ function dashboard() {
       {
         id: 'hpt-wearables', kind: 'project',
         title: 'HPT Wearables Rollout',
-        eyebrow: 'Human Performance LOE',
-        sub: 'Wearable physiological monitoring · CPE-CBRNDD partnership · MOU FB4479-XXXXX-011',
+        eyebrow: 'Human Performance LOE (Line of Effort)',
+        sub: 'Wearable physiological monitoring · CPE-CBRND (Chem/Bio/Radiological/Nuclear Defense) partnership · MOU (Memorandum of Understanding) FB4479-XXXXX-011',
         icon: 'watch', priority: true,
         imgPos: 'center 70%',
         img: 'img/hpt-wearables.jpg',
@@ -2380,7 +2460,7 @@ function dashboard() {
           milestones: [
             { d:'NOW–AUG 26', e:'Finalize $3M procurement action w/ T2S' },
             { d:'JUN–SEP 26', e:'Launch opt-in program · informed consent / IRB' },
-            { d:'AUG 26', e:'CPE-CBRND device delivery complete — all AF members eligible' },
+            { d:'AUG 26', e:'CPE-CBRND (Chem/Bio/Radiological/Nuclear Defense) device delivery complete — all AF members eligible' },
             { d:'SEP–NOV 26', e:'Commander dashboard deployment · IOC' },
             { d:'NOV 26+', e:'Author Value Assessment · AMC/AF policy dev' },
           ],
@@ -2406,7 +2486,7 @@ function dashboard() {
           note: 'Refocused FY26 SIF allocation toward the Spark Lab refit and in-house additive manufacturing.',
         },
         bullets: [
-          '<b>$50,250.43 equipment package</b> fully specced — held at CPTS pending a GPC card limit increase; <b>funds lapse 31 JUL 26</b>.',
+          '<b>$50,250.43 equipment package</b> fully specced — held at CPTS pending a GPC (Government Purchase Card) limit increase; <b>funds lapse 31 JUL 26</b>.',
           '<b>Bldg 307 refit</b> (EST Companies SOW, 27 APR 26) — store, lab &amp; main rooms across 3 subject areas (R-N-8 / R-N-4&amp;4A / R-N-7).',
           '<b>Store + lab rooms</b> — 1,000 sq ft carpet, 1,139 sq ft repaint, epoxy floor coating, 6 workstations &amp; steel storage lockers.',
           '<b>Main room</b> — new glass-walled conference room, U-shaped 14-person table + Crestron/BIAMP VTC AV, 3 sit-stand L-desks.',
@@ -2444,8 +2524,8 @@ function dashboard() {
           '<b>Partnering across the wing</b> — prints in progress for 57 WPS, 22 STS, 672 STS &amp; 62 MX, fulfilling cross-unit fabrication and repair-part requests.',
           '<b>1× Prusa XL procured with UFR funds</b> — carbon-fibre capable, plus filament/resin and spares.',
           '<b>4–5 Prusa printers</b> (Travis AFB Phoenix Spark donation) — incoming to expand fleet throughput.',
-          '<b>QAR disc SD-card holder</b> (62d MXG / 446th) — printed replacement for the QAR disc carrier; <b>fleet-wide if accepted</b>.',
-          '<b>627 CES 3D Printer line</b> ($6.3K) — in-house fabrication of HVAC, lock, and obsolete door hardware.',
+          '<b>QAR (Quick Access Recorder) disc SD-card holder</b> (62d MXG / 446th) — printed replacement for the QAR disc carrier; <b>fleet-wide if accepted</b>.',
+          '<b>627 CES (Civil Engineer Squadron) 3D Printer line</b> ($6.3K) — in-house fabrication of HVAC, lock, and obsolete door hardware.',
         ],
         lead: 'TSgt Russel', crew: ['TSgt Audett'], tag: 'OPERATIONAL · EXPANDING',
         detail: {
@@ -2463,7 +2543,7 @@ function dashboard() {
       {
         id: 'one-radar', kind: 'project', stage: 'pilot',
         title: 'One Radar',
-        eyebrow: 'sUAS · Counter-sUAS LOE',
+        eyebrow: 'sUAS (small Unmanned Aircraft System) · Counter-sUAS LOE',
         sub: 'Passive detection radar · BDOC array augmentation · 62d SFS',
         icon: 'drone', priority: false,
         img: 'img/one-radar.jpg', imgPos: '50% 40%',
@@ -2478,7 +2558,7 @@ function dashboard() {
         bullets: [
           '<b>Delivered 9 MAR 26</b> — $1.5M invested; test and evaluation in progress.',
           '<b>Passive detection radar</b> adding to the existing BDOC array for counter-sUAS coverage.',
-          '<b>BDOC &amp; 62d SFS informed</b> — integration path coordinated with defence operations.',
+          '<b>BDOC (Base Defense Operations Center) &amp; 62d SFS (Security Forces Squadron) informed</b> — integration path coordinated with defence operations.',
           '<b>LOS signature</b> — Col Thompson.',
         ],
         lead: 'Maj Williston', crew: ['TSgt Audett'], tag: 'IN TEST',
@@ -2497,7 +2577,7 @@ function dashboard() {
       {
         id: 'hand-built-drones', kind: 'project', stage: 'concept',
         title: 'Hand-Built Drones',
-        eyebrow: 'sUAS · Counter-sUAS LOE',
+        eyebrow: 'sUAS (small Unmanned Aircraft System) · Counter-sUAS LOE',
         sub: 'In-house sUAS construction · 62d MXG / 446th maintainer-pilots',
         icon: 'drone', priority: false,
         img: 'img/hand-built-drones.jpg',
@@ -2530,8 +2610,8 @@ function dashboard() {
       {
         id: 'mindgym', kind: 'project', stage: 'concept',
         title: 'MindGym',
-        eyebrow: 'Human Performance LOE',
-        sub: 'Immersive cognitive-resilience training · WA ANG Camp Murray partnership',
+        eyebrow: 'Human Performance LOE (Line of Effort)',
+        sub: 'Immersive cognitive-resilience training · standing up at McChord Field',
         icon: 'watch', priority: false,
         img: 'img/mindgym.jpg',
         status: 'UFR PENDING', statusColor: 'blue', progress: 35,
@@ -2544,17 +2624,18 @@ function dashboard() {
         ],
         bullets: [
           '<b>Mirrored-room immersive environment</b> for cognitive load &amp; stress-inoculation training.',
-          '<b>Cannot use MEEP funds</b> — placed on UFR (MSgt Wheir).',
+          '<b>Cannot use MEEP funds</b> — placed on UFR (Unfunded Requirement) (MSgt Wheir).',
           '<b>Interim path:</b> TRIPP App on unused IPRO VR headsets while UFR is staffed.',
           'POCs: Mr. Powell, Ms. Pileggi, TSgt Audett, MSgt Wheir.',
         ],
         lead: 'MSgt Wheir', tag: 'DEMO PHASE',
         detail: {
           problem: 'No dedicated stress-inoculation or cognitive-load training environment for high-tempo Airmen. Existing recovery programs are reactive — no proactive build-up of cognitive resilience prior to deployment or surge ops.',
-          solution: 'Stand up a mirrored-room immersive environment at Camp Murray (WA ANG partnership) for cognitive resilience training. Interim: TRIPP App deployed on unused IPRO VR headsets while UFR is staffed for full mirrored-room funding.',
+          solution: 'Stand up a mirrored-room immersive environment at McChord Field for cognitive resilience training. Interim: TRIPP App deployed on unused IPRO VR headsets while UFR is staffed for full mirrored-room funding.',
           impact: ['Proactive stress inoculation for surge ops','Builds cognitive resilience pre-deployment','Complements MedicMind passive monitoring','Cross-component (ANG + AD) partnership'],
           milestones: [
-            { d:'05 FEB 26', e:'Demo completed at Camp Murray' },
+            { d:'05 FEB 26', e:'Demo completed' },
+            { d:'NOW', e:'Procurement — $183,850 for 5 years of service, staffing through UFR' },
             { d:'MAR 2026', e:'UFR filed (MSgt Wheir)' },
             { d:'APR 2026', e:'TRIPP interim path · IPRO VR headsets' },
             { d:'JUN 2026', e:'UFR staffing decision' },
@@ -2564,7 +2645,7 @@ function dashboard() {
       {
         id: 'beast-running', kind: 'project', stage: 'fielded',
         title: 'Rainier Runners',
-        eyebrow: 'Human Performance LOE',
+        eyebrow: 'Human Performance LOE (Line of Effort)',
         sub: '8-week structured running improvement course · 62d AW Airmen cohort',
         icon: 'watch', priority: false,
         status: 'SESSION 2 IN PROGRESS', statusColor: 'amber', progress: 22,
@@ -2595,9 +2676,77 @@ function dashboard() {
         },
       },
       {
+        id: 'oura-platform', kind: 'project', stage: 'pilot',
+        title: 'Oura Platform',
+        eyebrow: 'Human Performance LOE (Line of Effort)',
+        sub: 'Ring-based sleep &amp; recovery telemetry · 62d AW rollout',
+        icon: 'watch', priority: false,
+        img: 'img/hpt-wearables.jpg',
+        status: 'IRB PENDING', statusColor: 'blue', progress: 45,
+        loe: 'hpt',
+        metrics: [
+          { k:'Rings Delivered', v:'98', big:true },
+          { k:'Gate', v:'IRB REVIEW', big:true },
+          { k:'Device', v:'OURA GEN 4/5', lg:true },
+          { k:'Programme Total', v:'2,759', lg:true },
+        ],
+        bullets: [
+          '<b>98 Oura Gen 4 rings</b> sized and issued — the first tranche of the wearables rollout.',
+          '<b>Current gate:</b> Non-Human IRB (Institutional Review Board) completion by 62d AW / AFRL (Air Force Research Laboratory).',
+          '<b>Gen 5 offered</b> alongside Garmin Fenix 8 Pro and Tactix 8 in the CPE-CBRND distribution.',
+          'POCs: Maj Williston, Maj Jordan, Maj Bolling.',
+        ],
+        lead: 'Maj Williston', crew: ['Maj Jordan','Maj Bolling'], tag: 'IRB PENDING',
+        detail: {
+          problem: 'Sleep and recovery data for aircrew and groundcrew is self-reported and inconsistent, so crew-rest and readiness decisions rest on subjective inputs rather than measured physiology.',
+          solution: 'Field Oura rings across the 62d AW to build a continuous, objective sleep and recovery baseline that feeds the fatigue and readiness work. Non-Human IRB completion by 62d AW/AFRL is the current gate before broader distribution.',
+          impact: ['Objective sleep and recovery baseline','98 rings already sized and issued','Feeds fatigue modelling and crew-rest policy','Airman choice of Oura or Garmin under CPE-CBRND'],
+          milestones: [
+            { d:'JAN 26', e:'Gen 4 sizing window opened' },
+            { d:'FEB 26', e:'98 rings delivered and issued' },
+            { d:'NOW', e:'Non-Human IRB completion — 62d AW / AFRL' },
+            { d:'AUG 26', e:'CPE-CBRND distribution — Gen 5 offered fleet-wide' },
+          ],
+        },
+      },
+      {
+        id: 'pulse-platform', kind: 'project', stage: 'pilot',
+        title: 'Pulse Platform',
+        eyebrow: 'Human Performance LOE (Line of Effort)',
+        sub: 'Fatigue Meter · Fatigue Advisor · McSTAT — 62d OG &amp; 7th AS',
+        icon: 'watch', priority: false,
+        img: 'img/hpt-wearables.jpg',
+        status: 'IN PROCESS', statusColor: 'amber', progress: 55,
+        loe: 'hpt',
+        metrics: [
+          { k:'Suite', v:'3 TOOLS', big:true },
+          { k:'Authority', v:'IL-4 IATT', big:true },
+          { k:'Briefed', v:'62d OG · 7 AS', lg:true },
+          { k:'Embedded SME', v:'ON SITE', lg:true },
+        ],
+        bullets: [
+          '<b>Fatigue Meter</b> — wearable-driven fatigue modelling with a commander dashboard (Maj Williston, Capt Kita, Maj Engle).',
+          '<b>Fatigue Advisor</b> — personal countermeasure planning for sleep, light exposure and caffeine timing (Maj Engle).',
+          '<b>McSTAT</b> — McChord scheduling and tasking analysis feeding crew-rest planning (Capt Fisk).',
+          '<b>Pulsar team briefed</b> 62d OG (Operations Group) and 7th AS leadership; embedded computer engineer on site since MAR 26.',
+        ],
+        lead: 'Maj Williston', crew: ['Capt Kita'], tag: 'IN PROCESS',
+        detail: {
+          problem: 'Aircraft commanders plan crew rest without visibility into actual crew physiology, and squadron leadership has no aggregated view of fatigue risk across a unit during high-tempo operations.',
+          solution: 'Operate the Pulse Platform suite across the 62d AW: Fatigue Meter for wearable-driven fatigue modelling and commander dashboards, Fatigue Advisor for individual countermeasure planning, and McSTAT for scheduling and tasking analysis. Running under an IL-4 Interim Authority To Test with an embedded Pulsar engineer at McChord.',
+          impact: ['Crew-rest decisions backed by measured physiology','Squadron-level fatigue risk visibility','Individual countermeasure planning for aircrew','Embedded vendor engineer shortens the feedback loop'],
+          milestones: [
+            { d:'MAR 26', e:'Pulsar computer engineer embedded at McChord' },
+            { d:'JUN 26', e:'62d OG and 7th AS leadership briefed' },
+            { d:'NOW', e:'IL-4 Interim Authority To Test in effect' },
+            { d:'SEP–NOV 26', e:'Commander dashboard deployment · IOC' },
+          ],
+        },
+      },
+      {
         id: 'medicmind', kind: 'project',
         title: 'MedicMind',
-        eyebrow: 'Human Performance LOE',
+        eyebrow: 'Human Performance LOE (Line of Effort)',
         sub: 'Cognitive readiness & mental-fitness platform · medical & aircrew cohort',
         icon: 'watch', priority: false,
         status: 'PILOT', statusColor: 'amber', progress: 28,
@@ -2688,24 +2837,71 @@ function dashboard() {
     // Archive of accomplished initiatives. Add an entry here once a Line of Effort is fielded:
     // { id, title, loe, completed: 'MON YYYY', story: '...narrative...', impact: ['...'], img: 'data:...' }
     successStories: [
-      { id:'sif26-tokens', title:'FY26 SIF Tokens Secured', loe:'infra', completed:'MAY 2026',
-        story:'Rainier Spark managed SIF token allocation on behalf of 14 squadron commanders — claiming every token before the HAF pull-back deadline, then crowdsourcing them into a smaller number of higher-impact initiatives rather than letting them fragment.',
-        impact:['All Sq CC tokens claimed by 2 MAR 26 — none returned to HAF','Every token allocated to an initiative by 1 MAY 26','Tokens pooled across 14 squadrons to fund larger builds'] },
-      { id:'dive-spool', title:'3D-Printed Dive Spools · 22 STS', loe:'am', completed:'2026',
-        story:'The Spark Lab designed and printed scuba gear spools for 22nd Special Tactics Squadron underwater dives. Tested and operational — fabricated in-house with no procurement action and no lead time.',
-        impact:['Tested and in operational use by 22 STS','No procurement action or vendor lead time','Reprintable on demand from stock filament'] },
-      { id:'oura-98', title:'98 Oura Rings Delivered', loe:'hpt', completed:'FEB 2026',
+      { id:'sif26-tokens', title:'FY26 SIF Tokens Secured', loe:'infra', completed:'MAY 2026', year:'2026',
+        story:'Rainier Spark managed SIF (Squadron Innovation Fund) token allocation on behalf of 14 squadron commanders — claiming every token before the HAF (Headquarters Air Force) pull-back deadline, then crowdsourcing them into a smaller number of larger, higher-impact builds.',
+        impact:['All squadron commander tokens claimed by 02 MAR 26 — none returned to HAF','Every token allocated to an initiative by 01 MAY 26','Tokens pooled across 14 squadrons to fund larger builds'],
+        milestones:[
+          { d:'20 JAN 26', e:'SIF marketplace opens' },
+          { d:'02 MAR 26', e:'All squadron commander tokens claimed' },
+          { d:'01 MAY 26', e:'Every token allocated to an initiative' },
+        ],
+        next:'Execute procurement against each funded initiative before end of fiscal year.',
+        goal:'A repeatable wing-level model for pooling SIF tokens into fewer, larger capability buys.' },
+
+      { id:'dive-spool', title:'3D-Printed Dive Spools · 22 STS', loe:'am', completed:'2026', year:'2026',
+        story:'The Spark Lab designed and printed scuba gear spools for 22 STS (Special Tactics Squadron) underwater dives. Tested and operational — fabricated in-house with no procurement action and no vendor lead time.',
+        impact:['Tested and in operational use by 22 STS','No procurement action or vendor lead time','Reprintable on demand from stock filament'],
+        milestones:[
+          { d:'2026', e:'Spool designed and printed in-house' },
+          { d:'2026', e:'Dive-tested by 22 STS — passed' },
+          { d:'NOW', e:'In operational use, reprinted on demand' },
+        ],
+        next:'Capture the design as a reusable package so other units can print it.',
+        goal:'In-house fabrication replaces vendor procurement for dive consumables.' },
+
+      { id:'oura-98', title:'98 Oura Rings Delivered', loe:'hpt', completed:'FEB 2026', year:'2026',
         story:'First tranche of the wearables rollout: 98 Oura Gen 4 rings sized, ordered and issued to 62d AW Airmen, standing up the physiological baseline the Human Performance line of effort now builds on.',
-        impact:['98 devices sized and issued','Seeded the wearables programme now at 2,759 devices','Baseline data for fatigue and readiness work'] },
-      { id:'briefing-sticks', title:'C-17A Briefing Sticks · 57 WPS', loe:'am', completed:'2026',
-        story:'Printed 10 replacement C-17A briefing stick models for the 57th Weapons Squadron, plus 1/3-scale threat and weapons replicas for recognition and employment training. All printed in PLA in-house.',
-        impact:['10× C-17A briefing sticks replaced','~$3,050 commercial cost avoided for ~$64 of filament','Threat/weapons replicas added for aircrew training'] },
-      { id:'outreach', title:'346 Airmen Through the Lab', loe:'infra', completed:'JUL 2025 – 2026',
-        story:'Rainier Spark has run monthly innovation-lab tours for the First Term Enlisted Course since July 2025, alongside continuous-improvement sessions for the NCO Foundations Course and an instructional print day for Army counterparts.',
-        impact:['14 FTEC lab tours · 346 Airmen (180 in 2026)','4 NCO Foundations classes · 56 Airmen, 62d AW & 446th','10 soldiers from 3rd MDTF trained at the print site'] },
-      { id:'sts-pilots', title:'22 STS Airmen Trained for Red Flag', loe:'suas',  completed:'MAY 2026',
-        story:'Rainier Spark trained 22 Special Tactics Squadron personnel on sUAS operation ahead of Red Flag Alaska — hands-on manual piloting reps on in-house built airframes rather than tying up high-cost COTS platforms.',
-        impact:['22 STS personnel trained and deployed to Red Flag AK','Training flown on in-house built airframes','Fed the AFSOC-approved instructional course now standing up'] },
+        impact:['98 devices sized and issued','Seeded the wearables programme now at 2,759 devices','Baseline data for fatigue and readiness work'],
+        milestones:[
+          { d:'JAN 26', e:'Gen 4 sizing window opens' },
+          { d:'FEB 26', e:'98 rings delivered and issued' },
+          { d:'NOW', e:'Programme at 2,759 devices across the wing' },
+        ],
+        next:'Non-Human IRB completion, then CPE-CBRND distribution from ~end AUG 26.',
+        goal:'Every eligible Air Force member at the 62d AW offered a device.' },
+
+      { id:'briefing-sticks', title:'C-17A Briefing Sticks · 57 WPS', loe:'am', completed:'2026', year:'2026',
+        story:'Printed 10 replacement C-17A briefing stick models for 57 WPS (Weapons Squadron), plus 1/3-scale threat and weapons replicas for recognition and employment training. All printed in PLA in-house — no procurement action, no lead time.',
+        impact:['10× C-17A briefing sticks replaced','~$3,050 commercial cost avoided for ~$64 of filament','Threat and weapons replicas added for aircrew training'],
+        milestones:[
+          { d:'2026', e:'10 C-17A briefing sticks printed to replace broken units' },
+          { d:'2026', e:'SA-7, SA-14, AGM-114 and AIM-120C replicas added' },
+          { d:'NOW', e:'In use for threat recognition and employment training' },
+        ],
+        next:'Extend the replica set as 57 WPS identifies further training gaps.',
+        goal:'A printable training-aid library any squadron can draw on.' },
+
+      { id:'outreach', title:'346 Airmen Through the Lab', loe:'infra', completed:'JUL 2025 – 2026', year:'2025–26',
+        story:'Rainier Spark has run monthly innovation-lab tours for FTEC (First Term Enlisted Course) since July 2025, alongside continuous-improvement sessions for the NCO Foundations Course and an instructional day for Army counterparts.',
+        impact:['14 FTEC lab tours · 346 Airmen (180 in 2026)','4 NCO Foundations classes · 56 Airmen, 62d AW and 446th','10 soldiers from 3rd MDTF trained at the print site'],
+        milestones:[
+          { d:'JUL 25', e:'Monthly FTEC innovation-lab tours begin' },
+          { d:'09 APR 26', e:'10 soldiers from 3rd MDTF trained at the print site' },
+          { d:'NOW', e:'14 tours · 346 Airmen · 4 NCO Foundations classes' },
+        ],
+        next:'Stand up the Spark Fellowship — one Airman per unit for 180 days.',
+        goal:'A steady talent pipeline feeding innovation capacity back into every unit.' },
+
+      { id:'sts-pilots', title:'22 STS Airmen Trained for Red Flag', loe:'suas', completed:'MAY 2026', year:'2026',
+        story:'Rainier Spark trained 22 STS (Special Tactics Squadron) personnel on sUAS operation ahead of Red Flag Alaska — hands-on manual piloting reps on in-house built airframes rather than tying up costly COTS platforms.',
+        impact:['22 STS personnel trained and deployed to Red Flag Alaska','Training flown on in-house built airframes','Fed the AFSOC-approved instructional course now standing up'],
+        milestones:[
+          { d:'MAY 26', e:'22 STS personnel trained on in-house airframes' },
+          { d:'JUN 26', e:'AFSOC approves the instructional course' },
+          { d:'AUG 26', e:'Skydio instructional classes begin — 20 students' },
+        ],
+        next:'Run the first 20-student Skydio course and finalise the METL.',
+        goal:'A standing 62d AW sUAS schoolhouse qualifying maintainer-pilots in-house.' },
     ],
 
     get visibleProjects() {
@@ -2726,8 +2922,8 @@ function dashboard() {
 
     // Execution pipeline: place each initiative by progress into a stage.
     pipeline: [
-      { k:'concept', l:'Incubation',   color:'#a8c4e6' },
-      { k:'pilot',   l:'In Execution', color:'#e8b94a' },
+      { k:'concept', l:'Incubation / Development', color:'#a8c4e6' },
+      { k:'pilot',   l:'In Process',   color:'#e8b94a' },
       { k:'fielded', l:'Operational',  color:'#6fb47a' },
     ],
     stageOf(p) { return p.stage || (p.progress >= 67 ? 'fielded' : (p.progress >= 34 ? 'pilot' : 'concept')); },
@@ -2784,6 +2980,10 @@ function dashboard() {
     closeBio() { this.bio = null; if (this.open === null) document.body.classList.remove('modal-open'); },
 
     // ── Calendar modal ──
+    win: null,
+    openWin(w) { this.win = w; document.body.classList.add('modal-open'); },
+    closeWin() { this.win = null; document.body.classList.remove('modal-open'); },
+
     calendarOpen: false,
     openCalendar() { this.calendarOpen = true; document.body.classList.add('modal-open'); },
     closeCalendar() { this.calendarOpen = false; document.body.classList.remove('modal-open'); },
