@@ -170,24 +170,13 @@
   }
   @keyframes hero-sweep { 0% { transform: translateX(-130%) skewX(-8deg); } 60%, 100% { transform: translateX(360%) skewX(-8deg); } }
 
-  /* Hero card entrance + one-time sheen */
-  @keyframes hero-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-  .hero-card { opacity: 0; animation: hero-rise .8s cubic-bezier(.22,1,.36,1) forwards; }
-  .hero-card-2 { animation-delay: .16s; }
-  .hero-card-1 { position: relative; overflow: hidden; }
-  .hero-card-1::after {
-    content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 55%;
-    background: linear-gradient(105deg, transparent, rgba(255,255,255,.13), transparent);
-    transform: translateX(-170%);
-    animation: hero-sheen 1.5s ease-out .7s 1 both;
-  }
-  @keyframes hero-sheen { to { transform: translateX(260%); } }
+  /* The .hero-card entrance and sheen rules lived here. Both overlay cards were
+     removed when the hero art was cleared, so the rules had nothing left to
+     match. */
 
   @media (prefers-reduced-motion: reduce) {
     .mtn-drift { animation: none; }
     .hero-sweep::before { display: none; }
-    .hero-card { opacity: 1; animation: none; }
-    .hero-card-1::after { display: none; }
   }
 
   /* ── Hero photo crossfade (Spark lab / team) ── */
@@ -394,42 +383,61 @@
           McCHORD AFB <span class="text-ice">·</span> Q2 FY26 <span class="text-ice">·</span> <b class="text-ice font-semibold" x-text="dtg"></b>
         </div>
       </div>
-      <!-- Stat pills — only shown once there is room for them alongside the title.
-           Below lg the title block needs the full row; see the min-width math in the
-           pill class below (4 × 120px + padding) which is what crushed the h1 at md. -->
-      <div class="hidden lg:flex shrink-0 items-stretch gap-0 pl-6 border-l border-white/10">
+      <!-- The stat pills used to sit here. They now live in the instrument strip
+           under the hero art, so these figures appear once instead of twice — and
+           with nothing competing for the row, the title can no longer be crushed
+           at tablet widths. -->
+    </div>
+  </header>
+
+  <!-- ════════════ HERO BAND ════════════
+       Direction A: nothing sits on the artwork. Mount Rainier and the C-17 are the
+       one asset here that could not belong to another unit, and two cards used to
+       be parked on top of them. The text they carried now lives in the instrument
+       strip directly below, which also absorbed the header's stat pills. -->
+  <section class="mtn relative border-b border-white/10 overflow-hidden">
+
+    <div class="mtn-drift relative h-[132px] sm:h-[210px] lg:h-[248px] flex items-end justify-center pointer-events-none">
+      <img src="img/hero-mountain.png" alt="Mount Rainier and a C-17 in silhouette, the Rainier Spark emblem"
+        width="900" height="379" decoding="async"
+        class="h-full w-auto max-w-none object-contain object-bottom mix-blend-screen opacity-95"
+        onerror="this.style.display='none'" />
+    </div>
+    <div class="hero-sweep" aria-hidden="true"></div>
+    <div class="hud-grid" aria-hidden="true"></div>
+
+    <!-- Instrument strip. One horizontally scrollable line on phones so the cells
+         keep their shape instead of stacking into a tall block. -->
+    <div class="relative z-[2] border-t border-ice/25 bg-ink-950/94 backdrop-blur-sm">
+      <!-- tabindex="0": this strip scrolls but, unlike the pill rows, contains no
+           buttons, so without it a keyboard user has no way to reach the cells
+           that are off-screen. -->
+      <div tabindex="0" role="group" aria-label="Status readouts"
+        class="max-w-[1480px] mx-auto flex items-stretch overflow-x-auto scrollbar-thin
+               divide-x divide-white/10 px-4 sm:px-8">
+        <div class="shrink-0 py-3 pr-5 sm:pr-7 flex flex-col justify-center gap-1">
+          <div class="font-mono text-[9px] text-ice tracking-[0.22em] uppercase whitespace-nowrap">62d Airlift Wing · Innovation Cell</div>
+          <h2 class="font-condensed font-extrabold text-white text-[19px] sm:text-[23px] uppercase tracking-wider leading-none whitespace-nowrap">FY26 Status Board</h2>
+        </div>
+        <div class="shrink-0 py-3 px-5 sm:px-7 flex flex-col justify-center gap-1">
+          <div class="font-mono text-[9px] text-slate-400 tracking-[0.2em] uppercase">Quarter</div>
+          <div class="font-condensed font-bold text-white text-[15px] uppercase tracking-wide leading-none whitespace-nowrap">Q2 Execution</div>
+        </div>
         <template x-for="s in topStats" :key="s.l">
-          <div class="px-5 min-w-[120px] flex flex-col gap-1 border-r border-white/10 last:border-r-0 last:pr-0 first:pl-0 justify-center">
-            <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase" x-text="s.l"></div>
-            <div class="font-mono text-sm text-white font-medium flex items-center gap-1.5">
+          <div class="shrink-0 py-3 px-5 sm:px-7 flex flex-col justify-center gap-1">
+            <div class="font-mono text-[9px] text-slate-400 tracking-[0.2em] uppercase whitespace-nowrap" x-text="s.l"></div>
+            <div class="font-mono text-sm text-white font-medium flex items-center gap-1.5 whitespace-nowrap">
               <span x-show="s.live" class="w-2 h-2 rounded-full bg-green pulse-dot shadow-[0_0_10px_#6fb47a]"></span>
               <span class="js-count" x-init="$nextTick(()=>window.__countup($el))" x-text="s.v"></span>
             </div>
           </div>
         </template>
-      </div>
-    </div>
-  </header>
-
-  <!-- ════════════ HERO BAND ════════════ -->
-  <section class="mtn relative min-h-[180px] sm:min-h-[260px] flex items-stretch border-b border-white/10 overflow-hidden">
-
-    <div class="mtn-drift absolute inset-0 flex items-center justify-center opacity-90 pointer-events-none">
-      <img src="img/hero-mountain.png" alt="" width="900" height="379" decoding="async" class="max-h-[200%] max-w-[80%] object-contain mix-blend-screen" onerror="this.style.display='none'" />
-    </div>
-    <div class="hero-sweep" aria-hidden="true"></div>
-    <div class="hud-grid" aria-hidden="true"></div>
-    <div class="relative z-[2] max-w-[1480px] mx-auto w-full px-4 sm:px-8 py-6 sm:py-10 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 sm:gap-6">
-      <div class="hero-card hero-card-1 bg-ink-950/90 border-l-2 border-ice px-5 sm:px-6 py-3.5 sm:py-4 max-w-[460px] backdrop-blur-sm">
-        <div class="font-mono text-[10px] text-ice tracking-[0.24em] uppercase">62d Airlift Wing · Innovation Cell</div>
-        <h2 class="font-condensed font-extrabold text-white text-[22px] sm:text-[28px] uppercase tracking-wider leading-none my-1.5 whitespace-nowrap">FY26 STATUS BOARD</h2>
-        <div class="font-mono text-[10px] text-slate-400 tracking-[0.16em] uppercase mt-1">McCHORD AFB <b class="text-white font-semibold">· Q2 EXECUTION</b></div>
-      </div>
-      <div class="hero-card hero-card-2 bg-ink-950/85 border-l-2 sm:border-l-0 sm:border-r-2 border-ice px-5 py-3.5 text-left sm:text-right self-start sm:self-auto">
-        <div class="font-mono text-[10px] text-slate-400 tracking-[0.18em] uppercase">Live Feed</div>
-        <div class="font-mono text-sm text-white font-medium flex items-center justify-end gap-2 mt-0.5">
-          <span class="w-2 h-2 rounded-full bg-green pulse-dot shadow-[0_0_10px_#6fb47a]"></span>
-          <span>9 LOEs <span class="text-ice">/</span> 6 VISION</span>
+        <div class="shrink-0 py-3 pl-5 sm:pl-7 flex flex-col justify-center gap-1 sm:ml-auto sm:items-end">
+          <div class="font-mono text-[9px] text-slate-400 tracking-[0.2em] uppercase">Live Feed</div>
+          <div class="font-mono text-sm text-white font-medium flex items-center gap-2 whitespace-nowrap">
+            <span class="w-2 h-2 rounded-full bg-green pulse-dot shadow-[0_0_10px_#6fb47a]"></span>
+            <span>9 LOEs <span class="text-ice">/</span> 6 VISION</span>
+          </div>
         </div>
       </div>
     </div>
