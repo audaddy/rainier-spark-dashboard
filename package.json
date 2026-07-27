@@ -1,0 +1,12 @@
+{
+  "name": "rainier-spark-dashboard",
+  "private": true,
+  "description": "Static dashboard for the 62d Airlift Wing Rainier Spark Innovation Cell.",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/tailwind.css -o ./css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./src/tailwind.css -o ./css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

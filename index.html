@@ -16,34 +16,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          ink:  { 950:'#050608', 900:'#0b0d11', 800:'#14171c', 700:'#1c2027', 600:'#2a2f38' },
-          steel:{ 700:'#1a3057', 600:'#2c4a78', 500:'#3e6aa8', 400:'#6f96c8' },
-          ice:  '#a8c4e6',
-          electric: '#1a8cff',
-          gold: '#c9a449',
-          amber:'#e8b94a',
-          green:'#6fb47a',
-          priority:'#e8794c',
-        },
-        fontFamily: {
-          sans: ['Barlow','system-ui','sans-serif'],
-          condensed: ['"Barlow Condensed"','sans-serif'],
-          mono: ['"JetBrains Mono"','monospace'],
-        },
-        boxShadow: {
-          'card': '0 8px 32px rgba(0,0,0,0.4)',
-          'priority': '0 0 0 1px rgba(232,121,76,.18), 0 8px 32px rgba(0,0,0,.5)',
-        }
-      }
-    }
-  }
-</script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 <style>
   body {
@@ -308,6 +280,11 @@
     .reveal-card[data-bracket="priority"] { animation: none; }
   }
 </style>
+<!-- Built by `npm run build:css` from src/tailwind.css + tailwind.config.js.
+     Loaded after the custom <style> above because the Play CDN used to inject
+     its sheet at the end of <head>; keeping that order preserves which rules
+     win at equal specificity. -->
+<link rel="stylesheet" href="css/tailwind.css" />
 <!-- Cloudflare Web Analytics -->
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9f55604f3aba482ebf00e7dc11ad334d"}'></script>
 <!-- End Cloudflare Web Analytics -->

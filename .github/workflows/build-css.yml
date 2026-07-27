@@ -1,0 +1,60 @@
+name: Build Tailwind CSS
+
+# css/tailwind.css is committed to the repo on purpose: GitHub Pages serves this
+# branch directly, and keeping the built file in git means opening index.html
+# locally still looks right. This workflow's job is to make sure that committed
+# copy is never stale — you edit and push as before, and if index.html gained a
+# class the CSS does not cover yet, the bot rebuilds and pushes it.
+#
+# No infinite loop: the paths filter below does not include css/tailwind.css, so
+# the bot's own commit (which touches only that file) cannot retrigger this run.
+# The [skip ci] tag in its message is a second belt.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tailwind.config.js'
+      - 'src/tailwind.css'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/build-css.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-css
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install pinned toolchain
+        run: npm ci
+
+      - name: Build CSS
+        run: npm run build:css
+
+      - name: Commit rebuilt CSS only if it changed
+        run: |
+          if [ -n "$(git status --porcelain css/tailwind.css)" ]; then
+            echo "css/tailwind.css is stale — committing the rebuild."
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add css/tailwind.css
+            git commit -m "Rebuild Tailwind CSS [skip ci]"
+            git push
+          else
+            echo "css/tailwind.css is already up to date — nothing to do."
+          fi
