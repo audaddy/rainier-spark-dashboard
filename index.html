@@ -3031,7 +3031,7 @@ document.addEventListener('alpine:init', () => {
       this._stateKey = 'sparkle-state-' + todayKey();
       this._clientId = getClientId(this._lbKey + '-cid');
       this.leaderboard = [];
-      fetchLeaderboard('sparkle', todayKey()).then(lb => { this.leaderboard = lb; });
+      this._lbLoaded = false;
       // restore today's progress if it exists
       try {
         const saved = JSON.parse(localStorage.getItem(this._stateKey) || 'null');
@@ -3050,7 +3050,15 @@ document.addEventListener('alpine:init', () => {
         }
       } catch(e) {}
     },
-    openGame() { this.gameOpen = true; document.body.classList.add('modal-open'); },
+    // The board only exists inside this modal, so fetch it on first open rather
+    // than on page load. Every visitor was paying 2 cross-origin round trips per
+    // game (6 total) for markup they had not asked to see.
+    loadBoard() {
+      if (this._lbLoaded) return;
+      this._lbLoaded = true;
+      fetchLeaderboard('sparkle', todayKey()).then(lb => { this.leaderboard = lb; });
+    },
+    openGame() { this.gameOpen = true; this.loadBoard(); document.body.classList.add('modal-open'); },
     closeGame() { this.gameOpen = false; document.body.classList.remove('modal-open'); },
 
     persist() {
@@ -3192,8 +3200,6 @@ document.addEventListener('alpine:init', () => {
     else if (e.key === 'Backspace') s.pressKey('⌫');
     else if (/^[a-zA-Z]$/.test(e.key)) s.pressKey(e.key.toUpperCase());
   });
-
-  Alpine.store('sparkle').init();
 });
 
 /* ── ZIP: daily path puzzle ── */
@@ -3360,7 +3366,7 @@ document.addEventListener('alpine:init', () => {
       this._stateKey = 'zip-state-' + dk;
       this._clientId = getClientId(this._lbKey + '-cid');
       this.leaderboard = [];
-      fetchLeaderboard('zip', dk).then(lb => { this.leaderboard = lb; });
+      this._lbLoaded = false;
       try {
         const saved = JSON.parse(localStorage.getItem(this._stateKey) || 'null');
         if (saved && saved.rows === this.rows && saved.cols === this.cols) {
@@ -3376,7 +3382,12 @@ document.addEventListener('alpine:init', () => {
         }
       } catch(e) {}
     },
-    openGame() { this.gameOpen = true; document.body.classList.add('modal-open'); if (!this.gameOver && this.pathArr.length) this.startTimer(); },
+    loadBoard() {
+      if (this._lbLoaded) return;
+      this._lbLoaded = true;
+      fetchLeaderboard('zip', this.dayLabel).then(lb => { this.leaderboard = lb; });
+    },
+    openGame() { this.gameOpen = true; this.loadBoard(); document.body.classList.add('modal-open'); if (!this.gameOver && this.pathArr.length) this.startTimer(); },
     closeGame() { this.gameOpen = false; document.body.classList.remove('modal-open'); this.stopTimer(); },
 
     fmtTime(ms) { const s = Math.floor(ms/1000); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); },
@@ -3536,8 +3547,6 @@ document.addEventListener('alpine:init', () => {
       z.dragOver(parseInt(el.dataset.zipCell, 10));
     }
   }, { passive: true });
-
-  Alpine.store('zip').init();
 });
 
 /* ── SNAKE: hidden easter egg (Konami code ↑↑↓↓←→←→BA) ── */
@@ -3621,10 +3630,15 @@ document.addEventListener('alpine:init', () => {
 
     init() {
       this._clientId = getClientId('snake-lb-cid');
+      this._lbLoaded = false;
+    },
+    loadBoard() {
+      if (this._lbLoaded) return;
+      this._lbLoaded = true;
       fetchLeaderboard('snake', 'all').then(lb => { this.leaderboard = lb; });
     },
     openGame() {
-      this.gameOpen = true; document.body.classList.add('modal-open');
+      this.gameOpen = true; this.loadBoard(); document.body.classList.add('modal-open');
       this.message = 'PRESS LAUNCH';
       this.drawIdle();
       trackClick('snake_open');
@@ -3738,7 +3752,6 @@ document.addEventListener('alpine:init', () => {
       setTimeout(() => { this.shareState = 'idle'; }, 1600);
     },
   });
-  Alpine.store('snake').init();
 
   // ── Konami controller: tap-to-enter the code (mobile-friendly path to Snake) ──
   Alpine.store('konami', {
