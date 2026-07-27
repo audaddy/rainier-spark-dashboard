@@ -338,7 +338,7 @@
           @keydown.escape.prevent="closePalette()"
           placeholder="Search lines, initiatives, calendar, sections…"
           autocomplete="off" spellcheck="false"
-          class="flex-1 min-w-0 bg-transparent outline-none border-0 text-white placeholder:text-slate-500 font-condensed text-lg tracking-wide" />
+          class="flex-1 min-w-0 bg-transparent outline-none border-0 text-white placeholder:text-slate-400 font-condensed text-lg tracking-wide" />
         <kbd class="font-mono text-[10px] leading-none border border-white/20 rounded px-1.5 py-1 text-slate-400">ESC</kbd>
       </div>
       <div class="max-h-[52vh] overflow-y-auto py-2">
@@ -348,7 +348,7 @@
             class="w-full flex items-center gap-3 text-left px-4 py-2.5 transition-colors"
             :class="paletteActive === i ? 'bg-electric/15' : 'hover:bg-white/5'">
             <span class="font-mono text-[9px] shrink-0 w-[92px] uppercase tracking-[0.12em]"
-              :class="paletteActive === i ? 'text-electric' : 'text-slate-500'" x-text="item.group"></span>
+              :class="paletteActive === i ? 'text-electric' : 'text-slate-400'" x-text="item.group"></span>
             <span class="flex-1 min-w-0">
               <span class="block text-white font-condensed text-[15px] leading-tight truncate" x-text="item.label"></span>
               <span x-show="item.hint" class="block text-slate-400 font-mono text-[10px] truncate mt-0.5" x-text="item.hint"></span>
@@ -356,11 +356,11 @@
             <svg x-show="paletteActive === i" viewBox="0 0 24 24" class="w-4 h-4 text-electric/70 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 6l6 6-6 6"/></svg>
           </button>
         </template>
-        <div x-show="paletteResults.length === 0" class="px-4 py-8 text-center text-slate-500 font-mono text-[12px]">
+        <div x-show="paletteResults.length === 0" class="px-4 py-8 text-center text-slate-400 font-mono text-[12px]">
           No matches for "<span x-text="paletteQuery"></span>"
         </div>
       </div>
-      <div class="flex items-center gap-4 px-4 py-2 border-t border-white/10 bg-ink-950/50 font-mono text-[10px] text-slate-500">
+      <div class="flex items-center gap-4 px-4 py-2 border-t border-white/10 bg-ink-950/50 font-mono text-[10px] text-slate-400">
         <span><kbd class="text-slate-400">↑↓</kbd> navigate</span>
         <span><kbd class="text-slate-400">↵</kbd> open</span>
         <span class="ml-auto" x-text="paletteResults.length + ' result' + (paletteResults.length === 1 ? '' : 's')"></span>
@@ -451,7 +451,7 @@
               :class="item.m==='ARCADE' ? 'cursor-pointer' : ''"
               @click="item.m==='ARCADE' && $store.konami.show()">
               <span class="text-ice/40 px-3">◈</span>
-              <span class="text-slate-500" x-text="item.m"></span>
+              <span class="text-slate-400" x-text="item.m"></span>
               <span class="ml-2" :class="item.m==='ARCADE' ? 'text-electric underline decoration-dotted underline-offset-2' : 'text-slate-200'" x-text="item.e"></span>
             </span>
           </template>
@@ -460,7 +460,7 @@
               :class="item.m==='ARCADE' ? 'cursor-pointer' : ''"
               @click="item.m==='ARCADE' && $store.konami.show()">
               <span class="text-ice/40 px-3">◈</span>
-              <span class="text-slate-500" x-text="item.m"></span>
+              <span class="text-slate-400" x-text="item.m"></span>
               <span class="ml-2" :class="item.m==='ARCADE' ? 'text-electric underline decoration-dotted underline-offset-2' : 'text-slate-200'" x-text="item.e"></span>
             </span>
           </template>
@@ -532,7 +532,7 @@
               <input type="text" readonly value="62AW.Rainier.Spark@us.af.mil" @focus="$event.target.select()" @click="$event.target.select()" class="flex-1 min-w-0 bg-ink-950 border border-white/10 rounded-sm px-2 py-1.5 font-mono text-[12px] text-electric select-all" />
               <button type="button" @click="copy()" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-2.5 py-1.5 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors" x-text="copied ? 'Copied' : 'Copy'"></button>
             </div>
-            <div class="mt-2 font-mono text-[9px] text-slate-500 leading-relaxed">Paste into your email client's To: field.</div>
+            <div class="mt-2 font-mono text-[9px] text-slate-400 leading-relaxed">Paste into your email client's To: field.</div>
           </div>
         </div>
       </div>
@@ -555,7 +555,7 @@
     <div id="sec-status" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-4 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 01 / STATUS BOARD</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Active Innovation Lines</h2>
-      <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase" x-text="`${visibleProjects.length} of ${projects.length} shown`"></span>
+      <span class="ml-auto font-mono text-[10px] text-slate-400 tracking-[0.14em] uppercase" x-text="`${visibleProjects.length} of ${projects.length} shown`"></span>
     </div>
 
     <!-- Filter pills -->
@@ -576,7 +576,7 @@
 
     <!-- Meet the Team, per LOE -->
     <div class="flex flex-wrap items-center gap-2 mb-2.5">
-      <span class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase mr-0.5">Meet the Team</span>
+      <span class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mr-0.5">Meet the Team</span>
       <template x-for="f in filters.filter(f => !['all','priority','vision'].includes(f.k))" :key="'team-' + f.k">
         <button
           @click="teamLoeOpen = (teamLoeOpen === f.k ? null : f.k); trackClick('team_loe_' + f.k)"
@@ -613,7 +613,7 @@
               </button>
             </template>
           </div>
-          <p class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!teamForLoe(teamLoeOpen).length">No bios on file for this line of effort yet.</p>
+          <p class="font-mono text-[10px] text-slate-400 uppercase tracking-wide" x-show="!teamForLoe(teamLoeOpen).length">No bios on file for this line of effort yet.</p>
         </div>
       </template>
     </div>
@@ -624,7 +624,7 @@
       <div class="flex items-center gap-3 px-4 py-2.5 border-b border-white/10 bg-ink-950/60">
         <span class="w-1.5 h-1.5 rounded-full bg-ice pulse-dot"></span>
         <span class="font-mono text-[10px] text-ice tracking-[0.2em] uppercase font-bold">Execution Pipeline</span>
-        <span class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase ml-auto hidden sm:inline">Concept &rarr; Pilot &rarr; Fielded</span>
+        <span class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase ml-auto hidden sm:inline">Concept &rarr; Pilot &rarr; Fielded</span>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
         <template x-for="stage in pipeline" :key="stage.k">
@@ -632,7 +632,7 @@
             <div class="flex items-center gap-2 mb-3 pb-2 border-b border-dashed border-white/10">
               <span class="w-2 h-2 rounded-full shrink-0" :style="`background:${stage.color};box-shadow:0 0 8px ${stage.color}`"></span>
               <span class="font-condensed font-bold text-sm tracking-[0.14em] uppercase" :style="`color:${stage.color}`" x-text="stage.l"></span>
-              <span class="font-mono text-[10px] text-slate-500 ml-auto" x-text="stageProjects(stage.k).length"></span>
+              <span class="font-mono text-[10px] text-slate-400 ml-auto" x-text="stageProjects(stage.k).length"></span>
             </div>
             <div class="flex flex-col gap-2">
               <template x-for="p in stageProjects(stage.k)" :key="p.id">
@@ -643,10 +643,10 @@
                 >
                   <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="p.priority ? 'pulse-dot' : ''" :style="`background:${dotColor(p.statusColor)}`"></span>
                   <span class="font-condensed text-[13px] text-slate-300 leading-tight truncate group-hover/node:text-white transition" x-text="p.title"></span>
-                  <span class="font-mono text-[9px] text-slate-500 ml-auto shrink-0 tabular-nums" x-text="p.progress + '%'"></span>
+                  <span class="font-mono text-[9px] text-slate-400 ml-auto shrink-0 tabular-nums" x-text="p.progress + '%'"></span>
                 </button>
               </template>
-              <p x-show="stageProjects(stage.k).length === 0" class="font-mono text-[10px] text-slate-600 tracking-wide">— none in view —</p>
+              <p x-show="stageProjects(stage.k).length === 0" class="font-mono text-[10px] text-slate-400 tracking-wide">— none in view —</p>
             </div>
           </div>
         </template>
@@ -692,7 +692,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap mb-1">
-                <span class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase" x-text="p.eyebrow"></span>
+                <span class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase" x-text="p.eyebrow"></span>
                 <template x-if="hasUpdate(p)">
                   <span class="bg-amber/15 text-amber border border-amber/40 font-condensed font-bold text-[9px] tracking-[0.16em] uppercase px-2 py-0.5 rounded-sm flex items-center gap-1.5">
                     <span class="w-1 h-1 bg-amber rounded-full pulse-dot"></span>Updated
@@ -726,7 +726,7 @@
             <div class="grid grid-cols-2 gap-x-4 gap-y-3">
               <template x-for="m in p.metrics" :key="m.k">
                 <div>
-                  <div class="font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase font-medium mb-0.5" x-text="m.k"></div>
+                  <div class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase font-medium mb-0.5" x-text="m.k"></div>
                   <div
                     :class="m.big ? 'text-xl text-ice font-semibold' : (m.lg ? 'text-base' : 'text-sm')"
                     class="font-mono text-white"
@@ -740,7 +740,7 @@
             <template x-if="p.change">
               <div class="bg-gradient-to-r from-amber/15 to-amber/5 border-l-[3px] border-amber px-3 py-2 text-[11px] leading-relaxed text-slate-200">
                 <div class="font-condensed font-bold text-amber tracking-[0.16em] uppercase text-[9px] mb-0.5">⚠ Scope Change · FY26</div>
-                <span class="line-through text-slate-500" x-text="p.change.before"></span>
+                <span class="line-through text-slate-400" x-text="p.change.before"></span>
                 <span class="mx-1">→</span>
                 <b class="text-white" x-text="p.change.after"></b>
               </div>
@@ -748,7 +748,7 @@
 
             <!-- Progress -->
             <div>
-              <div class="flex justify-between font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase mb-1.5">
+              <div class="flex justify-between font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase mb-1.5">
                 <span>Execution Progress</span>
                 <span class="text-slate-300" x-text="p.progress + '%'"></span>
               </div>
@@ -777,7 +777,7 @@
             <span class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
               <span>LEAD ·</span>
               <template x-if="hasBio(p.lead)">
-                <button type="button" @click="openBio(p.lead)" class="card-action text-white font-semibold hover:text-ice underline decoration-dotted decoration-slate-500 hover:decoration-ice underline-offset-2 transition uppercase tracking-wider" x-text="p.lead"></button>
+                <button type="button" @click="openBio(p.lead)" class="card-action text-white font-semibold hover:text-ice underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2 transition uppercase tracking-wider" x-text="p.lead"></button>
               </template>
               <template x-if="!hasBio(p.lead)">
                 <span class="text-white font-semibold" x-text="p.lead"></span>
@@ -826,7 +826,7 @@
     <div id="sec-impact" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 02 / MISSION IMPACT</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">62d Airlift Wing · ROI Summary</h2>
-      <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase">FY26 Actuals · FY27 Forecast</span>
+      <span class="ml-auto font-mono text-[10px] text-slate-400 tracking-[0.14em] uppercase">FY26 Actuals · FY27 Forecast</span>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5 mb-12">
@@ -837,7 +837,7 @@
           <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-white/10">
             <svg viewBox="0 0 24 24" class="w-7 h-7 text-gold" fill="currentColor"><path d="M12 2 L14.5 8.5 L21.5 9 L16.2 13.4 L17.8 20.5 L12 16.7 L6.2 20.5 L7.8 13.4 L2.5 9 L9.5 8.5 Z"/></svg>
             <h3 class="font-condensed font-extrabold text-white text-xl tracking-wide uppercase">Return on Investment</h3>
-            <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.16em] uppercase">FY26 actuals · FY27 projected</span>
+            <span class="ml-auto font-mono text-[10px] text-slate-400 tracking-[0.16em] uppercase">FY26 actuals · FY27 projected</span>
           </div>
           <div class="grid grid-cols-2 gap-3.5">
             <template x-for="r in roiTiles" :key="r.lbl">
@@ -853,15 +853,15 @@
           <div class="mt-5 bg-ink-950/50 border border-white/10 px-4 py-3.5 grid grid-cols-3 gap-3">
             <div class="text-center border-r border-white/10 pr-3">
               <div class="js-count font-condensed font-extrabold text-amber text-2xl leading-none" x-init="$nextTick(()=>window.__countup($el))">9</div>
-              <div class="text-[10px] text-slate-500 tracking-[0.14em] uppercase mt-1">Active LOEs</div>
+              <div class="text-[10px] text-slate-400 tracking-[0.14em] uppercase mt-1">Active LOEs</div>
             </div>
             <div class="text-center border-r border-white/10 pr-3">
               <div class="js-count font-condensed font-extrabold text-amber text-2xl leading-none" x-init="$nextTick(()=>window.__countup($el))">2</div>
-              <div class="text-[10px] text-slate-500 tracking-[0.14em] uppercase mt-1">SBIR Phase II · $1.5M</div>
+              <div class="text-[10px] text-slate-400 tracking-[0.14em] uppercase mt-1">SBIR Phase II · $1.5M</div>
             </div>
             <div class="text-center">
               <div class="js-count font-condensed font-extrabold text-amber text-2xl leading-none" x-init="$nextTick(()=>window.__countup($el))">14</div>
-              <div class="text-[10px] text-slate-500 tracking-[0.14em] uppercase mt-1">Sq CCs · SIF Tokens</div>
+              <div class="text-[10px] text-slate-400 tracking-[0.14em] uppercase mt-1">Sq CCs · SIF Tokens</div>
             </div>
           </div>
         </div>
@@ -897,28 +897,28 @@
     <div id="sec-vision" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-green tracking-[0.2em]">§ 03 / VISION · SIF26</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Authored Initiatives · Squadron Innovation Fund</h2>
-      <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase" x-text="`${vision.length} APPS · ${visionTotal.toLocaleString()} TOKENS FUNDED`"></span>
+      <span class="ml-auto font-mono text-[10px] text-slate-400 tracking-[0.14em] uppercase" x-text="`${vision.length} APPS · ${visionTotal.toLocaleString()} TOKENS FUNDED`"></span>
     </div>
 
     <!-- VISION summary banner -->
     <div class="bg-gradient-to-b from-emerald-900/20 to-ink-900/95 border border-green/30 rounded p-5 mb-4 grid grid-cols-1 md:grid-cols-[1.6fr_1fr_1fr_1fr] gap-4 items-center">
       <div class="md:border-r border-white/10 md:pr-5">
         <div class="font-mono text-[10px] text-green tracking-[0.22em] uppercase">SIF26 · VISION PORTFOLIO</div>
-        <h4 class="font-condensed font-bold text-white text-xl tracking-wide uppercase mt-1">Six Authored Initiatives</h4>
+        <h3 class="font-condensed font-bold text-white text-xl tracking-wide uppercase mt-1">Six Authored Initiatives</h3>
         <p class="text-xs text-slate-400 leading-snug mt-1.5">Submitted to the Squadron Innovation Fund — green pill on each card is total tokens funded.</p>
       </div>
       <div class="md:border-r border-white/10 md:px-4">
-        <div class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase">Tokens Funded</div>
+        <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase">Tokens Funded</div>
         <div class="font-condensed font-extrabold text-white text-3xl leading-none mt-1.5">
           <span x-text="visionTotal.toLocaleString()"></span><span class="text-sm text-green ml-1 font-semibold">SIF</span>
         </div>
       </div>
       <div class="md:border-r border-white/10 md:px-4">
-        <div class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase">Total Min Request</div>
+        <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase">Total Min Request</div>
         <div class="font-condensed font-extrabold text-white text-3xl leading-none mt-1.5" x-text="visionMin.toLocaleString()"></div>
       </div>
       <div class="md:px-4">
-        <div class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase">Ceiling (Max)</div>
+        <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase">Ceiling (Max)</div>
         <div class="font-condensed font-extrabold text-white text-3xl leading-none mt-1.5" x-text="visionMax.toLocaleString()"></div>
       </div>
     </div>
@@ -950,7 +950,9 @@
             <!-- Auth pill -->
             <span class="absolute top-2 left-2.5 font-mono text-[9px] text-ice tracking-[0.18em] uppercase bg-ink-950/80 border border-white/15 px-2 py-0.5">AUTHORED · USER</span>
             <!-- Total Tokens green pill (matches source UI) -->
-            <span class="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-green bg-emerald-900/95 border border-green/55 px-2.5 py-1 rounded-full">
+            <!-- emerald-300 not `green`: the token figure sits on emerald-900 here, where
+                 `green` (#6fb47a) is only 3.93:1. emerald-300 keeps the green read at 6.38:1. -->
+            <span class="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-emerald-300 bg-emerald-900/95 border border-green/55 px-2.5 py-1 rounded-full">
               <span class="w-2 h-2 border-[1.5px] border-green rounded-full"></span>
               <span class="text-slate-200 text-[9px] tracking-[0.16em] pr-1.5 border-r border-green/40 mr-0.5">SIF26</span>
               <span x-text="v.funded.toLocaleString()"></span>
@@ -960,13 +962,13 @@
           <div class="p-4 flex flex-col gap-3 flex-1">
             <div>
               <div class="font-condensed font-bold text-white text-[17px] uppercase leading-tight" x-text="v.title"></div>
-              <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase mt-1" x-text="v.org"></div>
+              <div class="font-mono text-[9px] text-slate-400 tracking-[0.14em] uppercase mt-1" x-text="v.org"></div>
             </div>
             <p class="text-xs text-slate-300 leading-relaxed line-clamp-4" x-text="v.app"></p>
 
             <!-- Funded vs Min progress -->
             <div>
-              <div class="flex justify-between font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase mb-1">
+              <div class="flex justify-between font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase mb-1">
                 <span>Funded vs. Min Request</span>
                 <span class="text-green" x-text="Math.round(Math.min(100, v.funded/v.min*100)) + '%'"></span>
               </div>
@@ -979,15 +981,15 @@
             <!-- Meta row -->
             <div class="grid grid-cols-3 gap-2 border-t border-dashed border-white/10 pt-2.5 mt-auto">
               <div>
-                <div class="font-mono text-[8px] text-slate-500 tracking-[0.16em] uppercase">Total Tokens</div>
+                <div class="font-mono text-[8px] text-slate-400 tracking-[0.16em] uppercase">Total Tokens</div>
                 <div class="font-mono text-green text-sm font-semibold" x-text="v.funded.toLocaleString()"></div>
               </div>
               <div>
-                <div class="font-mono text-[8px] text-slate-500 tracking-[0.16em] uppercase">Min</div>
+                <div class="font-mono text-[8px] text-slate-400 tracking-[0.16em] uppercase">Min</div>
                 <div class="font-mono text-white text-sm" x-text="v.min.toLocaleString()"></div>
               </div>
               <div>
-                <div class="font-mono text-[8px] text-slate-500 tracking-[0.16em] uppercase">Max</div>
+                <div class="font-mono text-[8px] text-slate-400 tracking-[0.16em] uppercase">Max</div>
                 <div class="font-mono text-white text-sm" x-text="v.max.toLocaleString()"></div>
               </div>
             </div>
@@ -1007,7 +1009,7 @@
         <div class="absolute inset-x-0 top-7 h-px bg-white/15"></div>
         <template x-for="(m, idx) in timeline" :key="m.m">
           <div class="relative pt-3.5">
-            <div class="absolute -top-7 left-0 font-mono text-[10px] tracking-[0.18em]" :class="m.now ? 'text-ice' : 'text-slate-500'" x-text="m.m"></div>
+            <div class="absolute -top-7 left-0 font-mono text-[10px] tracking-[0.18em]" :class="m.now ? 'text-ice' : 'text-slate-400'" x-text="m.m"></div>
             <div
               class="absolute -top-3 left-0 w-3 h-3 rounded-full border-2"
               :class="m.now ? 'bg-ice border-white shadow-[0_0_12px_#a8c4e6]' : 'bg-ink-900 border-steel-600'"
@@ -1030,7 +1032,7 @@
     <div id="team" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 mt-12 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 05 / TEAM</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Rainier Spark · Innovation Cell</h2>
-      <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase" x-text="`${team.length} Members`"></span>
+      <span class="ml-auto font-mono text-[10px] text-slate-400 tracking-[0.14em] uppercase" x-text="`${team.length} Members`"></span>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
@@ -1048,7 +1050,7 @@
                   <span class="font-condensed font-extrabold text-ice text-2xl tracking-wide" x-text="t.initials"></span>
                 </template>
               </div>
-              <div x-show="!t.photo" class="absolute -bottom-1.5 -right-1.5 bg-ink-950 border border-white/15 rounded-sm px-1.5 py-0.5 font-mono text-[8px] text-slate-500 tracking-[0.14em] uppercase">Photo</div>
+              <div x-show="!t.photo" class="absolute -bottom-1.5 -right-1.5 bg-ink-950 border border-white/15 rounded-sm px-1.5 py-0.5 font-mono text-[8px] text-slate-400 tracking-[0.14em] uppercase">Photo</div>
               <!-- Hover-to-enlarge preview (expands from corner, stays inside card) -->
               <template x-if="t.photo">
                 <div class="pointer-events-none absolute top-0 left-0 z-30 opacity-0 scale-90 group-hover/pic:opacity-100 group-hover/pic:scale-100 transition-all duration-200 ease-out origin-top-left">
@@ -1061,7 +1063,7 @@
             <div class="flex-1 min-w-0">
               <div class="font-condensed font-bold text-white text-xl uppercase leading-tight" x-text="t.name"></div>
               <div class="text-xs text-ice mt-1 leading-snug font-medium" x-text="t.role"></div>
-              <div class="inline-flex items-center gap-1.5 mt-2 font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase border border-white/10 px-2 py-0.5 rounded-sm">
+              <div class="inline-flex items-center gap-1.5 mt-2 font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase border border-white/10 px-2 py-0.5 rounded-sm">
                 <span class="w-1.5 h-1.5 bg-ice rotate-45"></span><span x-text="t.loe"></span>
               </div>
             </div>
@@ -1069,7 +1071,7 @@
 
           <!-- Bio -->
           <div class="px-5 py-4 flex-1">
-            <div class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase mb-1.5">Bio</div>
+            <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-1.5">Bio</div>
             <p class="text-sm text-slate-200 leading-relaxed" :class="(expandedBio !== t.id && t.bio.length > 320) ? 'line-clamp-5' : ''" style="white-space: pre-line;" x-text="t.bio"></p>
             <button x-show="t.bio.length > 320" @click="expandedBio = (expandedBio === t.id ? null : t.id)" class="mt-2 font-mono text-[10px] tracking-[0.14em] uppercase text-ice/80 hover:text-ice inline-flex items-center gap-1 transition">
               <span x-text="expandedBio === t.id ? 'Read less' : 'Read full bio'"></span>
@@ -1079,42 +1081,42 @@
 
           <!-- Contact placeholders (to be completed) -->
           <div class="px-5 py-4 border-t border-dashed border-white/10 bg-ink-950/40">
-            <div class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase mb-3">Contact</div>
+            <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-3">Contact</div>
             <div class="space-y-2.5">
               <!-- Email -->
               <div class="flex items-center gap-3">
                 <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice/70 shrink-0" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7 L12 13 L21 7"/></svg>
-                <span class="font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase w-14 shrink-0">Email</span>
+                <span class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase w-14 shrink-0">Email</span>
                 <template x-if="t.contact.email">
-                  <a :href="'mailto:' + t.contact.email" class="font-mono text-xs flex-1 min-w-0 text-slate-200 hover:text-ice transition underline decoration-dotted decoration-slate-600 hover:decoration-ice underline-offset-2 truncate" x-text="t.contact.email"></a>
+                  <a :href="'mailto:' + t.contact.email" class="font-mono text-xs flex-1 min-w-0 text-slate-200 hover:text-ice transition underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2 truncate" x-text="t.contact.email"></a>
                 </template>
                 <template x-if="!t.contact.email">
-                  <span class="font-mono text-xs flex-1 min-w-0 text-slate-600 italic">— to be added —</span>
+                  <span class="font-mono text-xs flex-1 min-w-0 text-slate-400 italic">— to be added —</span>
                 </template>
               </div>
               <!-- Phone -->
               <div class="flex items-center gap-3">
                 <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice/70 shrink-0" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4 H9 L11 9 L8.5 10.5 A11 11 0 0 0 13.5 15.5 L15 13 L20 15 V19 A2 2 0 0 1 18 21 A16 16 0 0 1 3 6 A2 2 0 0 1 5 4 Z"/></svg>
-                <span class="font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase w-14 shrink-0">Phone</span>
+                <span class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase w-14 shrink-0">Phone</span>
                 <template x-if="t.contact.phone">
-                  <a :href="'tel:' + t.contact.phone.replace(/[^0-9+]/g,'')" class="font-mono text-xs flex-1 min-w-0 text-slate-200 hover:text-ice transition underline decoration-dotted decoration-slate-600 hover:decoration-ice underline-offset-2" x-text="t.contact.phone"></a>
+                  <a :href="'tel:' + t.contact.phone.replace(/[^0-9+]/g,'')" class="font-mono text-xs flex-1 min-w-0 text-slate-200 hover:text-ice transition underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2" x-text="t.contact.phone"></a>
                 </template>
                 <template x-if="!t.contact.phone">
-                  <span class="font-mono text-xs flex-1 min-w-0 text-slate-600 italic">— to be added —</span>
+                  <span class="font-mono text-xs flex-1 min-w-0 text-slate-400 italic">— to be added —</span>
                 </template>
               </div>
               <!-- Social -->
               <div class="flex items-center gap-3">
                 <svg viewBox="0 0 24 24" class="w-4 h-4 text-ice/70 shrink-0" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8 L15.8 6.2 M8.2 13.2 L15.8 17.8"/></svg>
-                <span class="font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase w-14 shrink-0">Social</span>
+                <span class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase w-14 shrink-0">Social</span>
                 <template x-if="t.contact.social">
                   <a :href="t.contact.social" target="_blank" rel="noopener noreferrer" class="font-mono text-xs flex-1 min-w-0 inline-flex items-center gap-1.5 text-slate-200 hover:text-ice transition">
-                    <span class="underline decoration-dotted decoration-slate-600 hover:decoration-ice underline-offset-2">LinkedIn Profile</span>
+                    <span class="underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2">LinkedIn Profile</span>
                     <svg viewBox="0 0 24 24" class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 L17 7 M9 7 H17 V15"/></svg>
                   </a>
                 </template>
                 <template x-if="!t.contact.social">
-                  <span class="font-mono text-xs flex-1 min-w-0 text-slate-600 italic">— to be added —</span>
+                  <span class="font-mono text-xs flex-1 min-w-0 text-slate-400 italic">— to be added —</span>
                 </template>
               </div>
             </div>
@@ -1127,7 +1129,7 @@
     <div id="sec-success" class="scroll-mt-24 flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5 mt-12 pb-3 border-b border-white/10">
       <span class="font-mono text-[11px] text-gold tracking-[0.2em]">§ 06 / SUCCESS STORIES</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Mission Wins · Archive</h2>
-      <span class="ml-auto font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase" x-text="`${successStories.length} Archived`"></span>
+      <span class="ml-auto font-mono text-[10px] text-slate-400 tracking-[0.14em] uppercase" x-text="`${successStories.length} Archived`"></span>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12" x-show="successStories.length">
@@ -1145,7 +1147,7 @@
                 <svg viewBox="0 0 24 24" class="w-2.5 h-2.5 shrink-0" fill="currentColor"><path d="M12 2 L14.5 8.5 L21.5 9 L16.2 13.4 L17.8 20.5 L12 16.7 L6.2 20.5 L7.8 13.4 L2.5 9 L9.5 8.5 Z"/></svg>
                 Success Story
               </span>
-              <span class="font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase" x-text="s.completed"></span>
+              <span class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase" x-text="s.completed"></span>
             </div>
             <div class="font-condensed font-bold text-white text-[18px] uppercase leading-tight" x-text="s.title"></div>
             <p class="text-xs text-slate-300 leading-relaxed" x-text="s.story"></p>
@@ -1165,7 +1167,7 @@
     <div class="border border-dashed border-white/15 rounded p-8 text-center mb-12" x-show="!successStories.length">
       <svg viewBox="0 0 24 24" class="w-8 h-8 text-gold/60 mx-auto mb-3" fill="currentColor"><path d="M12 2 L14.5 8.5 L21.5 9 L16.2 13.4 L17.8 20.5 L12 16.7 L6.2 20.5 L7.8 13.4 L2.5 9 L9.5 8.5 Z"/></svg>
       <div class="font-condensed font-bold text-white text-lg uppercase tracking-wide">No Success Stories Archived Yet</div>
-      <p class="font-mono text-[10px] text-slate-500 tracking-[0.1em] uppercase mt-2 max-w-md mx-auto leading-relaxed">As Innovation Lines are fielded and accomplished, they'll be archived here as mission-win stories.</p>
+      <p class="font-mono text-[10px] text-slate-400 tracking-[0.1em] uppercase mt-2 max-w-md mx-auto leading-relaxed">As Innovation Lines are fielded and accomplished, they'll be archived here as mission-win stories.</p>
     </div>
 
     <!-- ════════════ SECTION 07 — VISIT ════════════ -->
@@ -1173,8 +1175,8 @@
       <span class="font-mono text-[11px] text-ice tracking-[0.2em]">§ 07 / VISIT</span>
       <h2 class="font-condensed font-bold text-white text-2xl tracking-wide uppercase">Find the Lab</h2>
       <div class="ml-auto flex items-center gap-3">
-        <span class="font-mono text-[10px] text-slate-500 tracking-[0.14em] uppercase">Bldg 307 · McChord AFB</span>
-        <a href="https://www.instagram.com/rainierspark/" @click="trackClick('instagram')" target="_blank" rel="noopener noreferrer" aria-label="Rainier Spark on Instagram" class="group/ig inline-flex items-center gap-2 border border-white/15 hover:border-ice px-2.5 py-1.5 rounded-sm transition-colors">
+        <span class="font-mono text-[10px] text-slate-400 tracking-[0.14em] uppercase">Bldg 307 · McChord AFB</span>
+        <a href="https://www.instagram.com/rainierspark/" @click="trackClick('instagram')" target="_blank" rel="noopener noreferrer" aria-label="@rainierspark on Instagram" class="group/ig inline-flex items-center gap-2 border border-white/15 hover:border-ice px-2.5 py-1.5 rounded-sm transition-colors">
           <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-300 group-hover/ig:text-ice transition-colors" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
           <span class="font-mono text-[10px] text-slate-300 group-hover/ig:text-ice tracking-[0.14em] transition-colors">@rainierspark</span>
         </a>
@@ -1192,13 +1194,18 @@
             <svg viewBox="0 0 24 24" class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 L17 7 M9 7 H17 V15"/></svg>
           </a>
         </div>
-        <a href="https://www.google.com/maps/place/Rainier+Spark+Innovation+Lab/@47.1236228,-122.4824672,550m/data=!3m2!1e3!4b1!4m6!3m5!1s0x549103002d475fa9:0x472bae37c364b9c9!8m2!3d47.1236228!4d-122.4824672!16s%2Fg%2F11wx4qkzzf" @click="trackClick('map')" target="_blank" rel="noopener noreferrer" class="relative block group/map flex-1 min-h-[260px]" aria-label="Open Rainier Spark Innovation Lab in Google Maps">
+        <a href="https://www.google.com/maps/place/Rainier+Spark+Innovation+Lab/@47.1236228,-122.4824672,550m/data=!3m2!1e3!4b1!4m6!3m5!1s0x549103002d475fa9:0x472bae37c364b9c9!8m2!3d47.1236228!4d-122.4824672!16s%2Fg%2F11wx4qkzzf" @click="trackClick('map')" target="_blank" rel="noopener noreferrer" class="relative block group/map flex-1 min-h-[260px]" aria-label="Click map to open directions to Rainier Spark Innovation Lab in Google Maps">
+          <!-- tabindex="-1" + aria-hidden: the map is decorative here (pointer-events are
+               already off) and the wrapping link is the real control. Without this the
+               iframe is a focus stop inside a link whose children are presentational. -->
           <iframe
             title="Rainier Spark Innovation Lab location"
             src="https://maps.google.com/maps?q=47.1236228,-122.4824672&z=16&output=embed"
             class="absolute inset-0 w-full h-full grayscale-[0.35] contrast-[1.05] brightness-[0.92]"
             style="border:0; pointer-events:none;"
             loading="lazy"
+            tabindex="-1"
+            aria-hidden="true"
             referrerpolicy="no-referrer-when-downgrade"
           ></iframe>
           <!-- Click overlay (iframe pointer-events disabled so the whole tile opens Maps) -->
@@ -1218,16 +1225,16 @@
         </div>
         <div class="p-5 flex-1 flex flex-col gap-4">
           <div class="flex items-baseline justify-between gap-3">
-            <span class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase">Days</span>
+            <span class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase">Days</span>
             <span class="font-condensed font-bold text-white text-xl tracking-wide uppercase">Mon – Fri</span>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div class="border border-white/10 rounded-sm bg-ink-950/40 px-3 py-3 text-center">
-              <div class="font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase mb-1">Morning</div>
+              <div class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase mb-1">Morning</div>
               <div class="font-mono text-ice text-lg font-semibold tabular-nums">0930–1200</div>
             </div>
             <div class="border border-white/10 rounded-sm bg-ink-950/40 px-3 py-3 text-center">
-              <div class="font-mono text-[9px] text-slate-500 tracking-[0.16em] uppercase mb-1">Afternoon</div>
+              <div class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase mb-1">Afternoon</div>
               <div class="font-mono text-ice text-lg font-semibold tabular-nums">1300–1430</div>
             </div>
           </div>
@@ -1259,7 +1266,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="mt-12 pt-5 border-t border-white/10 flex justify-between items-center font-mono text-[10px] text-slate-500 tracking-wider uppercase">
+    <div class="mt-12 pt-5 border-t border-white/10 flex justify-between items-center font-mono text-[10px] text-slate-400 tracking-wider uppercase">
       <span>RAINIER SPARK <span class="text-ice">·</span> 62D AW <span class="text-ice">·</span> McCHORD AFB</span>
       <span class="text-slate-300 font-semibold">AMERICA'S AIRLIFT WING <span class="text-ice">·</span> MOBILITY WARFIGHTERS</span>
       <span>UNCLASSIFIED <span class="text-ice">·</span> <span x-text="dtg"></span></span>
@@ -1345,14 +1352,14 @@
           <div class="px-7 py-3.5 border-t border-white/10 bg-ink-950/60 flex items-start justify-between gap-3 font-mono text-[10px] text-slate-400 tracking-wider uppercase">
             <span class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
               <span>LEAD ·</span>
-              <span @click.stop="openBio(open.lead)" :class="hasBio(open.lead) ? 'cursor-pointer text-white font-semibold hover:text-ice underline decoration-dotted decoration-slate-500 hover:decoration-ice underline-offset-2 transition' : 'text-white font-semibold'" x-text="open.lead"></span>
+              <span @click.stop="openBio(open.lead)" :class="hasBio(open.lead) ? 'cursor-pointer text-white font-semibold hover:text-ice underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2 transition' : 'text-white font-semibold'" x-text="open.lead"></span>
               <template x-if="open.crew && open.crew.length">
-                <span class="text-slate-500">· CREW ·</span>
+                <span class="text-slate-400">· CREW ·</span>
               </template>
               <template x-for="(c, ci) in (open.crew || [])" :key="c">
                 <span class="inline-flex items-center">
-                  <span @click.stop="openBio(c)" :class="hasBio(c) ? 'cursor-pointer text-slate-200 hover:text-ice underline decoration-dotted decoration-slate-600 hover:decoration-ice underline-offset-2 transition' : 'text-slate-200'" x-text="c"></span>
-                  <span x-show="ci < (open.crew.length - 1)" class="text-slate-500">,&nbsp;</span>
+                  <span @click.stop="openBio(c)" :class="hasBio(c) ? 'cursor-pointer text-slate-200 hover:text-ice underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2 transition' : 'text-slate-200'" x-text="c"></span>
+                  <span x-show="ci < (open.crew.length - 1)" class="text-slate-400">,&nbsp;</span>
                 </span>
               </template>
             </span>
@@ -1457,10 +1464,10 @@
           <button @click="closeBio()" class="text-slate-300 hover:text-white border border-white/15 hover:border-ice w-9 h-9 rounded-sm text-xl leading-none shrink-0">×</button>
         </div>
         <div class="px-5 sm:px-7 py-6 overflow-y-auto scrollbar-thin">
-          <div class="font-mono text-[9px] text-slate-500 tracking-[0.18em] uppercase mb-2">Bio</div>
+          <div class="font-mono text-[9px] text-slate-400 tracking-[0.18em] uppercase mb-2">Bio</div>
           <p class="text-sm text-slate-200 leading-relaxed" style="white-space: pre-line;" x-text="bio.bio"></p>
           <template x-if="bio.contact && bio.contact.email">
-            <a :href="'mailto:' + bio.contact.email" class="mt-4 inline-flex items-center gap-2 font-mono text-xs text-slate-200 hover:text-ice transition underline decoration-dotted decoration-slate-600 hover:decoration-ice underline-offset-2" x-text="bio.contact.email"></a>
+            <a :href="'mailto:' + bio.contact.email" class="mt-4 inline-flex items-center gap-2 font-mono text-xs text-slate-200 hover:text-ice transition underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2" x-text="bio.contact.email"></a>
           </template>
         </div>
       </div>
@@ -1595,7 +1602,7 @@
                   'flex-1 text-sm': k !== 'ENTER' && k !== '⌫',
                   'bg-green/80 text-ink-950': $store.sparkle.keyState[k] === 'correct',
                   'bg-amber/80 text-ink-950': $store.sparkle.keyState[k] === 'present',
-                  'bg-slate-800 text-slate-500': $store.sparkle.keyState[k] === 'absent',
+                  'bg-slate-800 text-slate-400': $store.sparkle.keyState[k] === 'absent',
                   'bg-slate-500 text-white hover:bg-slate-400': !$store.sparkle.keyState[k],
                 }"
                 x-text="k"
@@ -1616,7 +1623,7 @@
         <div class="flex gap-2">
           <input type="text" x-model="$store.sparkle.playerName" placeholder="Initials or name" maxlength="20"
             @keydown.enter="$store.sparkle.submitScore()"
-            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
+            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-400" />
           <button @click="$store.sparkle.submitScore()" :disabled="$store.sparkle.submitting" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors disabled:opacity-50">Submit</button>
         </div>
       </div>
@@ -1638,19 +1645,19 @@
       <div class="border-t border-white/10 pt-4 mt-4">
         <div class="flex items-center justify-between mb-2.5">
           <div class="font-mono text-[9px] text-ice tracking-[0.18em] uppercase font-bold">Today's Board</div>
-          <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase" x-text="$store.sparkle.dayLabel"></div>
+          <div class="font-mono text-[9px] text-slate-400 tracking-[0.14em] uppercase" x-text="$store.sparkle.dayLabel"></div>
         </div>
         <div class="space-y-1" x-show="$store.sparkle.leaderboard.length">
           <template x-for="(e, i) in $store.sparkle.leaderboard.slice(0,8)" :key="i">
             <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-sm bg-ink-950/50 border border-white/5">
-              <span class="font-mono text-[10px] text-slate-500 w-4 shrink-0" x-text="i+1"></span>
+              <span class="font-mono text-[10px] text-slate-400 w-4 shrink-0" x-text="i+1"></span>
               <span class="font-condensed font-semibold text-white text-sm flex-1 truncate" x-text="e.name"></span>
               <span class="font-mono text-[10px] text-ice" x-text="e.guesses + '/6' + (e.ms ? ' · ' + $store.sparkle.fmtMs(e.ms) : '')"></span>
             </div>
           </template>
         </div>
-        <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.sparkle.leaderboard.length">No scores yet today — be the first.</div>
-        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
+        <div class="font-mono text-[10px] text-slate-400 uppercase tracking-wide" x-show="!$store.sparkle.leaderboard.length">No scores yet today — be the first.</div>
+        <div class="font-mono text-[8px] text-slate-400 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
       </div>
     </div>
   </div>
@@ -1703,7 +1710,7 @@
                 'bg-electric text-ink-950 border-electric shadow-[0_0_8px_rgba(26,140,255,0.5)]': $store.zip.pathSet.has(i) && $store.zip.pathArr[$store.zip.pathArr.length-1] === i,
                 'bg-steel-500/70 text-white border-steel-400': $store.zip.pathSet.has(i) && $store.zip.pathArr[$store.zip.pathArr.length-1] !== i,
                 'bg-ink-950/60 border-amber/50 text-amber': !$store.zip.pathSet.has(i) && cell.number !== null,
-                'bg-ink-950/40 border-white/10 text-slate-600': !$store.zip.pathSet.has(i) && cell.number === null,
+                'bg-ink-950/40 border-white/10 text-slate-400': !$store.zip.pathSet.has(i) && cell.number === null,
               }"
               x-text="cell.number || ''"
             ></div>
@@ -1714,7 +1721,7 @@
           <div class="absolute bg-ice rounded-sm pointer-events-none" :style="`left:${bar.left}px; top:${bar.top}px; width:${bar.width}px; height:${bar.height}px;`"></div>
         </template>
       </div>
-      <div class="text-center font-mono text-[9px] text-slate-500 tracking-[0.1em] uppercase mb-1">Drag across tiles, or click ahead to auto-fill</div>
+      <div class="text-center font-mono text-[9px] text-slate-400 tracking-[0.1em] uppercase mb-1">Drag across tiles, or click ahead to auto-fill</div>
 
       <!-- Message -->
       <div class="h-6 text-center font-condensed font-semibold text-sm tracking-wide uppercase mb-3" :class="$store.zip.msgType === 'error' ? 'text-priority' : 'text-ice'" x-text="$store.zip.message"></div>
@@ -1742,7 +1749,7 @@
         <div class="flex gap-2">
           <input type="text" x-model="$store.zip.playerName" placeholder="Initials or name" maxlength="20"
             @keydown.enter="$store.zip.submitScore()"
-            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
+            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-400" />
           <button @click="$store.zip.submitScore()" :disabled="$store.zip.submitting" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors disabled:opacity-50">Submit</button>
         </div>
       </div>
@@ -1764,19 +1771,19 @@
       <div class="border-t border-white/10 pt-4 mt-4">
         <div class="flex items-center justify-between mb-2.5">
           <div class="font-mono text-[9px] text-ice tracking-[0.18em] uppercase font-bold">Today's Board</div>
-          <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase" x-text="$store.zip.dayLabel"></div>
+          <div class="font-mono text-[9px] text-slate-400 tracking-[0.14em] uppercase" x-text="$store.zip.dayLabel"></div>
         </div>
         <div class="space-y-1" x-show="$store.zip.leaderboard.length">
           <template x-for="(e, i) in $store.zip.leaderboard.slice(0,8)" :key="i">
             <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-sm bg-ink-950/50 border border-white/5">
-              <span class="font-mono text-[10px] text-slate-500 w-4 shrink-0" x-text="i+1"></span>
+              <span class="font-mono text-[10px] text-slate-400 w-4 shrink-0" x-text="i+1"></span>
               <span class="font-condensed font-semibold text-white text-sm flex-1 truncate" x-text="e.name"></span>
               <span class="font-mono text-[10px] text-ice" x-text="e.timeLabel"></span>
             </div>
           </template>
         </div>
-        <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.zip.leaderboard.length">No times yet today — be the first.</div>
-        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
+        <div class="font-mono text-[10px] text-slate-400 uppercase tracking-wide" x-show="!$store.zip.leaderboard.length">No times yet today — be the first.</div>
+        <div class="font-mono text-[8px] text-slate-400 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
       </div>
     </div>
   </div>
@@ -1840,7 +1847,7 @@
         </div>
       </div>
     </div>
-    <div class="text-center font-mono text-[9px] text-slate-500 tracking-[0.12em] uppercase mt-3">Tap the classic code to deploy</div>
+    <div class="text-center font-mono text-[9px] text-slate-400 tracking-[0.12em] uppercase mt-3">Tap the classic code to deploy</div>
   </div>
 </div>
 
@@ -1880,7 +1887,7 @@
       <div class="mx-auto mb-3 border border-white/10 rounded-sm bg-ink-950/60" style="width: min(100%, 400px);">
         <canvas id="snake-canvas" width="400" height="400" class="block w-full h-auto" style="touch-action:none;"></canvas>
       </div>
-      <div class="text-center font-mono text-[9px] text-slate-500 tracking-[0.1em] uppercase mb-1">Arrows / WASD · swipe or tap the pad</div>
+      <div class="text-center font-mono text-[9px] text-slate-400 tracking-[0.1em] uppercase mb-1">Arrows / WASD · swipe or tap the pad</div>
 
       <!-- On-screen D-pad (phones only) -->
       <div class="sm:hidden flex justify-center my-3" x-show="$store.snake.gameOpen">
@@ -1924,7 +1931,7 @@
         <div class="flex gap-2">
           <input type="text" x-model="$store.snake.playerName" placeholder="Initials or name" maxlength="20"
             @keydown.enter="$store.snake.submitScore()"
-            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-600" />
+            class="flex-1 min-w-0 bg-ink-950 border border-white/15 rounded-sm px-3 py-2 font-condensed text-sm text-white placeholder:text-slate-400" />
           <button @click="$store.snake.submitScore()" :disabled="$store.snake.submitting" class="shrink-0 bg-electric hover:bg-white text-ink-950 px-3.5 py-2 rounded-sm font-condensed font-bold text-[11px] tracking-[0.1em] uppercase transition-colors disabled:opacity-50">Submit</button>
         </div>
       </div>
@@ -1933,19 +1940,19 @@
       <div class="border-t border-white/10 pt-4 mt-4">
         <div class="flex items-center justify-between mb-2.5">
           <div class="font-mono text-[9px] text-ice tracking-[0.18em] uppercase font-bold">All-Time Board</div>
-          <div class="font-mono text-[9px] text-slate-500 tracking-[0.14em] uppercase">High Score</div>
+          <div class="font-mono text-[9px] text-slate-400 tracking-[0.14em] uppercase">High Score</div>
         </div>
         <div class="space-y-1" x-show="$store.snake.leaderboard.length">
           <template x-for="(e, i) in $store.snake.leaderboard.slice(0,8)" :key="i">
             <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-sm bg-ink-950/50 border border-white/5">
-              <span class="font-mono text-[10px] text-slate-500 w-4 shrink-0" x-text="i+1"></span>
+              <span class="font-mono text-[10px] text-slate-400 w-4 shrink-0" x-text="i+1"></span>
               <span class="font-condensed font-semibold text-white text-sm flex-1 truncate" x-text="e.name"></span>
               <span class="font-mono text-[10px] text-ice" x-text="e.score + ' pts'"></span>
             </div>
           </template>
         </div>
-        <div class="font-mono text-[10px] text-slate-600 uppercase tracking-wide" x-show="!$store.snake.leaderboard.length">No flights logged — be the first.</div>
-        <div class="font-mono text-[8px] text-slate-600 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
+        <div class="font-mono text-[10px] text-slate-400 uppercase tracking-wide" x-show="!$store.snake.leaderboard.length">No flights logged — be the first.</div>
+        <div class="font-mono text-[8px] text-slate-400 uppercase tracking-wide mt-2 leading-relaxed">Shared team leaderboard.</div>
       </div>
     </div>
   </div>
