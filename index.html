@@ -2430,7 +2430,7 @@ function dashboard() {
         eyebrow: '3D Printing LOE',
         sub: 'In-house 3D printing · rapid prototyping & repair-part fabrication',
         icon: 'lab', priority: false,
-        img: 'img/additive-mfg.jpg',
+        img: 'img/sd-card-holder.jpg', imgPos: '50% 45%',
         status: 'PRINTING · EXPANDING', statusColor: 'green', progress: 68,
         loe: 'am',
         metrics: [
@@ -2444,13 +2444,14 @@ function dashboard() {
           '<b>Partnering across the wing</b> — prints in progress for 57 WPS, 22 STS, 672 STS &amp; 62 MX, fulfilling cross-unit fabrication and repair-part requests.',
           '<b>1× Prusa XL procured with UFR funds</b> — carbon-fibre capable, plus filament/resin and spares.',
           '<b>4–5 Prusa printers</b> (Travis AFB Phoenix Spark donation) — incoming to expand fleet throughput.',
+          '<b>QAR disc SD-card holder</b> (62d MXG / 446th) — printed replacement for the QAR disc carrier; <b>fleet-wide if accepted</b>.',
           '<b>627 CES 3D Printer line</b> ($6.3K) — in-house fabrication of HVAC, lock, and obsolete door hardware.',
         ],
         lead: 'TSgt Russel', crew: ['TSgt Audett'], tag: 'OPERATIONAL · EXPANDING',
         detail: {
           problem: 'The wing’s organic 3D-printing capability is operational and partnering with 57 WPS, 22 STS, 672 STS, and 62 MX with prints in progress, but capacity and material reserves are constrained. SIF token distribution is still pending, which holds the committed Prusa XL purchase and material/parts resupply needed to scale throughput.',
           solution: 'Expand the operational 3D-printing cell along two procurement tracks: (1) a 1× Prusa XL procured with UFR funds — carbon-fibre capable — plus materials and spare parts, and (2) a separate 4–5 Prusa printer fleet donated via the Travis AFB Phoenix Spark program. A 627 CES dedicated 3D printer ($6.3K) covers HVAC/lock/door hardware. Together they grow in-house repair-part, jig, and sUAS-airframe production across the Spark Lab portfolio.',
-          impact: ['Prints in progress for 57 WPS, 22 STS, 672 STS &amp; 62 MX','On-demand sUAS airframe &amp; tooling production','Carbon-fibre capable Prusa XL for high-strength tooling &amp; parts','Reduces COTS procurement dependency &amp; lead times'],
+          impact: ['Prints in progress for 57 WPS, 22 STS, 672 STS &amp; 62 MX','On-demand sUAS airframe &amp; tooling production','Carbon-fibre capable Prusa XL for high-strength tooling &amp; parts','QAR SD-card holder — fleet-wide potential','Reduces COTS procurement dependency &amp; lead times'],
           milestones: [
             { d:'NOW', e:'Operational — printing in progress for partner units' },
             { d:'PROCURED', e:'Prusa XL bought with UFR funds — carbon-fibre capable' },
@@ -2690,7 +2691,7 @@ function dashboard() {
       { id:'sif26-tokens', title:'FY26 SIF Tokens Secured', loe:'infra', completed:'MAY 2026',
         story:'Rainier Spark managed SIF token allocation on behalf of 14 squadron commanders — claiming every token before the HAF pull-back deadline, then crowdsourcing them into a smaller number of higher-impact initiatives rather than letting them fragment.',
         impact:['All Sq CC tokens claimed by 2 MAR 26 — none returned to HAF','Every token allocated to an initiative by 1 MAY 26','Tokens pooled across 14 squadrons to fund larger builds'] },
-      { id:'dive-spool', title:'3D-Printed Dive Spools · 22 STS', loe:'am', completed:'2026', img:'img/printed-case.jpg',
+      { id:'dive-spool', title:'3D-Printed Dive Spools · 22 STS', loe:'am', completed:'2026',
         story:'The Spark Lab designed and printed scuba gear spools for 22nd Special Tactics Squadron underwater dives. Tested and operational — fabricated in-house with no procurement action and no lead time.',
         impact:['Tested and in operational use by 22 STS','No procurement action or vendor lead time','Reprintable on demand from stock filament'] },
       { id:'oura-98', title:'98 Oura Rings Delivered', loe:'hpt', completed:'FEB 2026',
