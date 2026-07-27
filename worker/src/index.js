@@ -58,6 +58,23 @@ function validScore(game, score) {
   return Number.isFinite(score.timeMs);
 }
 
+// Copy ONLY the numeric fields this game uses. Never spread the caller's score
+// object into a stored entry: validScore checks that the expected numbers are
+// present but does not reject extra keys, so a spread lets the client smuggle in
+// its own `name` / `clientId` / `squadron` and clobber the sanitized values.
+function pickScore(game, score) {
+  if (game === 'sparkle') return { guesses: Number(score.guesses), ms: Number(score.ms) || 0 };
+  if (game === 'snake') return { score: Number(score.score) };
+  return { timeMs: Number(score.timeMs) };
+}
+
+// clientId is only ever compared for equality, so a bounded string is enough.
+function sanitizeClientId(raw) {
+  if (typeof raw !== 'string') return null;
+  const s = raw.trim().slice(0, 64);
+  return /^[A-Za-z0-9_-]{8,64}$/.test(s) ? s : null;
+}
+
 function isBetter(game, a, b) {
   if (game === 'sparkle') return a.guesses < b.guesses || (a.guesses === b.guesses && (a.ms || 0) < (b.ms || 0));
   if (game === 'snake') return a.score > b.score;
@@ -92,14 +109,22 @@ async function handlePost(request, env, origin) {
     return json({ error: 'invalid payload' }, 400, origin);
   }
   const sq = sanitizeSquadron(squadron);
+  const cid = sanitizeClientId(clientId);
 
   const key = `${game}:${period}`;
   const raw = await env.LEADERBOARD_KV.get(key);
   const entries = raw ? JSON.parse(raw) : [];
 
-  const entry = { name: sanitizeName(name), clientId: clientId || null, ...(sq ? { squadron: sq } : {}), ...score };
+  // Score fields first, sanitized fields last, so nothing the client sends can
+  // override the sanitized name/clientId/squadron.
+  const entry = {
+    ...pickScore(game, score),
+    name: sanitizeName(name),
+    clientId: cid,
+    ...(sq ? { squadron: sq } : {}),
+  };
   // one row per player: resubmits from the same client keep their best score
-  const existing = clientId ? entries.findIndex((e) => e.clientId === clientId) : -1;
+  const existing = cid ? entries.findIndex((e) => e.clientId === cid) : -1;
   if (existing !== -1) {
     if (isBetter(game, entry, entries[existing])) entries[existing] = entry;
   } else {
