@@ -816,14 +816,19 @@
             <h3 class="font-condensed font-extrabold text-white text-xl tracking-wide uppercase">Return on Investment</h3>
             <span class="ml-auto font-mono text-[10px] text-slate-400 tracking-[0.16em] uppercase">FY26 actuals · FY27 projected</span>
           </div>
-          <div class="grid grid-cols-2 gap-3.5">
+          <!-- One readout rail rather than four separate tiles. The 1px gap over the
+               container's background paints the hairline dividers, which stays correct
+               at any column count; `divide-x` would follow DOM order and misplace them
+               once the grid wraps. Label sits above the figure to match the header
+               stat pills, and the delta sits inline instead of absolutely positioned. -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10 rounded-sm overflow-hidden">
             <template x-for="r in roiTiles" :key="r.lbl">
-              <div class="bg-ink-950/55 border border-white/10 rounded-sm p-4 relative">
-                <div class="font-condensed font-extrabold text-white text-[34px] sm:text-[42px] leading-none tracking-tight">
-                  <span class="js-count" x-init="$nextTick(()=>window.__countup($el))" x-text="r.val"></span><span class="text-lg text-ice ml-0.5 font-semibold" x-text="r.unit"></span>
+              <div class="bg-ink-950/70 px-4 py-3.5 flex flex-col gap-1.5">
+                <div class="font-mono text-[9px] text-slate-400 tracking-[0.16em] uppercase leading-snug" x-text="r.lbl"></div>
+                <div class="font-condensed font-extrabold text-white text-[28px] sm:text-[32px] leading-none tracking-tight tabular-nums mt-auto">
+                  <span class="js-count" x-init="$nextTick(()=>window.__countup($el))" x-text="r.val"></span><span class="text-base text-ice ml-0.5 font-semibold" x-text="r.unit"></span>
                 </div>
-                <div class="text-[11px] text-slate-200 tracking-[0.14em] uppercase mt-2 leading-tight" x-text="r.lbl"></div>
-                <div class="absolute top-2.5 right-2.5 font-mono text-[10px] text-green bg-green/10 border border-green/30 px-1.5 rounded-sm" x-text="r.delta"></div>
+                <div class="font-mono text-[9px] text-green tracking-[0.1em] uppercase" x-text="r.delta"></div>
               </div>
             </template>
           </div>
