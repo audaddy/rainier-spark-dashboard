@@ -239,7 +239,7 @@
 
   /* Live milestone ticker */
   .ticker { position: relative; overflow: hidden; }
-  .ticker-track { display: inline-flex; align-items: center; white-space: nowrap; will-change: transform; animation: ticker-scroll 60s linear infinite; }
+  .ticker-track { display: inline-flex; align-items: center; white-space: nowrap; will-change: transform; animation: ticker-scroll 110s linear infinite; }
   .ticker:hover .ticker-track { animation-play-state: paused; }
   @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
@@ -1128,7 +1128,7 @@
                 <li
                   :class="m.now ? 'border-ice' : 'border-white/15'"
                   class="text-[11px] text-slate-200 leading-snug border-l-2 pl-2"
-                  x-text="e"
+                  x-html="fmtEvent(e)"
                 ></li>
               </template>
             </ul>
@@ -1703,7 +1703,7 @@
               <template x-for="e in m.events" :key="e">
                 <li class="text-[13px] text-slate-200 leading-snug flex gap-2">
                   <span class="w-1.5 h-1.5 mt-1.5 bg-ice rotate-45 shrink-0"></span>
-                  <span x-html="e"></span>
+                  <span x-html="fmtEvent(e)"></span>
                 </li>
               </template>
             </ul>
@@ -2698,7 +2698,7 @@ function dashboard() {
         id: 'oura-platform', kind: 'project', stage: 'pilot',
         title: 'Oura Platform',
         eyebrow: 'Human Performance LOE (Line of Effort)',
-        sub: 'Ring-based sleep &amp; recovery telemetry · 62d AW rollout',
+        sub: 'Ring-based sleep & recovery telemetry · 62d AW rollout',
         icon: 'watch', priority: false,
         img: 'img/hpt-wearables.jpg',
         status: 'IRB PENDING', statusColor: 'blue', progress: 45,
@@ -2732,7 +2732,7 @@ function dashboard() {
         id: 'pulse-platform', kind: 'project', stage: 'pilot',
         title: 'Pulse Platform',
         eyebrow: 'Human Performance LOE (Line of Effort)',
-        sub: 'Fatigue Meter · Fatigue Advisor · McSTAT — 62d OG &amp; 7th AS',
+        sub: 'Fatigue Meter · Fatigue Advisor · McSTAT — 62d OG & 7th AS',
         icon: 'watch', priority: false,
         img: 'img/hpt-wearables.jpg',
         status: 'IN PROCESS', statusColor: 'amber', progress: 55,
@@ -2998,6 +2998,18 @@ function dashboard() {
       trackClick('bio_' + name.replace(/[^a-z0-9]+/gi, '_').toLowerCase());
     },
     closeBio() { this.bio = null; if (this.open === null) document.body.classList.remove('modal-open'); },
+
+    // Underline the leading day-specific date on a calendar entry, e.g.
+    // "09 MAR · One Radar delivered". Input is escaped first — these strings are
+    // author-controlled today, but this renders through x-html.
+    fmtEvent(e) {
+      const esc = String(e)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return esc.replace(
+        /^(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)(?:\s+\d{2})?)\b/,
+        '<u class="decoration-ice/70 underline-offset-2 text-ice font-semibold">$1</u>'
+      );
+    },
 
     // ── Calendar modal ──
     win: null,
