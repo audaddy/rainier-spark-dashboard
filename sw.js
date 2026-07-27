@@ -8,7 +8,7 @@
  *   - CDN libs & fonts   → stale-while-revalidate
  *   - API / analytics    → not intercepted (always live network)
  */
-const VERSION = 'v4';
+const VERSION = 'v5';
 const SHELL_CACHE = `rainier-shell-${VERSION}`;
 const RUNTIME_CACHE = `rainier-runtime-${VERSION}`;
 const SCOPE = self.registration.scope;
@@ -23,6 +23,12 @@ const SHELL = [
   'icon-512.png',
   'icon-1024.png',
   'apple-touch-icon.png',
+  // Above-the-fold art only. The card/team/vision photos in img/ used to be
+  // inlined in index.html, so they were implicitly available offline; they are
+  // now runtime cache-first instead (see the fetch handler) rather than adding
+  // ~650KB to the install step. These two keep the shell looking right offline.
+  'img/crest.jpg',
+  'img/hero-mountain.png',
 ].map((p) => new URL(p, SCOPE).toString());
 
 const SHELL_FALLBACK = new URL('index.html', SCOPE).toString();
