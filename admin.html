@@ -51,14 +51,17 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
   <h1>Rainier Spark · Metrics</h1>
   <div class="sub">Button &amp; link clicks · admin only</div>
 
   <div class="card">
     <label for="key">Admin key</label>
     <div class="row">
-      <input id="key" type="password" placeholder="Paste your admin key" autocomplete="off" />
+      <!-- current-password, not off: autocomplete="off" blocks password managers,
+           which fails WCAG 3.3.8 and pushes people toward pasting the key from a
+           note instead of storing it properly. -->
+      <input id="key" type="password" placeholder="Paste your admin key" autocomplete="current-password" />
       <button id="load">Load</button>
       <button id="refresh" class="ghost" title="Reload data">Refresh</button>
       <button id="forget" class="ghost" title="Clear saved key">Forget</button>
@@ -70,7 +73,7 @@
   </div>
 
   <div id="results"></div>
-</div>
+</main>
 
 <script>
   const LB_API = 'https://rainier-spark-leaderboard.audaddy.workers.dev';
