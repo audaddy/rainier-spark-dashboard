@@ -1359,7 +1359,9 @@
               <template x-for="(c, ci) in (open.crew || [])" :key="c">
                 <span class="inline-flex items-center">
                   <span @click.stop="openBio(c)" :class="hasBio(c) ? 'cursor-pointer text-slate-200 hover:text-ice underline decoration-dotted decoration-slate-400 hover:decoration-ice underline-offset-2 transition' : 'text-slate-200'" x-text="c"></span>
-                  <span x-show="ci < (open.crew.length - 1)" class="text-slate-400">,&nbsp;</span>
+                  <!-- Guard `open`: Alpine re-evaluates this x-show as the modal tears down,
+                       when `open` is already null, and for vision records that have no crew. -->
+                  <span x-show="open && open.crew && ci < (open.crew.length - 1)" class="text-slate-400">,&nbsp;</span>
                 </span>
               </template>
             </span>
@@ -3310,8 +3312,13 @@ document.addEventListener('alpine:init', () => {
       }
     }
 
-    const cellPx = Math.floor(Math.min(48, 340/cols));
     const gapPx = 3;
+    // Budget the grid against the actual viewport, and subtract the gaps. The old
+    // `340/cols` ignored both, so a 9x9 always computed to 357px wide and spilled
+    // past the modal on a 375px screen. 360 keeps the desktop cell size identical
+    // (37px) while narrow screens scale down instead of overflowing.
+    const availPx = Math.min(360, (typeof window !== 'undefined' ? window.innerWidth : 400) - 64);
+    const cellPx = Math.max(22, Math.floor(Math.min(48, (availPx - (cols - 1) * gapPx) / cols)));
     const wallSetArr = walls.map(([a,b]) => a+'-'+b);
     const wallBars = walls.map(([a,b]) => {
       const ra=Math.floor(a/cols), ca=a%cols, rb=Math.floor(b/cols), cb=b%cols;
