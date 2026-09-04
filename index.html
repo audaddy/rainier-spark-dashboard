@@ -2342,7 +2342,7 @@ function dashboard() {
       { m: "JUL '26", events: ['Rainier Runners Session 2 in progress (thru 7 Aug)','C-17 sUAS operational test · 62d AMXS ramp','3D printing — Prusa XL procured (UFR), carbon-fibre capable','HPPSS planning underway'] },
       { m: "AUG '26", events: ['Skydio instructional classes begin — 20 students','CPE-CBRND (Chem/Bio/Radiological/Nuclear Defense) device delivery complete (~EOM AUG)','07 AUG · Rainier Runners Session 2 ends','First C-17 flight-line inspection flown by sUAS — successful'] },
       { m: "SEP '26", now: true, events: ['23–24 SEP · Industry Day & Spark Sync · Phoenix Spark, Travis AFB','294 Garmin watches delivered to LRS (Logistics Readiness Squadron)','SIF GPC (Government Purchase Card) lists routed — 3D printing $32,500 · sUAS $11,700','sUAS Initial Training annex in progress'] },
-      { m: "OCT '26", events: ['sUAS CONOP (Concept of Operations) testing forecast'] },
+      { m: "OCT '26", events: ['05–09 OCT · Anduril using Spark space · 0800–1600','12–16 OCT · Anduril using Spark space · 0800–1600','sUAS CONOP (Concept of Operations) testing forecast'] },
       { m: "DEC '26", events: ['HPPSS · Human Performance Puget Sound Summit — tentative'] },
     ],
 
@@ -2625,7 +2625,7 @@ function dashboard() {
         loe: 'suas',
         metrics: [
           { k:'Build Stations', v:'3', big:true },
-          { k:'Trained Pilots', v:'14', big:true },
+          { k:'Pilot Training', v:'NOT STARTED', big:true },
           { k:'NDAA Status', v:'COMPLIANT', lg:true },
           { k:'SIF Funded', v:'$11.7K', lg:true },
         ],
@@ -2638,14 +2638,14 @@ function dashboard() {
         lead: 'TSgt Audett', crew: ['TSgt Russel'], tag: 'IN PROCESS',
         detail: {
           problem: 'Spark Lab relies on limited high-cost sUAS systems and lacks low-cost build/training platforms. No hands-on real-time piloting practice for MX teams using Skydio X10D airframes and Special Tactics Squadron reconnaissance profiles.',
-          solution: 'Dedicated construction stations + NDAA-compliant parts/kits for in-house sUAS building. Hands-on real-time piloting practice for maintenance teams. Soldered airframes built at the bench at ~30% the cost of COTS Skydio platforms.',
-          impact: ['Per-platform cost drops ~70% vs. COTS','MX teams gain real-time piloting reps','Builds redundant airframe stockpile for ops','Pipelines into 22 STS recon profiles'],
+          solution: 'Dedicated construction stations + NDAA-compliant parts/kits for in-house sUAS building, to give maintenance teams hands-on real-time piloting practice. Soldered airframes built at the bench at ~30% the cost of COTS Skydio platforms. Pilot training has not yet begun — maintainer-pilots trained to date are counted under the sUAS Initial Training course.',
+          impact: ['Per-platform cost drops ~70% vs. COTS','Will give MX teams real-time piloting reps','Builds redundant airframe stockpile for ops','Pipelines into 22 STS recon profiles'],
           milestones: [
             { d:'APR 2026', e:'Build stations stood up · NDAA parts inventory' },
-            { d:'MAY 2026', e:'First cohort: 14 maintainer-pilots trained' },
             { d:'JUN 2026', e:'Bench-built airframe flight test' },
             { d:'JUL 2026', e:'Cross-base sharing w/ 22 STS' },
             { d:'SEP 2026', e:'$11,700 SIF GPC list routed for purchase' },
+            { d:'NEXT', e:'First maintainer-pilot cohort — training not yet begun' },
           ],
         },
       },
